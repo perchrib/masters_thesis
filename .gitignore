@@ -1,0 +1,16 @@
+##############
+# Python 
+###############
+
+
+*.pyc
+**/__pycache__/*
+
+#############
+# OS
+############
+**/.DS_Store
+**/.metadata/*
+**/.recommenders/*
+**/.DS_Store.orig
+**/.idea/*
