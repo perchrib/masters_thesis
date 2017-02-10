@@ -76,7 +76,9 @@ def format_dataset_chars(texts, labels, metadata):
     print('Total Chars: %i' % len(chars))
     char_index = dict((char, i) for i, char in enumerate(chars))
 
-    data = np.zeros((len(texts), MAX_SEQUENCE_LENGTH), dtype=np.int64)
+    # TODO: Why -1?
+    data = np.ones((len(texts), MAX_SEQUENCE_LENGTH), dtype=np.int64) * -1
+    # data = np.zeros((len(texts), MAX_SEQUENCE_LENGTH), dtype=np.int64)
     labels = to_categorical(np.asarray(labels))  # convert to one-hot label vectors
 
     print('Shape of data tensor:', data.shape)
