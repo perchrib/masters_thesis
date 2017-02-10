@@ -14,3 +14,11 @@
 **/.recommenders/*
 **/.DS_Store.orig
 **/.idea/*
+
+
+char-models-offbit/labeledTrainData.tsv
+data/*
+
+
+# Test and fiddle python file
+fiddle.py
