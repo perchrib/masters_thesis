@@ -1,7 +1,7 @@
 import yaml
 
 # Load yaml configuration file
-with open('../config/config.yaml', 'r') as f:
+with open('../config/config_char.yaml', 'r') as f:
     config_file = yaml.load(f)
 
 # Prediction type
