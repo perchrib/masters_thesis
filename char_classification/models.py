@@ -4,8 +4,9 @@ from keras.layers import Input, Dense, LSTM, Dropout, Lambda, Convolution1D, Max
 from char_classification.constants import MAX_SEQUENCE_LENGTH
 
 # TODO: Automate
-nb_chars = 1149
+nb_chars = 75
 
+# TODO: Try Conv2D layers?
 
 def get_char_model(num_output_nodes):
         tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
@@ -35,28 +36,14 @@ def get_char_model(num_output_nodes):
         output = Dense(128, activation='relu')(output)
         output = Dropout(0.3)(output)
         output = Dense(num_output_nodes, activation='softmax')(output)
-        model = Model(input=tweet_input, output=output)
+        model = Model(input=tweet_input, output=output, name='3xConv_2xLSTMmerge_model')
 
         return model
-
-def get_char_model_2(num_output_nodes):
-    tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
-    embedding = Lambda(binarize, output_shape=binarize_outshape)(tweet_input)
-
-    embedding = LSTM(128, return_sequences=False, dropout_W=0.2, dropout_U=0.2)(embedding)
-
-    output = Dropout(0.3)(embedding)
-    output = Dense(128, activation='relu')(output)
-    output = Dropout(0.3)(output)
-    output = Dense(num_output_nodes, activation='softmax')(output)
-    model = Model(input=tweet_input, output=output)
-
-    return model
 
 
 def binarize(x, chars=nb_chars):
     return tf.to_float(tf.one_hot(x, chars, on_value=1, off_value=0, axis=-1))
-
+    # return tf.to_float(tf.one_hot(x, chars, on_value=1, off_value=0))
 
 def binarize_outshape(in_shape):
     return in_shape[0], in_shape[1], nb_chars

@@ -1,0 +1,22 @@
+
+PREDICTION_TYPE: 'gender'  # Valid values: 'gender' or 'age'
+
+pre-processing:
+    MAX_NB_WORDS: 50000
+    MAX_SEQUENCE_LENGTH: 100
+    VALIDATION_SPLIT: 0.1
+
+    # Embedding type can be:
+    # - glove.twitter.27B.200d
+
+    EMBEDDINGS_INDEX: 'glove.twitter.27B.200d'
+
+
+model:
+    name: 'SeqLSTM' # corresponds to class name of model in models.py
+    optimizer: 'adam'
+    loss: 'categorical_crossentropy'
+    metrics:
+        - 'accuracy'
+    nb-epochs: 30
+    batch-size: 128

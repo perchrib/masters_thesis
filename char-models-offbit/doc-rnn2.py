@@ -19,6 +19,7 @@ def binarize(x, sz=71):
 
 
 def binarize_outshape(in_shape):
+    print("insh", in_shape)
     return in_shape[0], in_shape[1], 71
 
 
