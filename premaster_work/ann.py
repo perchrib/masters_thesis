@@ -42,7 +42,6 @@ def train():
     print('Training time: %i' % (time() - start_time))
     # TODO: Write and save log
 
-
 def get_model(embedding_layer, nb_output_nodes):
     if MODEL_NAME == 'SeqLSTM':
         return SeqLSTM(embedding_layer, nb_output_nodes)
