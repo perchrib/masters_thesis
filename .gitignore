@@ -14,3 +14,9 @@
 **/.recommenders/*
 **/.DS_Store.orig
 **/.idea/*
+
+#############
+#Files
+############
+
+/data
