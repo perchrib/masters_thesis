@@ -4,11 +4,16 @@ from nltk.tokenize import TweetTokenizer
 import re
 __author__ = "Per Berg"
 
-__dirs__ = ["../data/pan16-author-profiling-training-dataset-english-xml/",
-           "../data/pan17-author-profiling-training-dataset-english-xml/"]
+XML_DIR = "../data/xml/"
+TXT_DIR = "../data/txt/"
 
-save_dirs = ["../data/pan16-author-profiling-training-dataset-english-txt/",
-            "../data/pan17-author-profiling-training-dataset-english-txt/"]
+__dirs__ = [os.path.join(XML_DIR, "pan16-author-profiling-training-dataset-english-xml/"),
+            os.path.join(XML_DIR, "pan17-author-profiling-training-dataset-english-xml/"),
+            os.path.join(XML_DIR, "pan14-author-profiling-training-dataset-english-xml/")]
+
+save_dirs = [os.path.join(TXT_DIR, "pan16-author-profiling-training-dataset-english-txt/"),
+             os.path.join(TXT_DIR, "pan17-author-profiling-training-dataset-english-txt/"),
+             os.path.join(TXT_DIR, "pan14-author-profiling-training-dataset-english-txt/")]
 
 
 class Parser:
@@ -78,8 +83,8 @@ characters = set()
 
 
 def get_all_files(dir):
-    files = os.listdir(dir)
-    truth_file = files.pop()
+    files = os.listdir(dir)  # type: List
+    truth_file = files.pop(files.index('truth.txt'))
     return files, truth_file
 
 
@@ -136,6 +141,7 @@ def create_file_to_author_and_set_author_data(author_file, save_dir):
     path = save_dir + author + ".txt"
     if not os.path.exists(path):
         file = open(path, 'a')
+        print(TRUTH)
         gender = TRUTH[author][0]
         age = TRUTH[author][1]
         file.write(author + ":::" + gender + ":::" + age)
