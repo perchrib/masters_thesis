@@ -15,8 +15,22 @@
 **/.DS_Store.orig
 **/.idea/*
 
-#############
-#Files
-############
+# SSH keys
+keys/*
 
-/data
+##########
+# Datasets
+##########
+char-models-offbit/labeledTrainData.tsv
+data/*
+data_old/*
+
+# Parsed embeddings contained in .pkl files
+embeddings_index/*
+
+# Unparsed embeddings. E.g. glove .txt file
+embeddings_native/* 
+
+
+# Test and fiddle python file
+fiddle.py
