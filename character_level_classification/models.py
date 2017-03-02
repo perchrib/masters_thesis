@@ -1,7 +1,7 @@
 import tensorflow as tf
 from keras.models import Model
 from keras.layers import Input, Dense, LSTM, Dropout, Lambda, Convolution1D, MaxPooling1D, merge
-from char_classification.constants import MAX_SEQUENCE_LENGTH
+from character_level_classification.constants import MAX_SEQUENCE_LENGTH
 
 # TODO: Automate
 nb_chars = 75

@@ -75,7 +75,6 @@ class Parser:
         return content
 
 data_loss = {}
-file_not_accessed = []
 data_accessed = []
 DATA_PARSER = Parser()
 TRUTH = {}
@@ -89,6 +88,19 @@ def get_all_files(dir):
 
 
 def write_all_files(files, __dir__, save_dir):
+    """
+    Write tweets to .txt files
+    :param files:
+    :param __dir__: directory with xml files containing tweets
+    :param save_dir: directory to save parsed .txt files to
+    :return: list containing not accessed files for removal of .txt files
+    """
+    files_not_accessed = []
+
+    # Create directory if it does not exist
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
     for filename in files:
         # print("\nFilename: ", filename)
         if '.txt' in filename:
@@ -98,12 +110,13 @@ def write_all_files(files, __dir__, save_dir):
             create_file_to_author_and_set_author_data(filename, save_dir)
             parsed_data_in_file = get_parsed_data_from_xml_file(filename, __dir__)
             if not parsed_data_in_file:
-                file_not_accessed.append(filename)
+                files_not_accessed.append(filename)
             else:
                 write_data_to_file(parsed_data_in_file, filename, save_dir)
 
         # print("AUTHOR: ", author_id)
 
+    return files_not_accessed
 
 def get_parsed_data_from_xml_file(file, dir):
     current_file = dir + file
@@ -141,7 +154,6 @@ def create_file_to_author_and_set_author_data(author_file, save_dir):
     path = save_dir + author + ".txt"
     if not os.path.exists(path):
         file = open(path, 'a')
-        print(TRUTH)
         gender = TRUTH[author][0]
         age = TRUTH[author][1]
         file.write(author + ":::" + gender + ":::" + age)
@@ -170,26 +182,29 @@ def generate_truth(file, __dir__):
 
 
 if "__main__" == __name__:
-
     for i in range(len(__dirs__)):
         __dir__ = __dirs__[i]
         save_dir = save_dirs[i]
 
         files, truth = get_all_files(__dir__)
         generate_truth(truth, __dir__)
-        write_all_files(files, __dir__, save_dir)
+        files_not_accessed = write_all_files(files, __dir__, save_dir)
 
-        print("Total Files Not Accessed: ", len(file_not_accessed))
-        print("Tweets Availabe", len(data_accessed))
+        print("Total Files Not Accessed: ", len(files_not_accessed))
+        print("Tweets Available", len(data_accessed))
 
         print("Vocabulary: ", characters, " Length: ", len(characters))
         total = 0
+
         for file in data_loss:
             total += data_loss[file]
+
         print("Tweets Not Available: ", total)
-        for file in file_not_accessed:
-            print("EMPTY FILE: ", file[:-4] + ".txt")
+
+        for file in files_not_accessed:
+            print("EMPTY FILE: ", file[:-4] + ".txt")  # -4 to remove '.xml'
             txt_file = save_dir + file[:-4] + ".txt"
+            print(txt_file)
             os.remove(txt_file)
             print("REMOVED FILE")
 

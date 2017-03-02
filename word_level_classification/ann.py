@@ -3,11 +3,11 @@ import os
 # Append path to use modules outside pycharm environment, e.g. remote server
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 
-from premaster_work.text_preprocessing import *
-from premaster_work.constants import *
+from word_level_classification.text_preprocessing import *
+from word_level_classification.constants import *
 from keras.layers import Embedding
 from keras.callbacks import EarlyStopping
-from premaster_work.models import SeqLSTM
+from word_level_classification.models import SeqLSTM
 from time import time
 np.random.seed(1337)
 

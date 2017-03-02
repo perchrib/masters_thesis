@@ -5,7 +5,7 @@ import numpy as np
 import tensorflow as tf
 from keras.utils.np_utils import to_categorical
 
-from char_classification.constants import *
+from character_level_classification.constants import *
 
 np.random.seed(1337)
 

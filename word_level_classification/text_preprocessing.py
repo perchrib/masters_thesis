@@ -1,6 +1,6 @@
 import os
 from helpers.helper_functions import load_pickle
-from premaster_work.constants import *
+from word_level_classification.constants import *
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from keras.utils.np_utils import to_categorical
