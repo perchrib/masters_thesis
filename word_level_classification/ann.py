@@ -1,20 +1,24 @@
 import sys
 import os
+import numpy as np
 # Append path to use modules outside pycharm environment, e.g. remote server
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 
-from word_level_classification.text_preprocessing import *
+from word_level_classification.dataset_formatting import format_dataset_word_level, construct_embedding_matrix, get_embedding_dim
 from word_level_classification.constants import *
+from preprocessors.dataset_preparation import prepare_dataset
 from keras.layers import Embedding
 from keras.callbacks import EarlyStopping
 from word_level_classification.models import SeqLSTM
 from time import time
+
 np.random.seed(1337)
 
 
 def train():
     # Load dataset
-    x_train, y_train, meta_train, x_val, y_val, meta_val, word_index, labels_index = prepare_dataset_word_level()
+    texts, labels, metadata, labels_index = prepare_dataset()
+    x_train, y_train, meta_train, x_val, y_val, meta_val, word_index = format_dataset_word_level(texts, labels, metadata)
 
     embedding_layer = get_embedding_layer(word_index)
     model = get_model(embedding_layer, len(labels_index))

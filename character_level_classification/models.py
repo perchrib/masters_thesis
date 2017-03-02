@@ -8,6 +8,7 @@ nb_chars = 75
 
 # TODO: Try Conv2D layers?
 
+
 def get_char_model(num_output_nodes):
         tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
         embedding = Lambda(binarize, output_shape=binarize_outshape)(tweet_input)
