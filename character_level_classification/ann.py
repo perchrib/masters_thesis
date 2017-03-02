@@ -3,10 +3,10 @@ import os
 # Append path to use modules outside pycharm environment, e.g. remote server
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 
-from char_classification.text_preprocessing import prepare_dataset
-from char_classification.models import get_char_model, get_char_model_2
+from character_level_classification.text_preprocessing import prepare_dataset
+from character_level_classification.models import get_char_model, get_char_model_2
 from keras.callbacks import EarlyStopping
-from char_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE
+from character_level_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE
 from time import time
 import numpy as np
 np.random.seed(1337)
