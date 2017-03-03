@@ -137,7 +137,8 @@ def get_parsed_data_from_xml_file(file, dir):
                 chars = sum(chars, [])
                 for c in chars:
                     characters.add(c)
-                all_parsed_data.append(clean_text)
+                if clean_text not in all_parsed_data: # Avoid duplicate tweets
+                    all_parsed_data.append(clean_text)
                 data_accessed.append(id)
             else:
                 lost_data += 1

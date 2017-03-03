@@ -64,7 +64,6 @@ def construct_embedding_matrix(word_index):
     """
     embedding_matrix = np.zeros((len(word_index) + 1, get_embedding_dim()))
     embeddings_index = load_pickle(os.path.join(EMBEDDINGS_INDEX_DIR, EMBEDDINGS_INDEX))
-    print(len(embeddings_index))
 
     number_of_missing_occurrences = 0
     total_number_of_words = 0

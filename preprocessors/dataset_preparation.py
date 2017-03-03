@@ -24,6 +24,7 @@ def prepare_dataset(folder_path=TEXT_DATA_DIR):
     metadata = []  # list of dictionaries with author information (age, gender)
 
     print("------Parsing txt files...")
+    # TODO: If prediction type is, only PAN16 can be used
     for sub_folder_name in sorted(os.listdir(folder_path)):
         sub_folder_path = os.path.join(folder_path, sub_folder_name)
         for file_name in sorted(os.listdir(sub_folder_path)):
@@ -38,7 +39,7 @@ def prepare_dataset(folder_path=TEXT_DATA_DIR):
                 # Remaining lines correspond to the tweets by the author
                 for tweet in data_samples:
                     texts.append(tweet)
-                    metadata.append({GENDER: author_data[1], AGE: author_data[2]})
+                    metadata.append({GENDER: author_data[1].upper(), AGE: author_data[2]})
                     labels.append(labels_index[metadata[-1][PREDICTION_TYPE]])
 
     print('Found %s texts.' % len(texts))
