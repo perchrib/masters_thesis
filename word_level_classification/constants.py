@@ -1,7 +1,7 @@
 import yaml
 
 # Load yaml configuration file
-with open('../config/config_premaster.yaml', 'r') as f:
+with open('../config/config_word.yaml', 'r') as f:
     config_file = yaml.load(f)
 
 # Prediction type
@@ -10,7 +10,7 @@ GENDER = 'gender'
 AGE = 'age'
 
 # Directories
-TEXT_DATA_DIR = '../data/'
+TEXT_DATA_DIR = '../data/txt/'
 EMBEDDINGS_NATIVE_DIR = '../embeddings_native/'
 EMBEDDINGS_INDEX_DIR = '../embeddings_index/'
 LOG_DIR = '../logs/'

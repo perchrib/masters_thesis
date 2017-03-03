@@ -3,8 +3,9 @@ import os
 # Append path to use modules outside pycharm environment, e.g. remote server
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 
-from character_level_classification.text_preprocessing import prepare_dataset
-from character_level_classification.models import get_char_model, get_char_model_2
+from character_level_classification.dataset_formatting import format_dataset_char_level
+from character_level_classification.models import get_char_model
+from preprocessors.dataset_preparation import prepare_dataset
 from keras.callbacks import EarlyStopping
 from character_level_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE
 from time import time
@@ -13,7 +14,8 @@ np.random.seed(1337)
 
 def train():
     # Load dataset
-    x_train, y_train, meta_train, x_val, y_val, meta_val, char_index, labels_index = prepare_dataset()
+    texts, labels, metadata, labels_index = prepare_dataset()
+    x_train, y_train, meta_train, x_val, y_val, meta_val, char_index = format_dataset_char_level(texts, labels, metadata)
 
     model = get_char_model(len(labels_index))
 
