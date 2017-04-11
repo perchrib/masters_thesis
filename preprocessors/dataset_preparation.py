@@ -10,7 +10,7 @@ from character_level_classification.constants import *
 np.random.seed(1337)
 
 
-def prepare_dataset(folder_path=TEXT_DATA_DIR):
+def prepare_dataset(folder_path=TEXT_DATA_DIR, gender=None):
     """
     --Used in both word_level and character_level--
     Iterate over dataset folder and create sequences of word indices
@@ -25,7 +25,8 @@ def prepare_dataset(folder_path=TEXT_DATA_DIR):
 
     print("------Parsing txt files...")
     # TODO: If prediction type is, only PAN16 can be used
-    for sub_folder_name in sorted(os.listdir(folder_path)):
+    for sub_folder_name in sorted(list(filter(lambda x: 'pan' in x, os.listdir(folder_path)))):
+        print(sub_folder_name)
         sub_folder_path = os.path.join(folder_path, sub_folder_name)
         for file_name in sorted(os.listdir(sub_folder_path)):
             if file_name.lower().endswith('.txt'):
@@ -35,15 +36,17 @@ def prepare_dataset(folder_path=TEXT_DATA_DIR):
                     data_samples = [line.strip() for line in txt_file]
 
                 author_data = data_samples.pop(0).split(':::')  # ID, gender and age of author
-
                 # Remaining lines correspond to the tweets by the author
-                for tweet in data_samples:
-                    texts.append(tweet)
-                    metadata.append({GENDER: author_data[1].upper(), AGE: author_data[2]})
-                    labels.append(labels_index[metadata[-1][PREDICTION_TYPE]])
+                gender_author = author_data[1].upper()
+                if not gender:
+                    gender_author = gender
+                if gender == gender_author:
+                    for tweet in data_samples:
+                        texts.append(tweet)
+                        metadata.append({GENDER: author_data[1].upper(), AGE: author_data[2]})
+                        labels.append(labels_index[metadata[-1][PREDICTION_TYPE]])
 
     print('Found %s texts.' % len(texts))
-
     return texts, labels, metadata, labels_index
 
 
@@ -57,3 +60,11 @@ def construct_labels_index(prediction_type):
         return {'MALE': 0, 'FEMALE': 1}
     elif prediction_type == AGE:
         return {'18-24': 0, '25-34': 1, '35-49': 2, '50-64': 3, '65-xx': 4}
+
+
+def prepare_dataset_men():
+    return prepare_dataset(gender='MALE')
+
+
+def prepare_dataset_women():
+    return prepare_dataset(gender='FEMALE')
