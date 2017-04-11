@@ -114,7 +114,10 @@ def write_data_to_file(data, author_file, save_dir):
     if os.path.exists(path):
         file = open(path, 'a')
         for tweet in data:
-            file.write('\n'+tweet)
+            try:
+                file.write('\n'+tweet)
+            except UnicodeEncodeError:
+                file.write('\n' + tweet.encode('utf-8'))
         file.close()
 
 
