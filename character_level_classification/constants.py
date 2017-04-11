@@ -13,6 +13,7 @@ AGE = 'age'
 TEXT_DATA_DIR = '../data/txt/'
 EMBEDDINGS_NATIVE_DIR = '../embeddings_native/'
 EMBEDDINGS_INDEX_DIR = '../embeddings_index/'
+LOGS_DIR = "../logs/character_level"
 
 # Text pre-processing
 MAX_NB_WORDS = config_file['pre-processing']['MAX_NB_WORDS']
