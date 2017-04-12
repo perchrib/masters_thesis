@@ -59,26 +59,3 @@ def format_dataset_char_level(texts, labels, metadata):
 
     return x_train, y_train, meta_train, x_val, y_val, meta_val, char_index
 
-
-def display_dataset_statistics(texts):
-    """
-    Given a dataset as a list of texts, display statistics: Number of tweets, avg length of characters and tokens.
-    :param texts: List of string texts
-    """
-
-    # Number of tokens per tweet
-    tokens_all_texts = list(map(lambda tweet: tweet.split(" "), texts))
-    avg_token_len = reduce(lambda total_len, tweet_tokens: total_len + len(tweet_tokens), tokens_all_texts, 0) / len(tokens_all_texts)
-
-    # Number of characters per tweet
-    char_length_all_texts = list(map(lambda tweet: len(tweet), texts))
-    avg_char_len = reduce(lambda total_len, tweet_len: total_len + tweet_len, char_length_all_texts) / len(texts)
-
-    print("Number of tweets: %i" % len(texts))
-    print("Average number of tokens per tweet: %f" % avg_token_len)
-    print("Average number of characters per tweet: %f" % avg_char_len)
-
-
-if __name__ == "__main__":
-    prepare_dataset()
-

@@ -4,11 +4,11 @@ from keras.layers import Input, Dense, LSTM, Dropout, Lambda, Convolution1D, Max
 from character_level_classification.constants import MAX_SEQUENCE_LENGTH
 
 # TODO: Automate
-nb_chars = 75
+nb_chars = 100
 
 # TODO: Try Conv2D layers?
 
-
+# Model name: 3xConv_2xLSTMmerge_model
 def get_char_model(num_output_nodes):
         tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
         embedding = Lambda(binarize, output_shape=binarize_outshape)(tweet_input)
@@ -17,12 +17,13 @@ def get_char_model(num_output_nodes):
         nb_filter = [196, 196, 256]
         pool_length = 2
 
+        # len of nb_filter = num conv layers
         for i in range(len(nb_filter)):
             embedding = Convolution1D(nb_filter=nb_filter[i],
                                       filter_length=filter_length[i],
                                       border_mode='valid',
                                       activation='relu',
-                                      init='glorot_normal',
+                                      init='glorot_uniform',
                                       subsample_length=1)(embedding)
 
             embedding = Dropout(0.1)(embedding)
@@ -45,6 +46,7 @@ def get_char_model(num_output_nodes):
 def binarize(x, chars=nb_chars):
     return tf.to_float(tf.one_hot(x, chars, on_value=1, off_value=0, axis=-1))
     # return tf.to_float(tf.one_hot(x, chars, on_value=1, off_value=0))
+
 
 def binarize_outshape(in_shape):
     return in_shape[0], in_shape[1], nb_chars

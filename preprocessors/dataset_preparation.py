@@ -2,8 +2,6 @@ import os
 from functools import reduce
 
 import numpy as np
-import tensorflow as tf
-from keras.utils.np_utils import to_categorical
 
 from character_level_classification.constants import *
 
@@ -15,7 +13,7 @@ def prepare_dataset(folder_path=TEXT_DATA_DIR, gender=None):
     --Used in both word_level and character_level--
     Iterate over dataset folder and create sequences of word indices
     Expecting a directory of text files, one for each author. Each line in files corresponds to a tweet
-    :return: results of format_dataset: training set, validation set, word_index
+    :return: texts, labels, metadata, labels_index
     """
 
     texts = []  # list of text samples
@@ -24,7 +22,6 @@ def prepare_dataset(folder_path=TEXT_DATA_DIR, gender=None):
     metadata = []  # list of dictionaries with author information (age, gender)
 
     print("------Parsing txt files...")
-    # TODO: If prediction type is, only PAN16 can be used
     for sub_folder_name in sorted(list(filter(lambda x: 'pan' in x, os.listdir(folder_path)))):
         print(sub_folder_name)
         sub_folder_path = os.path.join(folder_path, sub_folder_name)
@@ -36,6 +33,7 @@ def prepare_dataset(folder_path=TEXT_DATA_DIR, gender=None):
                     data_samples = [line.strip() for line in txt_file]
 
                 author_data = data_samples.pop(0).split(':::')  # ID, gender and age of author
+
                 # Remaining lines correspond to the tweets by the author
                 gender_author = author_data[1].upper()
                 if not gender:
@@ -68,3 +66,23 @@ def prepare_dataset_men():
 
 def prepare_dataset_women():
     return prepare_dataset(gender='FEMALE')
+
+
+def display_dataset_statistics(texts):
+    """
+    Given a dataset as a list of texts, display statistics: Number of tweets, avg length of characters and tokens.
+    :param texts: List of string texts
+    """
+
+    # Number of tokens per tweet
+    tokens_all_texts = list(map(lambda tweet: tweet.split(" "), texts))
+    avg_token_len = reduce(lambda total_len, tweet_tokens: total_len + len(tweet_tokens), tokens_all_texts, 0) / len(
+        tokens_all_texts)
+
+    # Number of characters per tweet
+    char_length_all_texts = list(map(lambda tweet: len(tweet), texts))
+    avg_char_len = reduce(lambda total_len, tweet_len: total_len + tweet_len, char_length_all_texts) / len(texts)
+
+    print("Number of tweets: %i" % len(texts))
+    print("Average number of tokens per tweet: %f" % avg_token_len)
+    print("Average number of characters per tweet: %f" % avg_char_len)
