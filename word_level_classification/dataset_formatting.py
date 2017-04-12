@@ -23,7 +23,6 @@ def format_dataset_word_level(texts, labels, metadata):
 
     tokenizer = Tokenizer(nb_words=MAX_NB_WORDS)
     tokenizer.fit_on_texts(texts)
-    tokenizer.fit_on_texts(texts)
     sequences = tokenizer.texts_to_sequences(texts)  # construct word index sequences of the texts
 
     word_index = tokenizer.word_index  # dictionary mapping words (str) to their rank/index (int)
