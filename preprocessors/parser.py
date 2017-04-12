@@ -9,10 +9,10 @@ class Parser():
     def parse_all_content(self, content):
         content = self.clean_HTML(content)
         content = content.lower()
-        content = self.replace('url', ' ~ ', content)
-        content = self.replace('pic', ' P ', content)
-        content = self.replace('@', ' A ', content)
-        content = self.replace('#', ' H ', content)
+        content = self.replace('url', '~', content)
+        content = self.replace('pic', 'P', content)
+        content = self.replace('@', 'A', content)
+        content = self.replace('#', 'H', content)
         return content
 
     def clean_HTML(self, content):
@@ -35,6 +35,7 @@ class Parser():
 
 
     def replace(self, remove, replace, content):
+        replace = ' ' + replace + ' '
         """
         :param remove: specifies what will be removed: 'url'=urls, '@'=mentions, '#'=hashtag, 'pic'=picture urls
         :param replace: replace a string or character
