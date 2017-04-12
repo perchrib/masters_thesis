@@ -9,9 +9,6 @@ pre-processing:
     # Embedding type can be:
     # - glove.twitter.27B.200d
 
-    EMBEDDINGS_INDEX: 'glove.twitter.27B.200d'
-
-
 model:
     name: 'SeqLSTM' # corresponds to class name of model in models.py
     optimizer: 'adam'

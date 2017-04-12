@@ -2,6 +2,8 @@ from keras_diagram import ascii
 import pickle
 import sys
 import os
+import time
+import pandas
 
 
 def save_pickle(file_path, data):
@@ -57,20 +59,20 @@ def print_progress(iteration, total, prefix = '', suffix = '', decimals = 1, bar
     sys.stdout.flush()
 
 
-def log_session(model_ref, history, training_time, num_train, num_val, optimizer, batch_size, max_epochs):
-    print("Saving log file")
-    if not os.path.exists(LOGS_DIR):
-        os.makedirs(LOGS_DIR)
+def log_session(log_dir, model, history, training_time, num_train, num_val, optimizer, batch_size, max_epochs):
+    print("Writing log file")
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
 
-    if not os.path.exists(os.path.join(LOGS_DIR, model_ref.name)):
-        os.makedirs(os.path.join(LOGS_DIR, model_ref.name))
+    if not os.path.exists(os.path.join(log_dir, model.name)):
+        os.makedirs(os.path.join(log_dir, model.name))
 
     # TODO: Construct filename from details
-    file_name = time.strftime("%d.%m.%Y_%H:%M:%S") + "_" + model_ref.name +  ".txt"
-    with open(os.path.join(LOGS_DIR, model_ref.name, file_name), 'wb') as log_file:
+    file_name = time.strftime("%d.%m.%Y_%H:%M:%S") + "_" + model.name + ".txt"
+    with open(os.path.join(log_dir, model.name, file_name), 'wb') as log_file:
         log_file.write("Training_log - %s" % time.strftime("%d/%m/%Y %H:%M:%S"))
 
-        log_file.write("\n\nModel name: %s" % model_ref.name)
+        log_file.write("\n\nModel name: %s" % model.name)
         log_file.write("\nElapsed training time: %i minutes" % training_time)
 
         log_file.write("\n\nTraining set size: %i" % num_train)

@@ -4,7 +4,7 @@ from keras.layers import Input, Dense, LSTM, Dropout, Lambda, Convolution1D, Max
 from character_level_classification.constants import MAX_SEQUENCE_LENGTH
 
 # TODO: Automate
-nb_chars = 75
+nb_chars = 100
 
 # TODO: Try Conv2D layers?
 
@@ -46,6 +46,7 @@ def get_char_model(num_output_nodes):
 def binarize(x, chars=nb_chars):
     return tf.to_float(tf.one_hot(x, chars, on_value=1, off_value=0, axis=-1))
     # return tf.to_float(tf.one_hot(x, chars, on_value=1, off_value=0))
+
 
 def binarize_outshape(in_shape):
     return in_shape[0], in_shape[1], nb_chars

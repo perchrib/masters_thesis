@@ -15,7 +15,7 @@ def prepare_dataset(folder_path=TEXT_DATA_DIR):
     --Used in both word_level and character_level--
     Iterate over dataset folder and create sequences of word indices
     Expecting a directory of text files, one for each author. Each line in files corresponds to a tweet
-    :return: results of format_dataset: training set, validation set, word_index
+    :return: texts, labels, metadata, labels_index
     """
 
     texts = []  # list of text samples
@@ -57,3 +57,22 @@ def construct_labels_index(prediction_type):
         return {'MALE': 0, 'FEMALE': 1}
     elif prediction_type == AGE:
         return {'18-24': 0, '25-34': 1, '35-49': 2, '50-64': 3, '65-xx': 4}
+
+
+def display_dataset_statistics(texts):
+    """
+    Given a dataset as a list of texts, display statistics: Number of tweets, avg length of characters and tokens.
+    :param texts: List of string texts
+    """
+
+    # Number of tokens per tweet
+    tokens_all_texts = list(map(lambda tweet: tweet.split(" "), texts))
+    avg_token_len = reduce(lambda total_len, tweet_tokens: total_len + len(tweet_tokens), tokens_all_texts, 0) / len(tokens_all_texts)
+
+    # Number of characters per tweet
+    char_length_all_texts = list(map(lambda tweet: len(tweet), texts))
+    avg_char_len = reduce(lambda total_len, tweet_len: total_len + tweet_len, char_length_all_texts) / len(texts)
+
+    print("Number of tweets: %i" % len(texts))
+    print("Average number of tokens per tweet: %f" % avg_token_len)
+    print("Average number of characters per tweet: %f" % avg_char_len)

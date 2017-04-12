@@ -4,6 +4,6 @@
 - tensorflow v1.0
 - h5py
 - numpy
-- pandas
-- keras_diagram
-- nltk
+- nltk (corpus content must downloaded using nltk.download)
+- pandas (for logging)
+- keras_diagram (for logging)
