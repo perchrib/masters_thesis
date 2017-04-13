@@ -21,7 +21,7 @@ def prepare_dataset(folder_path=TEXT_DATA_DIR, gender=None):
     labels = []  # list of label ids
     metadata = []  # list of dictionaries with author information (age, gender)
 
-    print("------Parsing txt files...")
+    print("------Parsing txt files..")
     for sub_folder_name in sorted(list(filter(lambda x: 'pan' in x, os.listdir(folder_path)))):
         print(sub_folder_name)
         sub_folder_path = os.path.join(folder_path, sub_folder_name)
@@ -66,23 +66,3 @@ def prepare_dataset_men():
 
 def prepare_dataset_women():
     return prepare_dataset(gender='FEMALE')
-
-
-def display_dataset_statistics(texts):
-    """
-    Given a dataset as a list of texts, display statistics: Number of tweets, avg length of characters and tokens.
-    :param texts: List of string texts
-    """
-
-    # Number of tokens per tweet
-    tokens_all_texts = list(map(lambda tweet: tweet.split(" "), texts))
-    avg_token_len = reduce(lambda total_len, tweet_tokens: total_len + len(tweet_tokens), tokens_all_texts, 0) / len(
-        tokens_all_texts)
-
-    # Number of characters per tweet
-    char_length_all_texts = list(map(lambda tweet: len(tweet), texts))
-    avg_char_len = reduce(lambda total_len, tweet_len: total_len + tweet_len, char_length_all_texts) / len(texts)
-
-    print("Number of tweets: %i" % len(texts))
-    print("Average number of tokens per tweet: %f" % avg_token_len)
-    print("Average number of characters per tweet: %f" % avg_char_len)

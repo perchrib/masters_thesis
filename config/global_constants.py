@@ -1,0 +1,1 @@
+TEXT_DATA_DIR = '../data/txt/'
