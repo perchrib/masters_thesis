@@ -1,14 +1,14 @@
 import os
 from functools import reduce
-
+from preprocessors.parser import Parser
 import numpy as np
 
-from character_level_classification.constants import *
+from helpers.global_constants import TEXT_DATA_DIR, GENDER, AGE
 
 np.random.seed(1337)
 
 
-def prepare_dataset(folder_path=TEXT_DATA_DIR, gender=None):
+def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
     """
     --Used in both word_level and character_level--
     Iterate over dataset folder and create sequences of word indices
@@ -17,7 +17,7 @@ def prepare_dataset(folder_path=TEXT_DATA_DIR, gender=None):
     """
 
     texts = []  # list of text samples
-    labels_index = construct_labels_index(PREDICTION_TYPE)  # dictionary mapping label name to numeric id
+    labels_index = construct_labels_index(prediction_type)  # dictionary mapping label name to numeric id
     labels = []  # list of label ids
     metadata = []  # list of dictionaries with author information (age, gender)
 
@@ -35,6 +35,7 @@ def prepare_dataset(folder_path=TEXT_DATA_DIR, gender=None):
                 author_data = data_samples.pop(0).split(':::')  # ID, gender and age of author
 
                 # Remaining lines correspond to the tweets by the author
+                # TODO: If anything other than gender needs to be classified, this needs to be moved
                 gender_author = author_data[1].upper()
                 if not gender:
                     gender_author = gender
@@ -42,7 +43,7 @@ def prepare_dataset(folder_path=TEXT_DATA_DIR, gender=None):
                     for tweet in data_samples:
                         texts.append(tweet)
                         metadata.append({GENDER: author_data[1].upper(), AGE: author_data[2]})
-                        labels.append(labels_index[metadata[-1][PREDICTION_TYPE]])
+                        labels.append(labels_index[metadata[-1][prediction_type]])
 
     print('Found %s texts.' % len(texts))
     return texts, labels, metadata, labels_index
@@ -61,17 +62,20 @@ def construct_labels_index(prediction_type):
 
 
 def prepare_dataset_men():
-    return prepare_dataset(gender='MALE')
+    return prepare_dataset(prediction_type=GENDER, gender='MALE')
 
 
 def prepare_dataset_women():
-    return prepare_dataset(gender='FEMALE')
+    return prepare_dataset(prediction_type=GENDER, gender='FEMALE')
 
 
 def display_dataset_statistics(texts):
     """
-    Given a dataset as a list of texts, display statistics: Number of tweets, avg length of characters and tokens.
-    :param texts: List of string texts
+    Given a dataset, display statistics: Number of tweets, avg length of characters and tokens.
+    :param texts: list of string texts
+    :param labels: list of classification labels
+    :param metadata: list of metadata dictionaries
+    :param pred_type: classification_type
     """
 
     # Number of tokens per tweet
@@ -86,3 +90,21 @@ def display_dataset_statistics(texts):
     print("Number of tweets: %i" % len(texts))
     print("Average number of tokens per tweet: %f" % avg_token_len)
     print("Average number of characters per tweet: %f" % avg_char_len)
+
+
+def display_gender_distribution(metadata):
+
+    num_total = len(metadata)
+    num_males = reduce(lambda total, x: total + 1 if x['gender'] == 'MALE' else total, metadata, 0)
+    num_females = reduce(lambda total, x: total + 1 if x['gender'] == 'FEMALE' else total, metadata, 0)
+
+    print("Total number of texts %i" % num_total)
+    print("Number of male texts: %i. Fraction of total: %f" % (num_males, float(num_males) / num_total))
+    print("Number of female texts: %i Fraction of total: %f" % (num_females, float(num_females) / num_total))
+
+
+if __name__ == '__main__':
+    texts, labels, metadata, labels_index = prepare_dataset(GENDER)
+    parser = Parser()
+    texts = parser.replace_all(texts)
+    display_dataset_statistics(texts)

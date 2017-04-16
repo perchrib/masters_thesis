@@ -1,15 +1,15 @@
 import tensorflow as tf
-from keras.models import Model
+from keras.models import Model, Sequential
 from keras.layers import Input, Dense, LSTM, Dropout, Lambda, Convolution1D, MaxPooling1D, merge
 from character_level_classification.constants import MAX_SEQUENCE_LENGTH
 
 # TODO: Automate
-nb_chars = 100
+nb_chars = 77
 
 # TODO: Try Conv2D layers?
 
 # Model name: 3xConv_2xLSTMmerge_model
-def get_char_model(num_output_nodes):
+def get_char_model_3xConv_2xBiLSTM(num_output_nodes):
         tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
         embedding = Lambda(binarize, output_shape=binarize_outshape)(tweet_input)
 
@@ -29,18 +29,49 @@ def get_char_model(num_output_nodes):
             embedding = Dropout(0.1)(embedding)
             embedding = MaxPooling1D(pool_length=pool_length)(embedding)
 
-        forward = LSTM(128, return_sequences=False, dropout_W=0.2, dropout_U=0.2, consume_less='gpu')(embedding)
-        backward = LSTM(128, return_sequences=False, dropout_W=0.2, dropout_U=0.2, consume_less='gpu',
-                                 go_backwards=True)(embedding)
+        forward = LSTM(256, return_sequences=False, dropout=0.2, recurrent_dropout=0.2)(embedding)
+        backward = LSTM(256, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, go_backwards=True)(embedding)
 
         encoding = merge([forward, backward], mode='concat', concat_axis=-1)
-        output = Dropout(0.3)(encoding)
+        output = Dropout(0.5)(encoding)
         output = Dense(128, activation='relu')(output)
-        output = Dropout(0.3)(output)
+        output = Dropout(0.5)(output)
         output = Dense(num_output_nodes, activation='softmax')(output)
-        model = Model(input=tweet_input, output=output, name='3xConv_2xLSTMmerge_model')
+        model = Model(input=tweet_input, output=output, name='3xConv_2xBiLSTM')
 
         return model
+
+
+def get_model_2x512_256_lstm(num_output_nodes):
+    tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
+    embedding = Lambda(binarize, output_shape=binarize_outshape)(tweet_input)
+
+    encoding = LSTM(512, return_sequences=True)(embedding)
+    encoding = LSTM(512, return_sequences=True)(encoding)
+    encoding = LSTM(256, return_sequences=True)(encoding)
+
+    output = Dense(num_output_nodes, activation='softmax')(encoding)
+
+    model = Model(inputs=tweet_input, outputs=output, name="2x512_256LSTM")
+
+    return model
+
+
+def get_char_model_BiLSTM_full(num_output_nodes):
+    tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
+    embedding = Lambda(binarize, output_shape=binarize_outshape)(tweet_input)
+
+    forward = LSTM(512, return_sequences=False, dropout=0.2, recurrent_dropout=0.2)(embedding)
+    backward = LSTM(512, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, go_backwards=True)(embedding)
+
+    encoding = merge([forward, backward], mode='concat', concat_axis=-1)
+    output = Dropout(0.5)(encoding)
+    output = Dense(128, activation='relu')(output)
+    output = Dropout(0.5)(output)
+    output = Dense(num_output_nodes, activation='softmax')(output)
+    model = Model(input=tweet_input, output=output, name='BiLSTM_full')
+
+    return model
 
 
 def binarize(x, chars=nb_chars):

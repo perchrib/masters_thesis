@@ -34,3 +34,7 @@ embeddings_native/*
 
 # Test and fiddle python file
 fiddle.py
+
+
+# MG aws key
+key_apr17.pem

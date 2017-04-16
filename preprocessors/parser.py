@@ -6,14 +6,16 @@ class Parser():
     def __init__(self):
         self.tknzr = TweetTokenizer()
 
-    def parse_all_content(self, content):
-        content = self.clean_HTML(content)
-        content = content.lower()
-        content = self.replace('url', '~', content)
-        content = self.replace('pic', 'P', content)
-        content = self.replace('@', 'A', content)
-        content = self.replace('#', 'H', content)
-        return content
+    def replace_all(self, texts):
+        modified_texts = [self.clean_HTML(t) for t in texts]  # TODO: Kan fjernes?
+        modified_texts = [t.lower() for t in modified_texts]  # Lowercase
+
+        modified_texts = self.replace('url', '~', modified_texts)
+        modified_texts = self.replace('pic', 'P', modified_texts)
+        modified_texts = self.replace('@', 'M', modified_texts)
+        modified_texts = self.replace('#', 'H', modified_texts)
+
+        return modified_texts
 
     def clean_HTML(self, content):
         """
@@ -34,24 +36,31 @@ class Parser():
         return content
 
 
-    def replace(self, remove, replace, content):
-        replace = ' ' + replace + ' '
+    def replace(self, remove, replace, texts):
+
         """
         :param remove: specifies what will be removed: 'url'=urls, '@'=mentions, '#'=hashtag, 'pic'=picture urls
-        :param replace: replace a string or character
-        :param content: the string that will be modified
+        :param replace: the string or character which will be placed instead
+        :param texts: list of texts to be modified
         :return: the modified string :param content:
         """
-        if remove == "url":
-            content = re.sub(r'(?:(http://|https://)|(www\.)|(http|httphttp|https) :/ / )(\S+\b/?)([!"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~]*)(\s|$)', replace, content)
-        elif remove == "@":
-            content = re.sub(r'@([a-z0-9_]+)', replace, content)
-        elif remove == "#":
-            content = re.sub(r'#([a-z0-9_]+)', replace, content)
-        elif remove == 'pic':
-            content = re.sub(r'(pic .twitter.com/|pic.twitter.com/)(\w+)', replace, content)
-        content = self.do_join(content)
-        return content
+        modified_texts = []
+        replace = ' ' + replace + ' '
+        for txt in texts:
+            content = txt
+            if remove == "url":
+                content = re.sub(r'(?:(http://|https://)|(www\.)|(http|httphttp|https) :/ / )(\S+\b/?)([!"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~]*)(\s|$)', replace, content)
+            elif remove == "@":
+                content = re.sub(r'@([a-z0-9_]+)', replace, content)
+            elif remove == "#":
+                content = re.sub(r'#([a-z0-9_]+)', replace, content)
+            elif remove == 'pic':
+                content = re.sub(r'(pic .twitter.com/|pic.twitter.com/)(\w+)', replace, content)
+            content = self.do_join(content)
+
+            modified_texts.append(content)
+
+        return modified_texts
 
     def do_join(self, content):
         """

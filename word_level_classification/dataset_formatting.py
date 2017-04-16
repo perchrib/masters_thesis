@@ -1,10 +1,13 @@
 import os
+
+import numpy as np
+from keras.preprocessing.sequence import pad_sequences
+from keras.preprocessing.text import Tokenizer
+from keras.utils.np_utils import to_categorical
+
+from helpers.global_constants import EMBEDDINGS_INDEX_DIR
 from helpers.helper_functions import load_pickle
 from word_level_classification.constants import *
-from keras.preprocessing.text import Tokenizer
-from keras.preprocessing.sequence import pad_sequences
-from keras.utils.np_utils import to_categorical
-import numpy as np
 
 np.random.seed(1337)
 
@@ -21,7 +24,8 @@ def format_dataset_word_level(texts, labels, metadata):
     """
     print("------Formatting text samples into tensors...")
 
-    tokenizer = Tokenizer(nb_words=MAX_NB_WORDS)
+    # TODO: MAX_NB_WORDS seems to have no effect on the length of word_index
+    tokenizer = Tokenizer(num_words=MAX_NB_WORDS)
     tokenizer.fit_on_texts(texts)
     sequences = tokenizer.texts_to_sequences(texts)  # construct word index sequences of the texts
 
@@ -69,14 +73,14 @@ def construct_embedding_matrix(word_index):
     for word, i in word_index.items():
         embedding_vector = embeddings_index.get(word)
         if embedding_vector is not None:
-            # words not found in embedding index will be all-zeros.
+            # words not found in embedding index will be all zeros.
             embedding_matrix[i] = embedding_vector
         else:
             number_of_missing_occurrences += 1
         total_number_of_words += 1
 
     print("Total number of word occurences: %i" % total_number_of_words)
-    print('Number of missing word occurences: %i' % number_of_missing_occurrences)
+    print('Number of missing word occurences / words with no embedding: %i' % number_of_missing_occurrences)
 
     return embedding_matrix
 

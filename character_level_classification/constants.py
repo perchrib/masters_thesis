@@ -1,28 +1,22 @@
-import yaml
+from helpers.helper_functions import load_yaml
 
 # Load yaml configuration file
-with open('../config/config_char.yaml', 'r') as f:
-    config_file = yaml.load(f)
+config_file = load_yaml('../config/config_char.yaml')
 
 # Prediction type
 PREDICTION_TYPE = config_file['PREDICTION_TYPE']
 GENDER = 'gender'
 AGE = 'age'
 
-# Dataset directory
-TEXT_DATA_DIR = '../data/txt_old_backup/'
-EMBEDDINGS_NATIVE_DIR = '../embeddings_native/'
-EMBEDDINGS_INDEX_DIR = '../embeddings_index/'
-LOGS_DIR = "../logs/character_level"
+# Log directory
+LOGS_DIR = '../logs/character_level_classification'
 
 # Text pre-processing
-MAX_NB_WORDS = config_file['pre-processing']['MAX_NB_WORDS']
 MAX_SEQUENCE_LENGTH = config_file['pre-processing']['MAX_SEQUENCE_LENGTH']
 VALIDATION_SPLIT = config_file['pre-processing']['VALIDATION_SPLIT']
-EMBEDDINGS_INDEX = config_file['pre-processing']['EMBEDDINGS_INDEX']
 
 # Model
-MODEL_NAME = config_file['model']['name']
+MODELS = config_file['model']['names']
 MODEL_OPTIMIZER = config_file['model']['optimizer']
 MODEL_LOSS = config_file['model']['loss']
 MODEL_METRICS = config_file['model']['metrics']

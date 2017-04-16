@@ -1,19 +1,15 @@
-import yaml
+from helpers.helper_functions import load_yaml
 
 # Load yaml configuration file
-with open('../config/config_word.yaml', 'r') as f:
-    config_file = yaml.load(f)
+config_file = load_yaml('../config/config_word.yaml')
 
 # Prediction type
 PREDICTION_TYPE = config_file['PREDICTION_TYPE']
 GENDER = 'gender'
 AGE = 'age'
 
-# Directories
-TEXT_DATA_DIR = '../data/txt/'
-EMBEDDINGS_NATIVE_DIR = '../embeddings_native/'
-EMBEDDINGS_INDEX_DIR = '../embeddings_index/'
-LOG_DIR = '../logs/'
+# Log directory
+LOGS_DIR = '../logs/word_level_classification'
 
 # Text pre-processing
 MAX_NB_WORDS = config_file['pre-processing']['MAX_NB_WORDS']
@@ -22,7 +18,7 @@ VALIDATION_SPLIT = config_file['pre-processing']['VALIDATION_SPLIT']
 EMBEDDINGS_INDEX = config_file['pre-processing']['EMBEDDINGS_INDEX']
 
 # Model
-MODEL_NAME = config_file['model']['name']
+MODELS = config_file['model']['names']
 MODEL_OPTIMIZER = config_file['model']['optimizer']
 MODEL_LOSS = config_file['model']['loss']
 MODEL_METRICS = config_file['model']['metrics']

@@ -4,6 +4,7 @@ import sys
 import os
 import time
 import pandas
+import yaml
 
 
 def save_pickle(file_path, data):
@@ -35,8 +36,13 @@ def load_pickle(file_path, feedback=False):
     return data
 
 
+def load_yaml(file_path):
+    with open(file_path, 'r') as f:
+        return yaml.load(f)
+
+
 # Print iterations progress
-def print_progress(iteration, total, prefix = '', suffix = '', decimals = 1, barLength = 100):
+def print_progress(iteration, total, prefix='', suffix='', decimals=1, barLength=100):
     """
     source: http://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console
 
@@ -59,7 +65,9 @@ def print_progress(iteration, total, prefix = '', suffix = '', decimals = 1, bar
     sys.stdout.flush()
 
 
-def log_session(log_dir, model, history, training_time, num_train, num_val, optimizer, batch_size, max_epochs):
+def log_session(log_dir, model, history, training_time, num_train, num_val, optimizer, batch_size, max_epochs,
+                max_sequence_length,
+                extra_info=[]):
     print("Writing log file")
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
@@ -68,7 +76,7 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, opti
         os.makedirs(os.path.join(log_dir, model.name))
 
     # TODO: Construct filename from details
-    file_name = time.strftime("%d.%m.%Y_%H:%M:%S") + "_" + model.name + ".txt"
+    file_name = time.strftime("%d.%m.%Y_%H:%M:%S") + "_" + model.name + "_" + optimizer + ".txt"
     with open(os.path.join(log_dir, model.name, file_name), 'wb') as log_file:
         log_file.write("Training_log - %s" % time.strftime("%d/%m/%Y %H:%M:%S"))
 
@@ -85,11 +93,16 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, opti
         log_file.write("\nOptimizer: %s" % optimizer)
         log_file.write("\nBatch size: %i" % batch_size)
         log_file.write("\nMax number of epochs: %i" % max_epochs)
-
-
+        log_file.write("\nMax sequence length: %i" % max_sequence_length)
 
         # Write accuracies for training and validation set from callback history
         log_file.write("\n\n-----------Training statistics-----------\n")
         log_file.write(pandas.DataFrame(history).__repr__())
         log_file.write("\n\n--------------Model Diagram---------------\n")
         log_file.write(ascii(model))
+        log_file.write("\n")
+
+        if extra_info:
+            log_file.write("\nExtra information:\n=========================================")
+            for info in extra_info:
+                log_file.write("\n %s" % info)

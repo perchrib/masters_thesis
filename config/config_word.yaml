@@ -12,10 +12,12 @@ pre-processing:
 
 
 model:
-    name: 'SeqLSTM' # corresponds to class name of model in models.py
+    names: # names of all models to train
+#        - '2x512_256LSTM_128full'
+#        - '2x512_256GRU'
     optimizer: 'adam'
     loss: 'categorical_crossentropy'
     metrics:
         - 'accuracy'
-    nb-epochs: 30
+    nb-epochs: 20
     batch-size: 128
