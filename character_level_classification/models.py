@@ -13,9 +13,10 @@ nb_chars = 77
 # Model name: 3xConv_2xLSTMmerge_model
 def get_char_model_3xConv_2xBiLSTM(num_output_nodes):
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
-    embedding = Lambda(binarize, output_shape=binarize_outshape)(tweet_input)
+    embedding = Lambda(one_hot, output_shape=one_hot_out)(tweet_input)
 
-    filter_length = [5, 3, 3]
+    # filter_length = [5, 3, 3]
+    filter_length = [7, 5, 2]
     nb_filter = [196, 196, 256]
     pool_length = 2
 
@@ -42,13 +43,13 @@ def get_char_model_3xConv_2xBiLSTM(num_output_nodes):
     output = Dense(num_output_nodes, activation='softmax')(output)
     model = Model(input=tweet_input, output=output, name='3xConv_2xBiLSTM')
 
-    extra_info = ["LSTM dropout = 0.5, 0.2"]
+    extra_info = ["LSTM dropout = 0.5, 0.2, Filterlength: 20, 20, 10"]
     return model, extra_info
 
 
 def get_char_model_2x512_256_lstm(num_output_nodes):
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
-    embedding = Lambda(binarize, output_shape=binarize_outshape)(tweet_input)
+    embedding = Lambda(one_hot, output_shape=one_hot_out)(tweet_input)
 
     encoding = LSTM(512, return_sequences=True)(embedding)
     encoding = LSTM(512, return_sequences=True)(encoding)
@@ -63,7 +64,7 @@ def get_char_model_2x512_256_lstm(num_output_nodes):
 
 def get_char_model_BiLSTM_full(num_output_nodes):
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
-    embedding = Lambda(binarize, output_shape=binarize_outshape)(tweet_input)
+    embedding = Lambda(one_hot, output_shape=one_hot_out)(tweet_input)
 
     forward = LSTM(512, return_sequences=False, dropout=0.5, recurrent_dropout=0.5, consume_less='gpu')(embedding)
     backward = LSTM(512, return_sequences=False, dropout=0.5, recurrent_dropout=0.5, consume_less='gpu',
@@ -82,7 +83,7 @@ def get_char_model_BiLSTM_full(num_output_nodes):
 
 def get_char_model_3xConv(num_output_nodes):
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
-    embedding = Lambda(binarize, output_shape=binarize_outshape)(tweet_input)
+    embedding = Lambda(one_hot, output_shape=one_hot_out)(tweet_input)
 
     filter_length = [5, 3, 3]
     nb_filter = [196, 196, 256]
@@ -100,8 +101,8 @@ def get_char_model_3xConv(num_output_nodes):
         embedding = Dropout(0.1)(embedding)
         embedding = MaxPooling1D(pool_length=pool_length)(embedding)
 
-    output = Dropout(0.5)(embedding)
-    output = Dense(128, activation='relu')(output)
+    # output = Dropout(0.5)(embedding)
+    output = Dense(128, activation='relu')(embedding)
     output = Dropout(0.5)(output)
     output = Dense(num_output_nodes, activation='softmax')(output)
     model = Model(input=tweet_input, output=output, name='3xConv')
@@ -109,10 +110,11 @@ def get_char_model_3xConv(num_output_nodes):
     extra_info = []
     return model, extra_info
 
-def binarize(x, chars=nb_chars):
+
+def one_hot(x, chars=nb_chars):
     return tf.to_float(tf.one_hot(x, chars, on_value=1, off_value=0, axis=-1))
     # return tf.to_float(tf.one_hot(x, chars, on_value=1, off_value=0))
 
 
-def binarize_outshape(in_shape):
+def one_hot_out(in_shape):
     return in_shape[0], in_shape[1], nb_chars

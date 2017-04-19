@@ -1,7 +1,7 @@
-Training_log - 16/04/2017 03:05:07
+Training_log - 19/04/2017 13:09:40
 
 Model name: 3xConv_2xBiLSTM
-Elapsed training time: 22 minutes
+Elapsed training time: 12 minutes
 
 Training set size: 596499
 Validation set size: 66277
@@ -16,12 +16,10 @@ Max sequence length: 80
 
 -----------Training statistics-----------
         acc      loss   val_acc  val_loss
-0  0.541703  0.689856  0.542179  0.689605
-1  0.541721  0.689715  0.542179  0.689590
-2  0.541770  0.689679  0.542179  0.689585
-3  0.541751  0.689693  0.542179  0.689587
-4  0.541704  0.689697  0.542179  0.689592
-5  0.541714  0.689683  0.542179  0.689585
+0  0.541741  0.689809  0.540504  0.689865
+1  0.541954  0.689659  0.540504  0.689928
+2  0.541917  0.689679  0.540504  0.689883
+3  0.541909  0.689662  0.540504  0.689901
 
 --------------Model Diagram---------------
       InputLayer (None, 80)            InputLayer (None, 80)      
@@ -47,4 +45,5 @@ Max sequence length: 80
 
 Extra information:
 =========================================
- No consume_less
+ LSTM dropout = 0.5, 0.2
+ Did not replace web terms, urls etc... Apparently important

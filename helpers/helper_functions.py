@@ -67,8 +67,8 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=1, barLength
 
 def log_session(log_dir, model, history, training_time, num_train, num_val, optimizer, batch_size, max_epochs,
                 max_sequence_length,
-                extra_info=[]):
-    print("Writing log file")
+                extra_info=None):
+    print("Writing log file...")
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
@@ -106,3 +106,6 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, opti
             log_file.write("\nExtra information:\n=========================================")
             for info in extra_info:
                 log_file.write("\n %s" % info)
+
+    print("Done")
+

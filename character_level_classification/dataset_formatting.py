@@ -39,7 +39,8 @@ def format_dataset_char_level(texts, labels, metadata):
     for i, tweet in enumerate(texts):
         for j, char in enumerate(tweet):
             if j < MAX_SEQUENCE_LENGTH:
-                data[i, j] = char_index[char]
+                # data[i, j] = char_index[char]
+                data[i, MAX_SEQUENCE_LENGTH-1-j] = char_index[char]  # Input reversed
 
     # shuffle and split the data into a training set and a validation set
     indices = np.arange(data.shape[0])

@@ -11,5 +11,5 @@ model:
     loss: 'categorical_crossentropy'
     metrics:
         - 'accuracy'
-    nb-epochs: 20
-    batch-size: 128
+    nb-epochs: 30
+    batch-size: 256
