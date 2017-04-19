@@ -16,7 +16,6 @@ MAX_SEQUENCE_LENGTH = config_file['pre-processing']['MAX_SEQUENCE_LENGTH']
 VALIDATION_SPLIT = config_file['pre-processing']['VALIDATION_SPLIT']
 
 # Model
-MODELS = config_file['model']['names']
 MODEL_OPTIMIZER = config_file['model']['optimizer']
 MODEL_LOSS = config_file['model']['loss']
 MODEL_METRICS = config_file['model']['metrics']

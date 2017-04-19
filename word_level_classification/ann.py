@@ -21,23 +21,7 @@ from helpers.helper_functions import log_session
 np.random.seed(1337)
 
 
-def train(model_name, extra_info=None):
-    # Load dataset
-    texts, labels, metadata, labels_index = prepare_dataset(PREDICTION_TYPE)
-
-    # Clean texts
-    text_parser = Parser()
-    texts = text_parser.replace_all(texts)
-
-    x_train, y_train, meta_train, x_val, y_val, meta_val, word_index = format_dataset_word_level(texts, labels,
-                                                                                                 metadata)
-
-    embedding_layer = get_embedding_layer(word_index)
-    model = get_model(model_name, embedding_layer, len(labels_index))
-
-    if model is None:
-        print("Error: Model is none. Breaking execution")
-        return
+def train(model, extra_info, data):
 
     model.compile(optimizer=MODEL_OPTIMIZER,
                   loss=MODEL_LOSS,
@@ -52,8 +36,8 @@ def train(model_name, extra_info=None):
 
     print('\nCommence training %s model' % model.name)
     print('Embeddings from: %s' % EMBEDDINGS_INDEX)
-    history = model.fit(x_train, y_train,
-                        validation_data=[x_val, y_val],
+    history = model.fit(data['x_train'], data['y_train'],
+                        validation_data=[data['x_val'], data['y_val']],
                         epochs=NB_EPOCHS,
                         batch_size=BATCH_SIZE,
                         shuffle=True,
@@ -63,28 +47,8 @@ def train(model_name, extra_info=None):
     training_time = (time() - start_time) / 60
     print('Training time: %i' % training_time)
 
-    log_session(LOGS_DIR, model, history, training_time, len(x_train), len(x_val), MODEL_OPTIMIZER, BATCH_SIZE,
+    log_session(LOGS_DIR, model, history, training_time, len(data['x_train']), len(data['x_val']), MODEL_OPTIMIZER, BATCH_SIZE,
                 NB_EPOCHS, MAX_SEQUENCE_LENGTH, extra_info)
-
-
-def get_model(model_name, embedding_layer, num_output_nodes):
-    if model_name == '3xSimpleLSTM':
-        return get_word_model_3xsimple_lstm(embedding_layer, num_output_nodes)
-    elif model_name == '2x512_256LSTM':
-        return get_word_model_2x512_256_lstm(embedding_layer, num_output_nodes)
-    elif model_name == '3x512_LSTM':
-        return get_word_model_3x512_lstm(embedding_layer, num_output_nodes)
-    elif model_name == '3x512_recDropoutLSTM':
-        return get_word_model_3x512_rec_dropout_lstm(embedding_layer, num_output_nodes)
-    elif model_name == '2x1024_512_LSTM':
-        return get_word_model_2x1024_512_lstm(embedding_layer, num_output_nodes)
-    elif model_name == '2x512_256LSTM_128full':
-        return get_word_model_2x512_256_lstm_128_full(embedding_layer, num_output_nodes)
-    elif model_name == '2x512_256GRU':
-        return get_word_model_2x512_256_gru(embedding_layer, num_output_nodes)
-    else:
-        print("Error: Invalid model name")
-        return None
 
 
 def get_embedding_layer(word_index):

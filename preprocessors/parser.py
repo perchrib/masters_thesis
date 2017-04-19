@@ -7,8 +7,8 @@ class Parser():
         self.tknzr = TweetTokenizer()
 
     def replace_all(self, texts):
-        modified_texts = [self.clean_HTML(t) for t in texts]  # TODO: Kan fjernes?
-        modified_texts = [t.lower() for t in modified_texts]  # Lowercase
+        # content = self.clean_HTML(content)  # TODO: Kan fjernes?
+        modified_texts = [t.lower() for t in texts]  # Lower_case
 
         modified_texts = self.replace('url', '~', modified_texts)
         modified_texts = self.replace('pic', 'P', modified_texts)

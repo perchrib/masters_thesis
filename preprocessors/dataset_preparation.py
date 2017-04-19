@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 from functools import reduce
 from preprocessors.parser import Parser
@@ -23,8 +24,8 @@ def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
 
     print("------Parsing txt files...")
     for sub_folder_name in sorted(list(filter(lambda x: 'pan' in x, os.listdir(folder_path)))):
-        print(sub_folder_name)
         sub_folder_path = os.path.join(folder_path, sub_folder_name)
+        tweet_count = 0
         for file_name in sorted(os.listdir(sub_folder_path)):
             if file_name.lower().endswith('.txt'):
                 file_path = os.path.join(sub_folder_path, file_name)
@@ -44,8 +45,10 @@ def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
                         texts.append(tweet)
                         metadata.append({GENDER: author_data[1].upper(), AGE: author_data[2]})
                         labels.append(labels_index[metadata[-1][prediction_type]])
+                        tweet_count += 1
+        print("%i tweets in %s" % (tweet_count, sub_folder_name))
 
-    print('Found %s texts.' % len(texts))
+    print('\nFound %s texts.' % len(texts))
     return texts, labels, metadata, labels_index
 
 

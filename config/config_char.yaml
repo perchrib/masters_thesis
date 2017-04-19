@@ -7,9 +7,6 @@ pre-processing:
 
 
 model:
-    names:
-        - 'BiLSTM_full'
-        - '3xConv_2xBiLSTM'
     optimizer: 'adam'
     loss: 'categorical_crossentropy'
     metrics:

@@ -18,7 +18,6 @@ VALIDATION_SPLIT = config_file['pre-processing']['VALIDATION_SPLIT']
 EMBEDDINGS_INDEX = config_file['pre-processing']['EMBEDDINGS_INDEX']
 
 # Model
-MODELS = config_file['model']['names']
 MODEL_OPTIMIZER = config_file['model']['optimizer']
 MODEL_LOSS = config_file['model']['loss']
 MODEL_METRICS = config_file['model']['metrics']

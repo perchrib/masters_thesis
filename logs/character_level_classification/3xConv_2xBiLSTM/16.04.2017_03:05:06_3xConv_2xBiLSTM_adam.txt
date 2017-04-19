@@ -48,3 +48,4 @@ Max sequence length: 80
 Extra information:
 =========================================
  No consume_less
+ Bugged.. Wrong nb_char_value
