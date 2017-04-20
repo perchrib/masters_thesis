@@ -46,4 +46,4 @@ Max sequence length: 80
 Extra information:
 =========================================
  LSTM dropout = 0.5, 0.2
- Did not replace web terms, urls etc... Apparently important
+ Without replacement parsing of Twitter terms, results are considerably bad

@@ -1,6 +1,6 @@
 import tensorflow as tf
 from keras.models import Model, Sequential
-from keras.layers import Input, Dense, LSTM, Dropout, Lambda, Convolution1D, MaxPooling1D, merge
+from keras.layers import Input, Dense, LSTM, Dropout, Lambda, Convolution1D, MaxPooling1D, merge, Flatten
 from character_level_classification.constants import MAX_SEQUENCE_LENGTH
 
 # TODO: Automate
@@ -16,15 +16,14 @@ def get_char_model_3xConv_2xBiLSTM(num_output_nodes):
     embedding = Lambda(one_hot, output_shape=one_hot_out)(tweet_input)
 
     # filter_length = [5, 3, 3]
-    filter_length = [7, 5, 2]
-    nb_filter = [196, 196, 256]
+    filter_length = [7, 5, 3, 2]
+    nb_filter = [196, 196, 256, 256]
     pool_length = 2
 
     # len of nb_filter = num conv layers
     for i in range(len(nb_filter)):
         embedding = Convolution1D(nb_filter=nb_filter[i],
                                   filter_length=filter_length[i],
-                                  border_mode='valid',
                                   activation='relu',
                                   init='glorot_uniform',
                                   subsample_length=1)(embedding)
@@ -43,7 +42,7 @@ def get_char_model_3xConv_2xBiLSTM(num_output_nodes):
     output = Dense(num_output_nodes, activation='softmax')(output)
     model = Model(input=tweet_input, output=output, name='3xConv_2xBiLSTM')
 
-    extra_info = ["LSTM dropout = 0.5, 0.2, Filterlength: 20, 20, 10"]
+    extra_info = ["LSTM dropout = 0.5, 0.2, filter_length = [7, 5, 3, 2] nb_filter = [196, 196, 256, 256]"]
     return model, extra_info
 
 
@@ -93,7 +92,6 @@ def get_char_model_3xConv(num_output_nodes):
     for i in range(len(nb_filter)):
         embedding = Convolution1D(nb_filter=nb_filter[i],
                                   filter_length=filter_length[i],
-                                  border_mode='valid',
                                   activation='relu',
                                   init='glorot_uniform',
                                   subsample_length=1)(embedding)
@@ -101,8 +99,9 @@ def get_char_model_3xConv(num_output_nodes):
         embedding = Dropout(0.1)(embedding)
         embedding = MaxPooling1D(pool_length=pool_length)(embedding)
 
-    # output = Dropout(0.5)(embedding)
-    output = Dense(128, activation='relu')(embedding)
+    output = Flatten()(embedding)
+    # output = Dropout(0.5)(output)
+    output = Dense(128, activation='relu')(output)
     output = Dropout(0.5)(output)
     output = Dense(num_output_nodes, activation='softmax')(output)
     model = Model(input=tweet_input, output=output, name='3xConv')

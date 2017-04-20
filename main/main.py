@@ -17,7 +17,6 @@ from word_level_classification.constants import PREDICTION_TYPE
 from word_level_classification.ann import train as w_train, get_embedding_layer
 from word_level_classification.models import *
 
-global nb_chars
 
 def char_main():
     # Load dataset
@@ -34,10 +33,13 @@ def char_main():
 
     num_output_nodes = len(labels_index)
 
+    extra_info = []
+
     # ------- Insert models to train here -----------
     # Remember star before model getter
-    # c_train(*get_char_model_3xConv_2xBiLSTM(num_output_nodes), data=data)
-    c_train(*get_char_model_3xConv(num_output_nodes), data=data)
+    c_train(*get_char_model_3xConv_2xBiLSTM(num_output_nodes), data=data)
+    # c_train(*get_char_model_3xConv(num_output_nodes), data=data)
+
 
 def word_main():
     # Load dataset
@@ -56,9 +58,11 @@ def word_main():
 
     num_output_nodes = len(labels_index)
 
+    extra_info = []
+
     # ------- Insert models to train here -----------
     # Remember star before model getter
-    # w_train(*get_word_model_2x512_256_lstm(embedding_layer, num_output_nodes), data=data)
+    # w_train(*get_word_model_2x512_256_lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info)
 
 if __name__ == '__main__':
     # Train all models in character main

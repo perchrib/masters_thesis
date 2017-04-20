@@ -22,7 +22,7 @@ from helpers.helper_functions import log_session
 np.random.seed(1337)
 
 
-def train(model, extra_info, data):
+def train(model, model_info, data, extra_info=None):
 
     model.compile(optimizer=MODEL_OPTIMIZER,
                   loss=MODEL_LOSS,
@@ -49,7 +49,7 @@ def train(model, extra_info, data):
     print('Training time: %i' % training_time)
 
     log_session(LOGS_DIR, model, history, training_time, len(data['x_train']), len(data['x_val']), MODEL_OPTIMIZER, BATCH_SIZE,
-                NB_EPOCHS, MAX_SEQUENCE_LENGTH, extra_info)
+                NB_EPOCHS, MAX_SEQUENCE_LENGTH, model_info, extra_info)
 
 
 def get_embedding_layer(word_index):
