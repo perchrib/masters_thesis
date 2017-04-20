@@ -12,4 +12,4 @@ model:
     metrics:
         - 'accuracy'
     nb-epochs: 30
-    batch-size: 256
+    batch-size: 128

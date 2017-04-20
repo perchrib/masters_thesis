@@ -30,15 +30,16 @@ def char_main():
     data = {}
     data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], data['meta_val'], data['char_index'] = format_dataset_char_level(texts, labels,
                                                                                                  metadata)
-
+    num_chars = len(data['char_index'])
     num_output_nodes = len(labels_index)
 
     extra_info = []
 
     # ------- Insert models to train here -----------
     # Remember star before model getter
-    c_train(*get_char_model_3xConv_2xBiLSTM(num_output_nodes), data=data)
+    c_train(*get_char_model_3xConv_2xBiLSTM(num_output_nodes, num_chars), data=data)
     # c_train(*get_char_model_3xConv(num_output_nodes), data=data)
+    # c_train(*get_char_model_BiLSTM_full(num_output_nodes, num_chars), data=data)
 
 
 def word_main():
