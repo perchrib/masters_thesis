@@ -22,7 +22,7 @@ np.random.seed(1337)
 def train(model, model_info, data, extra_info=None):
 
     # Callbacks
-    early_stopping = EarlyStopping(monitor='val_loss', patience=2)
+    early_stopping = EarlyStopping(monitor='loss', patience=2)
 
     model.compile(optimizer=MODEL_OPTIMIZER,
                   loss=MODEL_LOSS,

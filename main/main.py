@@ -40,6 +40,8 @@ def char_main():
     c_train(*get_char_model_3xConv_2xBiLSTM(num_output_nodes, num_chars), data=data)
     # c_train(*get_char_model_3xConv(num_output_nodes), data=data)
     # c_train(*get_char_model_BiLSTM_full(num_output_nodes, num_chars), data=data)
+    # c_train(*get_char_model_3xConv_LSTM(num_output_nodes, num_chars), data=data)
+    c_train(*get_char_model_3xConv_4xBiLSTM(num_output_nodes, num_chars), data=data)
 
 
 def word_main():
