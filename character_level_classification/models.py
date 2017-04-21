@@ -21,7 +21,7 @@ def get_char_model_3xConv_2xBiLSTM(num_output_nodes, char_num):
     filter_length = [5, 3, 3]
     nb_filter = [196, 196, 256]
     # filter_length = [7, 5, 3]
-    # nb_filter = [196, 196, 256]
+    # nb_filter = [256, 256, 256]
     pool_length = 2
 
     # len of nb_filter = num conv layers
@@ -35,19 +35,18 @@ def get_char_model_3xConv_2xBiLSTM(num_output_nodes, char_num):
         embedding = Dropout(0.5)(embedding)
         embedding = MaxPooling1D(pool_length=pool_length)(embedding)
 
-    # recurrent_dropout=0.2
-    forward = LSTM(256, return_sequences=False, dropout=0.5, consume_less='gpu')(embedding)
-    backward = LSTM(256, return_sequences=False, dropout=0.5, consume_less='gpu',
+    forward = LSTM(256, return_sequences=False, dropout=0.5, recurrent_dropout=0.2, consume_less='gpu')(embedding)
+    backward = LSTM(256, return_sequences=False, dropout=0.5, recurrent_dropout=0.2, consume_less='gpu',
                     go_backwards=True)(embedding)
 
-    encoding = merge([forward, backward], mode='concat', concat_axis=-1)
-    output = Dropout(0.5)(encoding)
+    output = merge([forward, backward], mode='concat', concat_axis=-1)
+    output = Dropout(0.5)(output)
     output = Dense(128, activation='relu')(output)
     output = Dropout(0.5)(output)
     output = Dense(num_output_nodes, activation='softmax')(output)
     model = Model(input=tweet_input, output=output, name='3xConv_2xBiLSTM')
 
-    model_info = ["LSTM dropout = 0.5, 0.2", "No recurrent dropout"]
+    model_info = ["LSTM dropout = 0.5, 0.2", "Dense dropout: 0.5"]
     return model, model_info
 
 
@@ -75,18 +74,18 @@ def get_char_model_BiLSTM_full(num_output_nodes, char_num):
     embedding = Lambda(one_hot, output_shape=one_hot_out)(tweet_input)
 
     # dropout = 0.5, recurrent_dropout = 0.5
-    forward = LSTM(512, return_sequences=False, consume_less='gpu')(embedding)
-    backward = LSTM(512, return_sequences=False, consume_less='gpu',
+    forward = LSTM(256, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu')(embedding)
+    backward = LSTM(256, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu',
                     go_backwards=True)(embedding)
 
     encoding = merge([forward, backward], mode='concat', concat_axis=-1)
     output = Dropout(0.5)(encoding)
-    output = Dense(128, activation='relu')(output)
+    output = Dense(512, activation='relu')(output)
     output = Dropout(0.5)(output)
     output = Dense(num_output_nodes, activation='softmax')(output)
     model = Model(input=tweet_input, output=output, name='BiLSTM_full')
 
-    extra_info = ["LSTM dropout = 0.5, 0.5"]
+    extra_info = ["LSTM dropout = 0.2, 0.2"]
     return model, extra_info
 
 
@@ -162,6 +161,16 @@ def get_char_model_3xConv_LSTM(num_output_nodes, char_num):
 
 
 def get_char_model_3xConv_4xBiLSTM(num_output_nodes, char_num):
+
+    """
+    im(x)))
+ValueError: Input 0 is incompatible with layer lstm_5: expected ndim=3, found nd
+im=2
+
+    :param num_output_nodes:
+    :param char_num:
+    :return:
+    """
     # Set number of chars for use in one hot encoder
     global nb_chars
     nb_chars = char_num
@@ -191,12 +200,11 @@ def get_char_model_3xConv_4xBiLSTM(num_output_nodes, char_num):
                     go_backwards=True)(embedding)
 
     embedding = merge([forward, backward], mode='concat', concat_axis=-1)
-
+    embedding = Time
     forward = LSTM(256, return_sequences=False, dropout=0.5, recurrent_dropout=0.2, consume_less='gpu')(embedding)
     backward = LSTM(256, return_sequences=False, dropout=0.5, recurrent_dropout=0.2, consume_less='gpu',
                     go_backwards=True)(embedding)
 
-    embedding = merge([forward, backward], mode='concat', concat_axis=-1)
     output = Dropout(0.5)(embedding)
     output = Dense(128, activation='relu')(output)
     output = Dropout(0.5)(output)
@@ -205,6 +213,7 @@ def get_char_model_3xConv_4xBiLSTM(num_output_nodes, char_num):
 
     model_info = ["LSTM dropout = 0.5, 0.2"]
     return model, model_info
+
 
 def one_hot(x):
     return tf.to_float(tf.one_hot(x, nb_chars, on_value=1, off_value=0, axis=-1))
