@@ -10,7 +10,7 @@ class Parser:
         # content = self.clean_HTML(content)  # TODO: Kan fjernes?
         modified_texts = [t.lower() for t in texts]  # Lower_case
 
-        modified_texts = self.replace('url', 'U', modified_texts)
+        modified_texts = self.replace('url', '~', modified_texts)
         modified_texts = self.replace('pic', 'P', modified_texts)
         modified_texts = self.replace('@', 'M', modified_texts)
         modified_texts = self.replace('#', 'H', modified_texts)

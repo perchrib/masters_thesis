@@ -58,8 +58,8 @@ def char_main():
     # ------- Insert models to train here -----------
     # Remember star before model getter
     c_train(*get_char_model_3xConv_2xBiLSTM(num_output_nodes, num_chars), data=data)
-    # c_train(*get_char_model_3xConv(num_output_nodes), data=data)
     # c_train(*get_char_model_BiLSTM_full(num_output_nodes, num_chars), data=data)
+    # c_train(*get_char_model_3xConv(num_output_nodes), data=data)
     # c_train(*get_char_model_3xConv_LSTM(num_output_nodes, num_chars), data=data)
     # c_train(*get_char_model_3xConv_4xBiLSTM(num_output_nodes, num_chars), data=data)
 

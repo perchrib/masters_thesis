@@ -40,9 +40,9 @@ def get_char_model_3xConv_2xBiLSTM(num_output_nodes, char_num):
                     go_backwards=True)(embedding)
 
     output = merge([forward, backward], mode='concat', concat_axis=-1)
-    output = Dropout(0.5)(output)
+    # output = Dropout(0.5)(output)
     output = Dense(128, activation='relu')(output)
-    output = Dropout(0.5)(output)
+    # output = Dropout(0.5)(output)
     output = Dense(num_output_nodes, activation='softmax')(output)
     model = Model(input=tweet_input, output=output, name='3xConv_2xBiLSTM')
 
@@ -74,13 +74,13 @@ def get_char_model_BiLSTM_full(num_output_nodes, char_num):
     embedding = Lambda(one_hot, output_shape=one_hot_out)(tweet_input)
 
     # dropout = 0.5, recurrent_dropout = 0.5
-    forward = LSTM(256, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu')(embedding)
-    backward = LSTM(256, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu',
+    forward = LSTM(128, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu')(embedding)
+    backward = LSTM(128, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu',
                     go_backwards=True)(embedding)
 
     encoding = merge([forward, backward], mode='concat', concat_axis=-1)
     output = Dropout(0.5)(encoding)
-    output = Dense(512, activation='relu')(output)
+    output = Dense(256, activation='relu')(output)
     output = Dropout(0.5)(output)
     output = Dense(num_output_nodes, activation='softmax')(output)
     model = Model(input=tweet_input, output=output, name='BiLSTM_full')
@@ -156,7 +156,7 @@ def get_char_model_3xConv_LSTM(num_output_nodes, char_num):
     output = Dense(num_output_nodes, activation='softmax')(embedding)
     model = Model(input=tweet_input, output=output, name='3xConv_LSTM')
 
-    model_info = ["LSTM dropout = 0.5, 0.2"]
+    model_info = ["LSTM dropout = 0.5, 0.2", "No dense dropout"]
     return model, model_info
 
 
@@ -200,7 +200,6 @@ im=2
                     go_backwards=True)(embedding)
 
     embedding = merge([forward, backward], mode='concat', concat_axis=-1)
-    embedding = Time
     forward = LSTM(256, return_sequences=False, dropout=0.5, recurrent_dropout=0.2, consume_less='gpu')(embedding)
     backward = LSTM(256, return_sequences=False, dropout=0.5, recurrent_dropout=0.2, consume_less='gpu',
                     go_backwards=True)(embedding)
