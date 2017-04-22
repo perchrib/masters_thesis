@@ -29,7 +29,8 @@ def get_word_model_2x512_256_lstm(embedding_layer, nb_output_nodes):
     model.add(LSTM(256))
     model.add(Dense(nb_output_nodes, activation='softmax'))
 
-    return model
+    extra_info = ["Dropout: 0.5"]
+    return model, extra_info
 
 
 def get_word_model_2x512_256_gru(embedding_layer, nb_output_nodes):

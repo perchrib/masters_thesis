@@ -7,12 +7,9 @@ pre-processing:
 
 
 model:
-    names:
-        - 'BiLSTM_full'
-        - '3xConv_2xBiLSTM'
     optimizer: 'adam'
     loss: 'categorical_crossentropy'
     metrics:
         - 'accuracy'
-    nb-epochs: 20
-    batch-size: 128
+    nb-epochs: 50
+    batch-size: 256

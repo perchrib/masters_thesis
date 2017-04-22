@@ -1,7 +1,7 @@
 PREDICTION_TYPE: 'gender'  # Valid values: 'gender' or 'age'
 
 pre-processing:
-    MAX_NB_WORDS: 50000
+    MAX_NB_WORDS: 50000  # TODO: Test - Change to right amount
     MAX_SEQUENCE_LENGTH: 25
     VALIDATION_SPLIT: 0.1
 
@@ -12,12 +12,9 @@ pre-processing:
 
 
 model:
-    names: # names of all models to train
-#        - '2x512_256LSTM_128full'
-#        - '2x512_256GRU'
     optimizer: 'adam'
     loss: 'categorical_crossentropy'
     metrics:
         - 'accuracy'
-    nb-epochs: 20
+    nb-epochs: 30
     batch-size: 128

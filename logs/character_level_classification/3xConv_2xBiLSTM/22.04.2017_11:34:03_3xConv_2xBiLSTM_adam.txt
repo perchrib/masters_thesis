@@ -1,0 +1,49 @@
+Training_log - 22/04/2017 11:34:03
+
+Model name: 3xConv_2xBiLSTM
+Elapsed training time: 13 minutes
+
+Training set size: 596499
+Validation set size: 66277
+Validation set fraction: 0.099999
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 30
+Max sequence length: 80
+
+-----------Training statistics-----------
+        acc      loss   val_acc  val_loss
+0  0.541815  0.689818  0.540504  0.689867
+1  0.541899  0.689676  0.540504  0.689928
+2  0.541930  0.689670  0.540504  0.689883
+3  0.541912  0.689652  0.540504  0.689901
+
+--------------Model Diagram---------------
+      InputLayer (None, 80)            InputLayer (None, 80)      
+          Lambda (None, 80, 77)            Lambda (None, 80, 77)  
+          Conv1D (None, 76, 196)           Conv1D (None, 76, 196) 
+         Dropout (None, 76, 196)          Dropout (None, 76, 196) 
+    MaxPooling1D (None, 38, 196)     MaxPooling1D (None, 38, 196) 
+          Conv1D (None, 36, 196)           Conv1D (None, 36, 196) 
+         Dropout (None, 36, 196)          Dropout (None, 36, 196) 
+    MaxPooling1D (None, 18, 196)     MaxPooling1D (None, 18, 196) 
+          Conv1D (None, 16, 256)           Conv1D (None, 16, 256) 
+         Dropout (None, 16, 256)          Dropout (None, 16, 256) 
+    MaxPooling1D (None, 8, 256)      MaxPooling1D (None, 8, 256)  
+            LSTM (None, 256)                 LSTM (None, 256)     
+                 \______________________________/                 
+                                |                                 
+                           Merge (None, 512)                      
+                         Dropout (None, 512)                      
+                           Dense (None, 128)                      
+                         Dropout (None, 128)                      
+                           Dense (None, 2)                        
+
+
+Model information:
+=========================================
+ LSTM dropout = 0.5, 0.2
+ Dense dropout: 0.5

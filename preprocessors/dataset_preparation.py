@@ -1,6 +1,8 @@
+from __future__ import print_function
 import os
 from functools import reduce
 from preprocessors.parser import Parser
+from nltk import sent_tokenize
 import numpy as np
 
 from helpers.global_constants import TEXT_DATA_DIR, GENDER, AGE
@@ -23,8 +25,8 @@ def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
 
     print("------Parsing txt files...")
     for sub_folder_name in sorted(list(filter(lambda x: 'pan' in x, os.listdir(folder_path)))):
-        print(sub_folder_name)
         sub_folder_path = os.path.join(folder_path, sub_folder_name)
+        tweet_count = 0
         for file_name in sorted(os.listdir(sub_folder_path)):
             if file_name.lower().endswith('.txt'):
                 file_path = os.path.join(sub_folder_path, file_name)
@@ -44,8 +46,10 @@ def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
                         texts.append(tweet)
                         metadata.append({GENDER: author_data[1].upper(), AGE: author_data[2]})
                         labels.append(labels_index[metadata[-1][prediction_type]])
+                        tweet_count += 1
+        print("%i tweets in %s" % (tweet_count, sub_folder_name))
 
-    print('Found %s texts.' % len(texts))
+    print('\nFound %s texts.' % len(texts))
     return texts, labels, metadata, labels_index
 
 
@@ -78,18 +82,32 @@ def display_dataset_statistics(texts):
     :param pred_type: classification_type
     """
 
-    # Number of tokens per tweet
+    # Number of tokens/words per tweet
     tokens_all_texts = list(map(lambda tweet: tweet.split(" "), texts))
-    avg_token_len = reduce(lambda total_len, tweet_tokens: total_len + len(tweet_tokens), tokens_all_texts, 0) / len(
-        tokens_all_texts)
+    avg_token_len = reduce(lambda total_len, tweet_tokens: total_len + len(tweet_tokens), tokens_all_texts, 0) / float(len(
+        tokens_all_texts))
 
     # Number of characters per tweet
     char_length_all_texts = list(map(lambda tweet: len(tweet), texts))
-    avg_char_len = reduce(lambda total_len, tweet_len: total_len + tweet_len, char_length_all_texts) / len(texts)
+    avg_char_len = reduce(lambda total_len, tweet_len: total_len + tweet_len, char_length_all_texts) / float(len(texts))
 
     print("Number of tweets: %i" % len(texts))
-    print("Average number of tokens per tweet: %f" % avg_token_len)
+    print("Average number of tokens/words per tweet: %f" % avg_token_len)
     print("Average number of characters per tweet: %f" % avg_char_len)
+
+    # Split list of texts into lists of sentences
+    txt_sents = list(map(lambda tweet: sent_tokenize(tweet), texts))
+
+    # Number of sentences per tweet
+    avg_sents_per_tweet = reduce(lambda total_len, sents: total_len + len(sents), txt_sents, 0) / float(len(texts))
+
+    # Number of characters per sentence - len in chars
+    sent_len_tweets = [list(map(lambda s: len(s), tweet)) for tweet in txt_sents]
+    avg_sent_len_tweets = [reduce(lambda total_len, s_l: total_len + s_l, tweet, 0) / float(len(tweet)) for tweet in sent_len_tweets]
+    avg_char_per_sent = reduce(lambda total_len, avg_chars: total_len + avg_chars, avg_sent_len_tweets, 0) / float(len(texts))
+
+    print("Average number of sentences per tweet: %f" % avg_sents_per_tweet)
+    print("Average number of characters per sentences: %f" % avg_char_per_sent)
 
 
 def display_gender_distribution(metadata):
@@ -104,7 +122,8 @@ def display_gender_distribution(metadata):
 
 
 if __name__ == '__main__':
-    texts, labels, metadata, labels_index = prepare_dataset(GENDER)
+    txts, labels, metadata, labels_index = prepare_dataset(GENDER)
+    # txts = ["LJ_Barca all UK is a bigger grain harvest and banking ! We all still get taken for mugs by the Gov ! UK will selfdestruct eventually", "Hei. Duasdfsadfasdf. sadf. asd. Jeg"]
     parser = Parser()
-    texts = parser.replace_all(texts)
-    display_dataset_statistics(texts)
+    txts = parser.replace_all(txts)
+    display_dataset_statistics(txts)

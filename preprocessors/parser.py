@@ -2,13 +2,13 @@ from nltk.tokenize import TweetTokenizer
 import re
 
 
-class Parser():
+class Parser:
     def __init__(self):
         self.tknzr = TweetTokenizer()
 
     def replace_all(self, texts):
-        modified_texts = [self.clean_HTML(t) for t in texts]  # TODO: Kan fjernes?
-        modified_texts = [t.lower() for t in modified_texts]  # Lowercase
+        # content = self.clean_HTML(content)  # TODO: Kan fjernes?
+        modified_texts = [t.lower() for t in texts]  # Lower_case
 
         modified_texts = self.replace('url', '~', modified_texts)
         modified_texts = self.replace('pic', 'P', modified_texts)
@@ -17,7 +17,7 @@ class Parser():
 
         return modified_texts
 
-    def clean_HTML(self, content):
+    def clean_html(self, content):
         """
         Strips the input string from html code
         :param content: string containing html syntax
@@ -34,7 +34,6 @@ class Parser():
         content = ' '.join(tokens)
         content = self.do_join(content)
         return content
-
 
     def replace(self, remove, replace, texts):
 
@@ -61,6 +60,9 @@ class Parser():
             modified_texts.append(content)
 
         return modified_texts
+
+    def replace_urls(self, texts):
+        return self.replace('url', 'U', texts)
 
     def do_join(self, content):
         """

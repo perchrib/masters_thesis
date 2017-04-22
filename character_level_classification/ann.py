@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import sys
 
@@ -18,18 +19,7 @@ import numpy as np
 np.random.seed(1337)
 
 
-def train(model_name, extra_info=None):
-    # Load dataset
-    texts, labels, metadata, labels_index = prepare_dataset(PREDICTION_TYPE)
-
-    # Clean texts
-    text_parser = Parser()
-    texts = text_parser.replace_all(texts)
-
-    x_train, y_train, meta_train, x_val, y_val, meta_val, char_index = format_dataset_char_level(texts, labels,
-                                                                                                 metadata)
-
-    model = get_model(model_name, len(labels_index))
+def train(model, model_info, data, extra_info=None):
 
     # Callbacks
     early_stopping = EarlyStopping(monitor='val_loss', patience=2)
@@ -42,8 +32,8 @@ def train(model_name, extra_info=None):
     start_time = time()
 
     print('\nCommence training %s model' % model.name)
-    history = model.fit(x_train, y_train,
-                        validation_data=[x_val, y_val],
+    history = model.fit(data['x_train'], data['y_train'],
+                        validation_data=[data['x_val'], data['y_val']],
                         epochs=NB_EPOCHS,
                         batch_size=BATCH_SIZE,
                         shuffle=True,
@@ -51,18 +41,5 @@ def train(model_name, extra_info=None):
 
     training_time = (time() - start_time) / 60
     print('Training time: %i' % training_time)
-    log_session(LOGS_DIR, model, history, training_time, len(x_train), len(x_val), MODEL_OPTIMIZER, BATCH_SIZE,
-                NB_EPOCHS, MAX_SEQUENCE_LENGTH, extra_info)
-
-
-def get_model(model_name, num_output_nodes):
-    if model_name == '3xConv_2xBiLSTM':
-        return get_char_model_3xConv_2xBiLSTM(num_output_nodes)
-    elif model_name == '2x512_256LSTM':
-        return get_model_2x512_256_lstm(num_output_nodes)
-    elif model_name == 'BiLSTM_full':
-        return get_char_model_BiLSTM_full(num_output_nodes)
-
-
-if __name__ == '__main__':
-    train("BiLSTM_full")
+    log_session(LOGS_DIR, model, history, training_time, len(data['x_train']), len(data['x_val']), MODEL_OPTIMIZER, BATCH_SIZE,
+                NB_EPOCHS, MAX_SEQUENCE_LENGTH, model_info, extra_info)
