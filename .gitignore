@@ -21,7 +21,6 @@ keys/*
 ##########
 # Datasets
 ##########
-char-models-offbit/labeledTrainData.tsv
 data/*
 data_old/*
 
@@ -38,3 +37,6 @@ fiddle.py
 
 # MG aws key
 key_apr17.pem
+
+# To be removed
+char-models-offbit/*
