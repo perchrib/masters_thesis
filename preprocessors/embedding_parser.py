@@ -1,6 +1,11 @@
 import os
+import sys
+
+# Append path to use modules outside pycharm environment, e.g. remote server
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
+
 from helpers.helper_functions import save_pickle
-from word_level_classification.constants import *
+from helpers.global_constants import EMBEDDINGS_INDEX_DIR, EMBEDDINGS_NATIVE_DIR
 import numpy as np
 
 
@@ -17,6 +22,10 @@ def parse_glove(filename='glove.twitter.27B.200d.txt', save_file=True):
         os.makedirs(EMBEDDINGS_NATIVE_DIR)
         print(EMBEDDINGS_NATIVE_DIR, " directory created")
 
+    if not os.path.isfile(os.path.join(EMBEDDINGS_NATIVE_DIR, filename)):
+        print("Error: Embeddings file missing in embeddings_native directory")
+        return
+
     with open(os.path.join(EMBEDDINGS_NATIVE_DIR, filename), 'r') as glove_file:
         print("Reading Glove File...")
         for line in glove_file:
@@ -32,4 +41,5 @@ def parse_glove(filename='glove.twitter.27B.200d.txt', save_file=True):
 
         save_pickle(os.path.join(EMBEDDINGS_INDEX_DIR, filename.strip('.txt')), embeddings_index)
 
-parse_glove()
+if __name__ == '__main__':
+    parse_glove()

@@ -1,4 +1,4 @@
-from config.global_constants import TEXT_DATA_DIR
+from helpers.global_constants import TEXT_DATA_DIR
 from text_mining.helpers import get_data, word_tokenize
 from text_mining.dataset_characteristics import Characteristics, equal_token_count, unequal_token_count, most_common, lower, stopwords_counter, pos_tag_counter
 from text_mining.data_plot import Visualizer

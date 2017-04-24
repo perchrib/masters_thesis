@@ -1,27 +1,29 @@
-import sys
+from __future__ import print_function
 import os
+import sys
+
 import numpy as np
+
 # Append path to use modules outside pycharm environment, e.g. remote server
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 
-from word_level_classification.dataset_formatting import format_dataset_word_level, construct_embedding_matrix, get_embedding_dim
-from word_level_classification.constants import *
+from word_level_classification.dataset_formatting import format_dataset_word_level, construct_embedding_matrix, \
+    get_embedding_dim
+from word_level_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE, \
+    EMBEDDINGS_INDEX, MAX_SEQUENCE_LENGTH, LOGS_DIR
+from word_level_classification.models import *
+from preprocessors.parser import Parser
 from preprocessors.dataset_preparation import prepare_dataset
 from keras.layers import Embedding
 from keras.callbacks import EarlyStopping
-from word_level_classification.models import SeqLSTM
 from time import time
+from helpers.helper_functions import log_session
 
 np.random.seed(1337)
 
 
-def train():
-    # Load dataset
-    texts, labels, metadata, labels_index = prepare_dataset()
-    x_train, y_train, meta_train, x_val, y_val, meta_val, word_index = format_dataset_word_level(texts, labels, metadata)
+def train(model, model_info, data, extra_info=None):
 
-    embedding_layer = get_embedding_layer(word_index)
-    model = get_model(embedding_layer, len(labels_index))
     model.compile(optimizer=MODEL_OPTIMIZER,
                   loss=MODEL_LOSS,
                   metrics=MODEL_METRICS)
@@ -33,22 +35,24 @@ def train():
     # Time
     start_time = time()
 
-    print('\nCommence training %s model' % MODEL_NAME)
+    print('\nCommence training %s model' % model.name)
     print('Embeddings from: %s' % EMBEDDINGS_INDEX)
-    model.fit(x_train, y_train,
-              validation_data=[x_val, y_val],
-              nb_epoch=NB_EPOCHS,
-              batch_size=BATCH_SIZE,
-              shuffle=True,
-              callbacks=[early_stopping],
-              verbose=1)
+    history = model.fit(data['x_train'], data['y_train'],
+                        validation_data=[data['x_val'], data['y_val']],
+                        epochs=NB_EPOCHS,
+                        batch_size=BATCH_SIZE,
+                        shuffle=True,
+                        callbacks=[early_stopping],
+                        verbose=1).history
 
-    print('Training time: %i' % (time() - start_time))
-    # TODO: Write and save log
+    training_time = (time() - start_time) / 60
+    print('Training time: %i' % training_time)
 
-def get_model(embedding_layer, nb_output_nodes):
-    if MODEL_NAME == 'SeqLSTM':
-        return SeqLSTM(embedding_layer, nb_output_nodes)
+    # Evaluate on test set
+    test_results = model.evaluate(data['x_test'], data['y_test'], batch_size=BATCH_SIZE)
+
+    log_session(LOGS_DIR, model, history, training_time, len(data['x_train']), len(data['x_val']), MODEL_OPTIMIZER, BATCH_SIZE,
+                NB_EPOCHS, MAX_SEQUENCE_LENGTH, test_results, model_info, extra_info)
 
 
 def get_embedding_layer(word_index):
@@ -59,7 +63,3 @@ def get_embedding_layer(word_index):
                      trainable=False)  # Not trainable to prevent weights from being updated during training
 
 
-def write_and_save_log(save_dir=LOG_DIR, ):
-    pass
-
-train()

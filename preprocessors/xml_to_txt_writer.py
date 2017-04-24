@@ -76,7 +76,7 @@ def get_parsed_data_from_xml_file(file, dir):
             raw_data = doc.text
 
             if raw_data:
-                clean_text = DATA_PARSER.clean_HTML(raw_data)
+                clean_text = DATA_PARSER.clean_html(raw_data)
                 # chars = [[c for c in word] for word in clean_text.split()]
                 # chars = sum(chars, [])
                 # for c in chars:

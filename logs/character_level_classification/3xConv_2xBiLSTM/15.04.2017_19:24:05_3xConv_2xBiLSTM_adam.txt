@@ -1,0 +1,52 @@
+Training_log - 15/04/2017 19:24:05
+
+Model name: 3xConv_2xBiLSTM
+Elapsed training time: 35 minutes
+
+Training set size: 596499
+Validation set size: 66277
+Validation set fraction: 0.099999
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 30
+Max sequence length: 80
+
+-----------Training statistics-----------
+         acc      loss   val_acc  val_loss
+0   0.605208  0.652440  0.637280  0.621393
+1   0.645490  0.616782  0.652715  0.606595
+2   0.658777  0.602252  0.658268  0.600562
+3   0.666028  0.592538  0.659128  0.598540
+4   0.671540  0.585719  0.658087  0.597524
+5   0.676861  0.579556  0.666762  0.589413
+6   0.681661  0.573989  0.663895  0.589624
+7   0.684913  0.569143  0.670610  0.586120
+8   0.688848  0.565141  0.675121  0.581211
+9   0.691657  0.560878  0.668301  0.588455
+10  0.694350  0.557262  0.674668  0.580050
+11  0.697932  0.553006  0.673703  0.581575
+
+--------------Model Diagram---------------
+      InputLayer (None, 80)            InputLayer (None, 80)      
+          Lambda (None, 80, 77)            Lambda (None, 80, 77)  
+          Conv1D (None, 76, 196)           Conv1D (None, 76, 196) 
+         Dropout (None, 76, 196)          Dropout (None, 76, 196) 
+    MaxPooling1D (None, 38, 196)     MaxPooling1D (None, 38, 196) 
+          Conv1D (None, 36, 196)           Conv1D (None, 36, 196) 
+         Dropout (None, 36, 196)          Dropout (None, 36, 196) 
+    MaxPooling1D (None, 18, 196)     MaxPooling1D (None, 18, 196) 
+          Conv1D (None, 16, 256)           Conv1D (None, 16, 256) 
+         Dropout (None, 16, 256)          Dropout (None, 16, 256) 
+    MaxPooling1D (None, 8, 256)      MaxPooling1D (None, 8, 256)  
+            LSTM (None, 256)                 LSTM (None, 256)     
+                 \______________________________/                 
+                                |                                 
+                           Merge (None, 512)                      
+                         Dropout (None, 512)                      
+                           Dense (None, 128)                      
+                         Dropout (None, 128)                      
+                           Dense (None, 2)                        
+
