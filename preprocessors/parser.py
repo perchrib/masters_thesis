@@ -1,6 +1,7 @@
 from nltk.tokenize import TweetTokenizer
 from nltk import WordNetLemmatizer
 import re
+from nltk.corpus import stopwords
 
 
 URL_KEY = 'url'
@@ -21,7 +22,7 @@ class Parser:
 
     def replace_all(self, texts):
         modified_texts = [t.lower() for t in texts]  # Lower_case
-        modified_texts = self.replace(texts, url=URL_REPLACE, pic=PIC_REPLACE, mention=MENTION_REPLACE, hashtag=HASHTAG_REPLACE)
+        modified_texts = self.replace(modified_texts, url=URL_REPLACE, pic=PIC_REPLACE, mention=MENTION_REPLACE, hashtag=HASHTAG_REPLACE)
 
         return modified_texts
 
@@ -82,6 +83,23 @@ class Parser:
             content = " ".join(content.split()).strip()
         return content
 
+
+    def remove_stopwords(self, texts):
+        """
+        
+        :param content: list of text strings  
+        :return: list of text strings with removed stopwords
+        """
+        parsed_texts = []
+        stop_words = set(stopwords.words('english'))
+        for text in texts:
+            words = text.split()
+            sustain_words = [word for word in words if word not in stop_words]
+            new_text = " ".join(sustain_words)
+            parsed_texts.append(new_text)
+        return parsed_texts
+
+
     def lemmatize(self, texts):
         """
         Given list of texts. Lemmatize all text terms
@@ -95,6 +113,7 @@ class Parser:
             lemmatized_texts.append(" ".join(lemmatized_terms))
 
         return lemmatized_texts
+
 
     def generate_character_vocabulary(self, texts):
         pass

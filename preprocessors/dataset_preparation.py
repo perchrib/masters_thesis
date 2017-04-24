@@ -23,7 +23,7 @@ def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
     labels = []  # list of label ids
     metadata = []  # list of dictionaries with author information (age, gender)
 
-    print("------Parsing txt files...")
+    print("------Parsing txt files..")
     for sub_folder_name in sorted(list(filter(lambda x: 'pan' in x, os.listdir(folder_path)))):
         sub_folder_path = os.path.join(folder_path, sub_folder_name)
         tweet_count = 0

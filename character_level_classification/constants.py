@@ -4,8 +4,10 @@ GENDER = 'gender'
 AGE = 'age'
 PREDICTION_TYPE = GENDER
 
+
 # Log directory
 LOGS_DIR = '../logs/character_level_classification'
+
 
 # Text pre-processing
 MAX_SEQUENCE_LENGTH = 80
