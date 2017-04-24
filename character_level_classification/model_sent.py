@@ -58,6 +58,7 @@ def get_char_model_3xConv_Bi_lstm_sent(num_output_nodes, char_num):
 
     return model, model_info
 
+
 def one_hot(x):
     return tf.to_float(tf.one_hot(x, nb_chars, on_value=1, off_value=0, axis=-1))
     # return tf.to_float(tf.one_hot(x, chars, on_value=1, off_value=0))

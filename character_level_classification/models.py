@@ -17,7 +17,6 @@ def get_char_model_3xConv_2xBiLSTM(num_output_nodes, char_num):
     nb_chars = char_num
 
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
-    # embedding = Lambda(one_hot, output_shape=one_hot_out)(tweet_input)
     embedding = get_one_hot_layer(tweet_input)
 
     kernel_size = [5, 3, 3]
@@ -61,7 +60,6 @@ def get_char_model_2xConv_BiLSTM(num_output_nodes, char_num):
     nb_chars = char_num
 
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
-    # embedding = Lambda(one_hot, output_shape=one_hot_out)(tweet_input)
     embedding = get_one_hot_layer(tweet_input)
 
     kernel_size = [5, 3, 3]
@@ -103,7 +101,6 @@ def get_char_model_Conv_BiLSTM(num_output_nodes, char_num):
     nb_chars = char_num
 
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
-    # embedding = Lambda(one_hot, output_shape=one_hot_out)(tweet_input)
     embedding = get_one_hot_layer(tweet_input)
 
     kernel_size = [5, 3, 3]
@@ -131,7 +128,7 @@ def get_char_model_Conv_BiLSTM(num_output_nodes, char_num):
     output = Dense(128, activation='relu')(output)
     # output = Dropout(0.5)(output)
     output = Dense(num_output_nodes, activation='softmax')(output)
-    model = Model(input=tweet_input, output=output, name='2xConv_BiLSTM')
+    model = Model(input=tweet_input, output=output, name='Conv_BiLSTM')
 
     model_info = ["LSTM dropout = 0.2, 0.2", "No dense dropout", "filters = [1024]"]
     return model, model_info

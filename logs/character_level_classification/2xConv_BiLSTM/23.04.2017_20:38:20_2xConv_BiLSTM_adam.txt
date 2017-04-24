@@ -1,0 +1,61 @@
+Training_log - 23/04/2017 20:38:20
+
+Model name: 2xConv_BiLSTM
+Elapsed training time: 121 minutes
+
+Training set size: 596499
+Validation set size: 66277
+Validation set fraction: 0.099999
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 30
+Max sequence length: 80
+
+-----------Training statistics-----------
+         acc      loss   val_acc  val_loss
+0   0.606581  0.653659  0.634594  0.638264
+1   0.633810  0.628439  0.634428  0.622658
+2   0.642583  0.618970  0.646288  0.616507
+3   0.647592  0.612448  0.656713  0.609989
+4   0.652060  0.607335  0.657528  0.608688
+5   0.654843  0.604290  0.648822  0.605084
+6   0.658300  0.600947  0.659580  0.601404
+7   0.660875  0.598210  0.661436  0.599712
+8   0.662797  0.596079  0.659927  0.597887
+9   0.664506  0.594477  0.663956  0.595423
+10  0.665621  0.592170  0.667728  0.595157
+11  0.667155  0.590599  0.670338  0.593199
+12  0.667855  0.589599  0.669810  0.592834
+13  0.669277  0.588386  0.670791  0.593834
+14  0.669450  0.587409  0.670112  0.591636
+15  0.671243  0.586014  0.671500  0.590854
+16  0.671887  0.584900  0.673658  0.586180
+17  0.672794  0.584397  0.671696  0.588282
+18  0.673914  0.582688  0.673326  0.587730
+19  0.674360  0.582510  0.675046  0.589945
+
+--------------Model Diagram---------------
+          InputLayer (None, 80)                          InputLayer (None, 80)                
+              Lambda (None, Dimension(80), 78)               Lambda (None, Dimension(80), 78) 
+              Conv1D (None, Dimension(76), 256)              Conv1D (None, Dimension(76), 256)
+             Dropout (None, Dimension(76), 256)             Dropout (None, Dimension(76), 256)
+        MaxPooling1D (None, Dimension(38), 256)        MaxPooling1D (None, Dimension(38), 256)
+              Conv1D (None, Dimension(36), 256)              Conv1D (None, Dimension(36), 256)
+             Dropout (None, Dimension(36), 256)             Dropout (None, Dimension(36), 256)
+        MaxPooling1D (None, Dimension(18), 256)        MaxPooling1D (None, Dimension(18), 256)
+                   LSTM (None, 256)                               LSTM (None, 256)            
+                        \____________________________________________/                        
+                                              |                                               
+                                         Merge (None, 512)                                    
+                                         Dense (None, 128)                                    
+                                         Dense (None, 2)                                      
+
+
+Model information:
+=========================================
+ LSTM dropout = 0.2, 0.2
+ No dense dropout
+ filters = [256, 256]

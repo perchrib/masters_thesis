@@ -1,0 +1,45 @@
+Training_log - 23/04/2017 18:37:09
+
+Model name: 3xConv_2xBiLSTM
+Elapsed training time: 13 minutes
+
+Training set size: 596499
+Validation set size: 66277
+Validation set fraction: 0.099999
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 30
+Max sequence length: 80
+
+-----------Training statistics-----------
+        acc      loss   val_acc  val_loss
+0  0.541954  0.689756  0.540504  0.689870
+1  0.541954  0.689667  0.540504  0.689900
+2  0.541954  0.689660  0.540504  0.689879
+3  0.541954  0.689658  0.540504  0.689871
+
+--------------Model Diagram---------------
+          InputLayer (None, 80)                          InputLayer (None, 80)                
+              Lambda (None, Dimension(80), 78)               Lambda (None, Dimension(80), 78) 
+              Conv1D (None, Dimension(76), 196)              Conv1D (None, Dimension(76), 196)
+        MaxPooling1D (None, Dimension(38), 196)        MaxPooling1D (None, Dimension(38), 196)
+              Conv1D (None, Dimension(36), 196)              Conv1D (None, Dimension(36), 196)
+        MaxPooling1D (None, Dimension(18), 196)        MaxPooling1D (None, Dimension(18), 196)
+              Conv1D (None, Dimension(16), 256)              Conv1D (None, Dimension(16), 256)
+         MaxPooling1D (None, Dimension(8), 256)         MaxPooling1D (None, Dimension(8), 256)
+                   LSTM (None, 256)                               LSTM (None, 256)            
+                        \____________________________________________/                        
+                                              |                                               
+                                         Merge (None, 512)                                    
+                                         Dense (None, 128)                                    
+                                         Dense (None, 2)                                      
+
+
+Model information:
+=========================================
+ LSTM dropout = 0.2, 0.2
+ No dense dropout
+ No conv dropoutfilters = [256, 256]
