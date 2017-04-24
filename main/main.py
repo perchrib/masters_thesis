@@ -29,7 +29,7 @@ def char_sent_main():
     # texts = text_parser.replace_urls(texts)
 
     data = {}
-    data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], data['meta_val'], data[
+    data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], data['meta_val'], data['x_test'], data['y_test'], data['meta_test'], data[
         'char_index'] = format_dataset_char_level_sentences(texts, labels,
                                                   metadata)
     num_chars = len(data['char_index'])
@@ -48,7 +48,7 @@ def char_main():
     # texts = text_parser.replace_urls(texts)
 
     data = {}
-    data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], data['meta_val'], data['char_index'] = format_dataset_char_level(texts, labels,
+    data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], data['meta_val'], data['x_test'], data['y_test'], data['meta_test'], data['char_index'] = format_dataset_char_level(texts, labels,
                                                                                                  metadata)
     num_chars = len(data['char_index'])
     num_output_nodes = len(labels_index)
@@ -59,10 +59,12 @@ def char_main():
     # Remember star before model getter
     c_train(*get_char_model_3xConv_2xBiLSTM(num_output_nodes, num_chars), data=data)
     # c_train(*get_char_model_BiLSTM_full(num_output_nodes, num_chars), data=data)
-    # c_train(*get_char_model_3xConv(num_output_nodes), data=data)
-    # c_train(*get_char_model_3xConv_LSTM(num_output_nodes, num_chars), data=data)
+    ##c_train(*get_char_model_3xConv(num_output_nodes), data=data)
+    ##c_train(*get_char_model_3xConv_LSTM(num_output_nodes, num_chars), data=data)
     # c_train(*get_char_model_3xConv_4xBiLSTM(num_output_nodes, num_chars), data=data)
 
+    c_train(*get_char_model_2xConv_BiLSTM(num_output_nodes, num_chars), data=data)
+    c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data)
 
 def word_main():
     # Load dataset
@@ -73,7 +75,7 @@ def word_main():
     # texts = text_parser.replace_all(texts)
 
     data = {}
-    data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], data['meta_val'], data[
+    data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], data['meta_val'], data['x_test'], data['y_test'], data['meta_test'], data[
         'word_index'] = format_dataset_word_level(texts, labels,
                                                   metadata)
 

@@ -5,7 +5,7 @@ from preprocessors.parser import Parser
 from nltk import sent_tokenize
 import numpy as np
 
-from helpers.global_constants import TEXT_DATA_DIR, GENDER, AGE
+from helpers.global_constants import TEXT_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT
 
 np.random.seed(1337)
 
@@ -52,6 +52,36 @@ def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
     print('\nFound %s texts.' % len(texts))
     return texts, labels, metadata, labels_index
 
+
+def split_dataset(data, labels, metadata):
+    """
+    Given correctly formatted dataset, split into training, validation and test
+    :param data: formatted dataset, i.e., sequences of char/word indices
+    :return: training set, validation set, test set and metadata
+    """
+
+    # shuffle and split the data into a training set and a validation set
+    indices = np.arange(data.shape[0])
+    np.random.shuffle(indices)
+    data = data[indices]
+    labels = labels[indices]
+    metadata = [metadata[i] for i in indices]
+    nb_validation_samples = int(VALIDATION_SPLIT * data.shape[0])
+    nb_test_samples = int(TEST_SPLIT * data.shape[0])
+
+    x_train = data[:-nb_validation_samples-nb_test_samples]
+    y_train = labels[:-nb_validation_samples-nb_test_samples]
+    meta_train = metadata[:-nb_validation_samples-nb_test_samples]
+
+    x_val = data[-nb_validation_samples-nb_test_samples:-nb_test_samples]
+    y_val = labels[-nb_validation_samples-nb_test_samples:-nb_test_samples]
+    meta_val = metadata[-nb_validation_samples-nb_test_samples:-nb_test_samples]
+
+    x_test = data[-nb_test_samples:]
+    y_test = data[-nb_test_samples:]
+    meta_test = data[-nb_test_samples:]
+
+    return x_train, y_train, meta_train, x_val, y_val, meta_val, x_test, y_test, meta_test
 
 def construct_labels_index(prediction_type):
     """

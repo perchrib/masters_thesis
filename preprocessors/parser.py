@@ -1,19 +1,27 @@
 from nltk.tokenize import TweetTokenizer
+from nltk import WordNetLemmatizer
 import re
+
+
+URL_KEY = 'url'
+PIC_KEY = 'pic'
+MENTION_KEY = 'mention'
+HASHTAG_KEY = 'hashtag'
+
+URL_REPLACE = 'U'
+PIC_REPLACE = 'P'
+MENTION_REPLACE = 'M'
+HASHTAG_REPLACE = 'H'
 
 
 class Parser:
     def __init__(self):
         self.tknzr = TweetTokenizer()
+        self.lemmatizer = WordNetLemmatizer()
 
     def replace_all(self, texts):
-        # content = self.clean_HTML(content)  # TODO: Kan fjernes?
         modified_texts = [t.lower() for t in texts]  # Lower_case
-
-        modified_texts = self.replace('url', '~', modified_texts)
-        modified_texts = self.replace('pic', 'P', modified_texts)
-        modified_texts = self.replace('@', 'M', modified_texts)
-        modified_texts = self.replace('#', 'H', modified_texts)
+        modified_texts = self.replace(texts, url=URL_REPLACE, pic=PIC_REPLACE, mention=MENTION_REPLACE, hashtag=HASHTAG_REPLACE)
 
         return modified_texts
 
@@ -35,34 +43,35 @@ class Parser:
         content = self.do_join(content)
         return content
 
-    def replace(self, remove, replace, texts):
+    def replace(self, texts, **kwargs):
 
         """
-        :param remove: specifies what will be removed: 'url'=urls, '@'=mentions, '#'=hashtag, 'pic'=picture urls
+        :param remove: specifies what will be removed: URL_KEY=urls, MENTION_KEY=mentions, HASHTAG_KEY=hashtag, PIC_KEY=picture urls
         :param replace: the string or character which will be placed instead
         :param texts: list of texts to be modified
         :return: the modified string :param content:
         """
         modified_texts = []
-        replace = ' ' + replace + ' '
         for txt in texts:
             content = txt
-            if remove == "url":
-                content = re.sub(r'(?:(http://|https://)|(www\.)|(http|httphttp|https) :/ / )(\S+\b/?)([!"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~]*)(\s|$)', replace, content)
-            elif remove == "@":
-                content = re.sub(r'@([a-z0-9_]+)', replace, content)
-            elif remove == "#":
-                content = re.sub(r'#([a-z0-9_]+)', replace, content)
-            elif remove == 'pic':
-                content = re.sub(r'(pic .twitter.com/|pic.twitter.com/)(\w+)', replace, content)
-            content = self.do_join(content)
+            for remove, replace in kwargs.items():
+                replace = ' ' + replace + ' '
+                if remove == URL_KEY:
+                    content = re.sub(r'(?:(http://|https://)|(www\.)|(http|httphttp|https) :/ / )(\S+\b/?)([!"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~]*)(\s|$)', replace, content)
+                elif remove == MENTION_KEY:
+                    content = re.sub(r'@([a-z0-9_]+)', replace, content)
+                elif remove == HASHTAG_KEY:
+                    content = re.sub(r'#([a-z0-9_]+)', replace, content)
+                elif remove == PIC_KEY:
+                    content = re.sub(r'(pic .twitter.com/|pic.twitter.com/)(\w+)', replace, content)
+                content = self.do_join(content)
 
             modified_texts.append(content)
 
         return modified_texts
 
     def replace_urls(self, texts):
-        return self.replace('url', 'U', texts)
+        return self.replace(texts, url='U')
 
     def do_join(self, content):
         """
@@ -73,9 +82,25 @@ class Parser:
             content = " ".join(content.split()).strip()
         return content
 
+    def lemmatize(self, texts):
+        """
+        Given list of texts. Lemmatize all text terms
+        :param texts: list of texts
+        :return: lemmatized texts
+        """
+        lemmatized_texts = []
+        for t in texts:  # type: str
+            terms = t.split()
+            lemmatized_terms = [self.lemmatizer.lemmatize(w) for w in terms]
+            lemmatized_texts.append(" ".join(lemmatized_terms))
+
+        return lemmatized_texts
+
     def generate_character_vocabulary(self, texts):
         pass
 
     def generate_word_vocabulary(self, texts):
         pass
+
+
 

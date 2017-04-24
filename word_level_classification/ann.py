@@ -48,8 +48,11 @@ def train(model, model_info, data, extra_info=None):
     training_time = (time() - start_time) / 60
     print('Training time: %i' % training_time)
 
+    # Evaluate on test set
+    test_results = model.evaluate(data['x_test'], data['y_test'], batch_size=BATCH_SIZE)
+
     log_session(LOGS_DIR, model, history, training_time, len(data['x_train']), len(data['x_val']), MODEL_OPTIMIZER, BATCH_SIZE,
-                NB_EPOCHS, MAX_SEQUENCE_LENGTH, model_info, extra_info)
+                NB_EPOCHS, MAX_SEQUENCE_LENGTH, test_results, model_info, extra_info)
 
 
 def get_embedding_layer(word_index):

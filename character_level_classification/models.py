@@ -1,6 +1,7 @@
 import tensorflow as tf
 from keras.models import Model, Sequential
-from keras.layers import Input, Dense, LSTM, Dropout, Lambda, Convolution1D, MaxPooling1D, merge, Flatten
+from keras import backend as K
+from keras.layers import Input, Dense, LSTM, Dropout, Lambda, Conv1D, MaxPooling1D, merge, Flatten
 from character_level_classification.constants import MAX_SEQUENCE_LENGTH
 
 # TODO: Try Conv2D layers?
@@ -16,27 +17,29 @@ def get_char_model_3xConv_2xBiLSTM(num_output_nodes, char_num):
     nb_chars = char_num
 
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
-    embedding = Lambda(one_hot, output_shape=one_hot_out)(tweet_input)
+    embedding = get_one_hot_layer(tweet_input)
 
-    filter_length = [5, 3, 3]
-    nb_filter = [196, 196, 256]
-    # filter_length = [7, 5, 3]
-    # nb_filter = [256, 256, 256]
+    kernel_size = [5, 3, 3]
+    filters = [196, 196, 256]
+
+    # kernel_size = [7, 5, 3]
+    # filters = [256, 256]
+
     pool_length = 2
 
-    # len of nb_filter = num conv layers
-    for i in range(len(nb_filter)):
-        embedding = Convolution1D(nb_filter=nb_filter[i],
-                                  filter_length=filter_length[i],
+    # len of filters = num conv layers
+    for i in range(len(filters)):
+        embedding = Conv1D(filters=filters[i],
+                                  kernel_size=kernel_size[i],
                                   activation='relu',
-                                  init='glorot_uniform',
+                                  kernel_initializer='glorot_uniform',
                                   subsample_length=1)(embedding)
 
-        embedding = Dropout(0.5)(embedding)
+        # embedding = Dropout(0.5)(embedding)
         embedding = MaxPooling1D(pool_length=pool_length)(embedding)
 
-    forward = LSTM(256, return_sequences=False, dropout=0.5, recurrent_dropout=0.2, consume_less='gpu')(embedding)
-    backward = LSTM(256, return_sequences=False, dropout=0.5, recurrent_dropout=0.2, consume_less='gpu',
+    forward = LSTM(256, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu')(embedding)
+    backward = LSTM(256, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu',
                     go_backwards=True)(embedding)
 
     output = merge([forward, backward], mode='concat', concat_axis=-1)
@@ -46,23 +49,108 @@ def get_char_model_3xConv_2xBiLSTM(num_output_nodes, char_num):
     output = Dense(num_output_nodes, activation='softmax')(output)
     model = Model(input=tweet_input, output=output, name='3xConv_2xBiLSTM')
 
-    model_info = ["LSTM dropout = 0.5, 0.2", "Dense dropout: 0.5"]
+    model_info = ["LSTM dropout = 0.2, 0.2", "No dense dropout", "No conv dropout" "filters = [256, 256]"]
     return model, model_info
 
 
-def get_char_model_2x512_256_lstm(num_output_nodes):
+
+def get_char_model_2xConv_BiLSTM(num_output_nodes, char_num):
+    # Set number of chars for use in one hot encoder
+    global nb_chars
+    nb_chars = char_num
+
+    tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
+    embedding = get_one_hot_layer(tweet_input)
+
+    kernel_size = [5, 3, 3]
+
+    # kernel_size = [7, 5, 3]
+    filters = [256, 256]
+
+    pool_length = 2
+
+    # len of filters = num conv layers
+    for i in range(len(filters)):
+        embedding = Conv1D(filters=filters[i],
+                                  kernel_size=kernel_size[i],
+                                  activation='relu',
+                                  kernel_initializer='glorot_uniform',
+                                  subsample_length=1)(embedding)
+
+        embedding = Dropout(0.5)(embedding)
+        embedding = MaxPooling1D(pool_length=pool_length)(embedding)
+
+    forward = LSTM(256, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu')(embedding)
+    backward = LSTM(256, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu',
+                    go_backwards=True)(embedding)
+
+    output = merge([forward, backward], mode='concat', concat_axis=-1)
+    # output = Dropout(0.5)(output)
+    output = Dense(128, activation='relu')(output)
+    # output = Dropout(0.5)(output)
+    output = Dense(num_output_nodes, activation='softmax')(output)
+    model = Model(input=tweet_input, output=output, name='2xConv_BiLSTM')
+
+    model_info = ["LSTM dropout = 0.2, 0.2", "No dense dropout", "filters = [256, 256]"]
+    return model, model_info
+
+
+def get_char_model_Conv_BiLSTM(num_output_nodes, char_num):
+    # Set number of chars for use in one hot encoder
+    global nb_chars
+    nb_chars = char_num
+
+    tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
+    embedding = get_one_hot_layer(tweet_input)
+
+    kernel_size = [5, 3, 3]
+    filters = [1024]
+
+    pool_length = 2
+
+    # len of filters = num conv layers
+    for i in range(len(filters)):
+        embedding = Conv1D(filters=filters[i],
+                                  kernel_size=kernel_size[i],
+                                  activation='relu',
+                                  kernel_initializer='glorot_uniform',
+                                  subsample_length=1)(embedding)
+
+        embedding = Dropout(0.5)(embedding)
+        embedding = MaxPooling1D(pool_length=pool_length)(embedding)
+
+    forward = LSTM(256, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu')(embedding)
+    backward = LSTM(256, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu',
+                    go_backwards=True)(embedding)
+
+    output = merge([forward, backward], mode='concat', concat_axis=-1)
+    # output = Dropout(0.5)(output)
+    output = Dense(128, activation='relu')(output)
+    # output = Dropout(0.5)(output)
+    output = Dense(num_output_nodes, activation='softmax')(output)
+    model = Model(input=tweet_input, output=output, name='Conv_BiLSTM')
+
+    model_info = ["LSTM dropout = 0.2, 0.2", "No dense dropout", "filters = [1024]"]
+    return model, model_info
+
+def get_char_model_2x256_lstm_full(num_output_nodes, char_num):
+    # Set number of chars for use in one hot encoder
+    global nb_chars
+    nb_chars = char_num
+
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
     embedding = Lambda(one_hot, output_shape=one_hot_out)(tweet_input)
 
-    encoding = LSTM(512, return_sequences=True)(embedding)
-    encoding = LSTM(512, return_sequences=True)(encoding)
-    encoding = LSTM(256, return_sequences=True)(encoding)
+    encoding = LSTM(256, return_sequences=True)(embedding)
+    encoding = LSTM(256, return_sequences=False)(encoding)
 
-    output = Dense(num_output_nodes, activation='softmax')(encoding)
+    output = Dense(200, activation='relu')(encoding)
+    output = Dense(num_output_nodes, activation='softmax')(output)
 
-    model = Model(inputs=tweet_input, outputs=output, name="2x512_256LSTM")
+    model = Model(inputs=tweet_input, outputs=output, name="2x256LSTM_full")
 
-    return model
+    model_info = []
+    return model, model_info
 
 
 def get_char_model_BiLSTM_full(num_output_nodes, char_num):
@@ -97,16 +185,16 @@ def get_char_model_3xConv(num_output_nodes, char_num):
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
     embedding = Lambda(one_hot, output_shape=one_hot_out)(tweet_input)
 
-    filter_length = [5, 3, 3]
-    nb_filter = [196, 196, 256]
+    kernel_size = [5, 3, 3]
+    filters = [196, 196, 256]
     pool_length = 2
 
-    # len of nb_filter = num conv layers
-    for i in range(len(nb_filter)):
-        embedding = Convolution1D(nb_filter=nb_filter[i],
-                                  filter_length=filter_length[i],
+    # len of filters = num conv layers
+    for i in range(len(filters)):
+        embedding = Conv1D(filters=filters[i],
+                                  kernel_size=kernel_size[i],
                                   activation='relu',
-                                  init='glorot_uniform',
+                                  kernel_initializer='glorot_uniform',
                                   subsample_length=1)(embedding)
 
         embedding = Dropout(0.1)(embedding)
@@ -131,27 +219,27 @@ def get_char_model_3xConv_LSTM(num_output_nodes, char_num):
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
     embedding = Lambda(one_hot, output_shape=one_hot_out)(tweet_input)
 
-    filter_length = [5, 3, 3]
-    nb_filter = [196, 196, 256]
-    # filter_length = [7, 5, 3]
-    # nb_filter = [196, 196, 256]
+    kernel_size = [5, 3, 3]
+    filters = [196, 196, 256]
+    # kernel_size = [7, 5, 3]
+    # filters = [196, 196, 256]
     pool_length = 2
 
-    # len of nb_filter = num conv layers
-    for i in range(len(nb_filter)):
-        embedding = Convolution1D(nb_filter=nb_filter[i],
-                                  filter_length=filter_length[i],
+    # len of filters = num conv layers
+    for i in range(len(filters)):
+        embedding = Conv1D(filters=filters[i],
+                                  kernel_size=kernel_size[i],
                                   activation='relu',
-                                  init='glorot_uniform',
+                                  kernel_initializer='glorot_uniform',
                                   subsample_length=1)(embedding)
 
         embedding = Dropout(0.5)(embedding)
         embedding = MaxPooling1D(pool_length=pool_length)(embedding)
 
-    embedding = LSTM(256, return_sequences=False, dropout=0.5, recurrent_dropout=0.2, consume_less='gpu')(embedding)
+    embedding = LSTM(512, return_sequences=False, dropout=0.5, recurrent_dropout=0.2, consume_less='gpu')(embedding)
 
     # embedding = Dropout(0.5)(embedding)
-    embedding = Dense(128, activation='relu')(embedding)
+    embedding = Dense(256, activation='relu')(embedding)
     # embedding = Dropout(0.5)(embedding)
     output = Dense(num_output_nodes, activation='softmax')(embedding)
     model = Model(input=tweet_input, output=output, name='3xConv_LSTM')
@@ -178,18 +266,18 @@ im=2
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
     embedding = Lambda(one_hot, output_shape=one_hot_out)(tweet_input)
 
-    filter_length = [5, 3, 3]
-    nb_filter = [196, 196, 256]
-    # filter_length = [7, 5, 3]
-    # nb_filter = [196, 196, 256]
+    kernel_size = [5, 3, 3]
+    filters = [196, 196, 256]
+    # kernel_size = [7, 5, 3]
+    # filters = [196, 196, 256]
     pool_length = 2
 
-    # len of nb_filter = num conv layers
-    for i in range(len(nb_filter)):
-        embedding = Convolution1D(nb_filter=nb_filter[i],
-                                  filter_length=filter_length[i],
+    # len of filters = num conv layers
+    for i in range(len(filters)):
+        embedding = Conv1D(filters=filters[i],
+                                  kernel_size=kernel_size[i],
                                   activation='relu',
-                                  init='glorot_uniform',
+                                  kernel_initializer='glorot_uniform',
                                   subsample_length=1)(embedding)
 
         embedding = Dropout(0.5)(embedding)
@@ -213,6 +301,9 @@ im=2
     model_info = ["LSTM dropout = 0.5, 0.2"]
     return model, model_info
 
+
+def get_one_hot_layer(input_layer):
+    return Lambda(K.one_hot, arguments={'num_classes': nb_chars}, output_shape=(input_layer.shape[1], nb_chars))(input_layer)
 
 def one_hot(x):
     return tf.to_float(tf.one_hot(x, nb_chars, on_value=1, off_value=0, axis=-1))

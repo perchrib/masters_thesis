@@ -1,0 +1,52 @@
+Training_log - 23/04/2017 01:44:27
+
+Model name: 3xConv_2xBiLSTM
+Elapsed training time: 24 minutes
+
+Training set size: 596499
+Validation set size: 66277
+Validation set fraction: 0.099999
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 30
+Max sequence length: 80
+
+-----------Training statistics-----------
+        acc      loss   val_acc  val_loss
+0  0.600836  0.658276  0.624545  0.648901
+1  0.625656  0.638068  0.639498  0.638528
+2  0.632393  0.630863  0.642334  0.631493
+3  0.635711  0.626319  0.632437  0.629711
+4  0.639830  0.622602  0.643421  0.619144
+5  0.642293  0.619965  0.648460  0.620844
+6  0.643843  0.617975  0.650105  0.620944
+7  0.645637  0.615940  0.645246  0.621034
+
+--------------Model Diagram---------------
+      InputLayer (None, 80)            InputLayer (None, 80)      
+          Lambda (None, 80, 77)            Lambda (None, 80, 77)  
+          Conv1D (None, 76, 128)           Conv1D (None, 76, 128) 
+         Dropout (None, 76, 128)          Dropout (None, 76, 128) 
+    MaxPooling1D (None, 38, 128)     MaxPooling1D (None, 38, 128) 
+          Conv1D (None, 36, 128)           Conv1D (None, 36, 128) 
+         Dropout (None, 36, 128)          Dropout (None, 36, 128) 
+    MaxPooling1D (None, 18, 128)     MaxPooling1D (None, 18, 128) 
+          Conv1D (None, 16, 128)           Conv1D (None, 16, 128) 
+         Dropout (None, 16, 128)          Dropout (None, 16, 128) 
+    MaxPooling1D (None, 8, 128)      MaxPooling1D (None, 8, 128)  
+            LSTM (None, 256)                 LSTM (None, 256)     
+                 \______________________________/                 
+                                |                                 
+                           Merge (None, 512)                      
+                           Dense (None, 128)                      
+                           Dense (None, 2)                        
+
+
+Model information:
+=========================================
+ LSTM dropout = 0.2, 0.2
+ No dense dropout
+ nb_filter = [128, 128, 128]
