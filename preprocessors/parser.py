@@ -1,5 +1,6 @@
 from nltk.tokenize import TweetTokenizer
 import re
+from nltk.corpus import stopwords
 
 
 class Parser():
@@ -62,9 +63,27 @@ class Parser():
             content = " ".join(content.split()).strip()
         return content
 
+    def remove_stopwords(self, texts):
+        """
+        
+        :param content: list of text strings  
+        :return: list of text strings with removed stopwords
+        """
+        parsed_texts = []
+        stop_words = set(stopwords.words('english'))
+        for text in texts:
+            words = text.split()
+            sustain_words = [word for word in words if word not in stop_words]
+            new_text = " ".join(sustain_words)
+            parsed_texts.append(new_text)
+        return parsed_texts
+
+
+
     def generate_character_vocabulary(self, texts):
         pass
 
     def generate_word_vocabulary(self, texts):
         pass
+
 

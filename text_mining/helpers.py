@@ -5,6 +5,9 @@ from author import Author
 def flatten(list):
     return [item for sublist in list for item in sublist]
 
+def word_tokenize(texts):
+    return flatten(map(lambda x: x.split(), texts))
+
 
 def get_data(path):
     """

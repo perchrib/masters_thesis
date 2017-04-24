@@ -30,10 +30,19 @@ class Visualizer():
         elif n_tokens <= 50:
             return 6
         elif n_tokens <= 100:
-            return 3
+            return 5
+        return 3
 
 
     def plot_two_dataset_token_counts(self, tc1, tc2, tc1_label="male", tc2_label="female"):
+        """
+        Plot two distributions with two Counter object
+        :param tc1: A Counter object for dataset nr 1 (male)
+        :param tc2: A Counter object for dataset nr 2 (female)
+        :param tc1_label: labelname for dataset nr 1
+        :param tc2_label: labelname for dataset nr 1
+        
+        """
         rotation = 90
         if "emoticons" in self.title.lower() or "emoticons" in self.xlabel.lower():
             rotation = 270
@@ -51,6 +60,14 @@ class Visualizer():
 
 
     def plot_one_dataset_token_counts(self, tc, color, label="gender", subplot=False):
+        """
+        :param tc: Counter object for a dataset
+        :param color: color option
+        :param label: labelname for the dataset
+        :param subplot: True or False, if True, wait for another function call and take another tc dataset and plot
+                this in same figure.  
+        :return: 
+        """
         tokens = sorted(tc.keys())
         if subplot:
             self.subplot_checker()
@@ -62,13 +79,25 @@ class Visualizer():
         plt.tight_layout()
 
     def plot_avg_length_of_texts(self, counts, color, label="gender", subplot=False):
+        """
+        :param counts: Counter object
+        :param color: color option 
+        :param label: labelname
+        :param subplot: True or False, if True, wait for another function call and take another tc dataset and plot
+                this in same figure. 
+        :return: 
+        """
         x_values = counts.keys()
         y_values = counts.values()
 
+        total_elements = sum(counts.values())
+        total_sum_of_lengths = reduce(lambda x, y: x+y, map(lambda x: x[0] * x[1], zip(counts.values(), counts.keys())))
+        avg_length = round(float(total_sum_of_lengths)/float(total_elements), 2)
         if subplot:
             self.subplot_checker()
 
-        #plt.axvline(x=avg_length)
+        plt.axvline(x=avg_length, color='black', label="avg length " + str(avg_length))
+        #print "AVG length: ", avg_length, "total_elements: ", total_elements, " total_sum: ", total_sum_of_lengths
 
         plt.bar(x_values, y_values, color=color, label=label)
         plt.legend(loc='best', frameon=False)
@@ -93,7 +122,7 @@ class Visualizer():
             self.create_dir(sub_dir)
             plt.savefig(os.path.join(sub_dir, filename.lower() + "." + file_format), format=file_format, dpi=quality)
         elif filename:
-            plt.savefig(os.path.join(save_dir, filename.lower() + "." +  file_format), format=file_format, dpi=quality)
+            plt.savefig(os.path.join(save_dir, filename.lower() + "." + file_format), format=file_format, dpi=quality)
 
     def show(self):
         plt.show()
