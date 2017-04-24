@@ -66,7 +66,7 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=1, barLength
 
 
 def log_session(log_dir, model, history, training_time, num_train, num_val, optimizer, batch_size, max_epochs,
-                max_sequence_length, model_info=None, extra_info=None):
+                max_sequence_length, test_results, model_info=None, extra_info=None):
 
     print("Writing log file...")
     if not os.path.exists(log_dir):
@@ -98,6 +98,13 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, opti
         # Write accuracies for training and validation set from callback history
         log_file.write("\n\n-----------Training statistics-----------\n")
         log_file.write(pandas.DataFrame(history).__repr__())
+
+        # Write Test results
+        log_file.write("\n\n--------------Test results---------------\n")
+        log_file.write("%s: %f" % (model.metrics_names[0], round(test_results[0], 5)))  # loss
+        log_file.write("%s: %f" % (model.metrics_names[1], round(test_results[1], 5)))  # accuracy
+
+        # Write model diagram
         log_file.write("\n\n--------------Model Diagram---------------\n")
         log_file.write(ascii(model))
         log_file.write("\n")

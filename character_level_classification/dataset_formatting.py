@@ -6,7 +6,9 @@ import tensorflow as tf
 from keras.utils.np_utils import to_categorical
 from nltk import sent_tokenize
 
+from preprocessors.dataset_preparation import split_dataset
 from character_level_classification.constants import *
+from helpers.global_constants import VALIDATION_SPLIT
 
 np.random.seed(1337)
 
@@ -42,23 +44,10 @@ def format_dataset_char_level(texts, labels, metadata):
                 data[i, j] = char_index[char]
                 # data[i, MAX_SEQUENCE_LENGTH-1-j] = char_index[char]  # Input reversed
 
-    # shuffle and split the data into a training set and a validation set
-    indices = np.arange(data.shape[0])
-    np.random.shuffle(indices)
-    data = data[indices]
-    labels = labels[indices]
-    metadata = [metadata[i] for i in indices]
-    nb_validation_samples = int(VALIDATION_SPLIT * data.shape[0])
+    # split the data into a training set and a validation set
+    x_train, y_train, meta_train, x_val, y_val, meta_val, x_test, y_test, meta_test = split_dataset(data, labels, metadata)
 
-    x_train = data[:-nb_validation_samples]
-    y_train = labels[:-nb_validation_samples]
-    meta_train = metadata[:-nb_validation_samples]
-
-    x_val = data[-nb_validation_samples:]
-    y_val = labels[-nb_validation_samples:]
-    meta_val = metadata[-nb_validation_samples:]
-
-    return x_train, y_train, meta_train, x_val, y_val, meta_val, char_index
+    return x_train, y_train, meta_train, x_val, y_val, meta_val,  x_test, y_test, meta_test, char_index
 
 
 # PUT ON HOLD -- METHOD FOR SPLITTING TWEETS IN SENTENCES FOR ENCODING, BUT TWEETS CONTAIN ON AVERAGE 1.3 SENTENCES

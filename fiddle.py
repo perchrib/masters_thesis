@@ -7,14 +7,15 @@ import numpy as np
 
 
 p = Parser()
-#
-# text = ["@hola i have found something cool @hola http://c2.com/cgi/wiki?GeraldWeinbergQuotes",
-#         "Kids No #yo Longer http://feedly.com/k/103bzsz Good read", " Matt Taibbi - Everything Is Rigged : The Biggest Price-Fixing Scandal Ever no good readhttp :/ / www.rollingstone.com/politics/news/everything-is-rigged-the-biggest-financial-scandal-yet-20130425?print=true"]
 
-# text = p.replace_all(text)
+text = ["@hola i have found something cool @hola http://c2.com/cgi/wiki?GeraldWeinbergQuotes",
+        "Kids No #yo Longer http://feedly.com/k/103bzsz Good read", " Matt Taibbi - Everything Is Rigged : The Biggest Price-Fixing Scandal Ever no good readhttp :/ / www.rollingstone.com/politics/news/everything-is-rigged-the-biggest-financial-scandal-yet-20130425?print=true"]
 
-texts = ["hello dogs", "cars and stores"]
-print(p.lemmatize(texts))
+text = p.replace_all(text)
+print(text)
+
+# texts = ["hello dogs", "cars and stores"]
+# print(p.lemmatize(texts))
 
 
 

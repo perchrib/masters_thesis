@@ -5,6 +5,7 @@ from keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import Tokenizer
 from keras.utils.np_utils import to_categorical
 
+from preprocessors.dataset_preparation import split_dataset
 from helpers.global_constants import EMBEDDINGS_INDEX_DIR
 from helpers.helper_functions import load_pickle
 from word_level_classification.constants import *
@@ -24,7 +25,6 @@ def format_dataset_word_level(texts, labels, metadata):
     """
     print("------Formatting text samples into tensors...")
 
-    # TODO: MAX_NB_WORDS seems to have no effect on the length of word_index
     tokenizer = Tokenizer(num_words=MAX_NB_WORDS)
     tokenizer.fit_on_texts(texts)
     sequences = tokenizer.texts_to_sequences(texts)  # construct word index sequences of the texts
@@ -38,23 +38,11 @@ def format_dataset_word_level(texts, labels, metadata):
     print('Shape of data tensor:', data.shape)
     print('Shape of label tensor:', labels.shape)
 
-    # shuffle and split the data into a training set and a validation set
-    indices = np.arange(data.shape[0])
-    np.random.shuffle(indices)
-    data = data[indices]
-    labels = labels[indices]
-    metadata = [metadata[i] for i in indices]
-    nb_validation_samples = int(VALIDATION_SPLIT * data.shape[0])
+    # split the data into a training set and a validation set
+    x_train, y_train, meta_train, x_val, y_val, meta_val, x_test, y_test, meta_test = split_dataset(data, labels,
+                                                                                                    metadata)
 
-    x_train = data[:-nb_validation_samples]
-    y_train = labels[:-nb_validation_samples]
-    meta_train = metadata[:-nb_validation_samples]
-
-    x_val = data[-nb_validation_samples:]
-    y_val = labels[-nb_validation_samples:]
-    meta_val = metadata[-nb_validation_samples:]
-
-    return x_train, y_train, meta_train, x_val, y_val, meta_val, word_index
+    return x_train, y_train, meta_train, x_val, y_val, meta_val, x_test, y_test, meta_test, word_index
 
 
 def construct_embedding_matrix(word_index):
@@ -79,8 +67,8 @@ def construct_embedding_matrix(word_index):
             number_of_missing_occurrences += 1
         total_number_of_words += 1
 
-    print("Total number of word occurences: %i" % total_number_of_words)
-    print('Number of missing word occurences / words with no embedding: %i' % number_of_missing_occurrences)
+    print("Total number of word occurrences: %i" % total_number_of_words)
+    print('Number of missing word occurrences / words with no embedding: %i' % number_of_missing_occurrences)
 
     return embedding_matrix
 
