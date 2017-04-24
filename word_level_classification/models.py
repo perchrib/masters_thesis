@@ -3,7 +3,6 @@ from keras.layers import Dense, LSTM, Dropout, GRU
 from word_level_classification.constants import PREDICTION_TYPE
 
 
-# TODO: Understand return_sequences
 def get_word_model_3xsimple_lstm(embedding_layer, nb_output_nodes):
     model = Sequential(name="3xSimpleLSTM")
 

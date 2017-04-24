@@ -1,16 +1,18 @@
 from nltk.tokenize import TweetTokenizer
+from nltk import WordNetLemmatizer
 import re
 
 
 class Parser:
     def __init__(self):
         self.tknzr = TweetTokenizer()
+        self.lemmatizer = WordNetLemmatizer()
 
     def replace_all(self, texts):
         # content = self.clean_HTML(content)  # TODO: Kan fjernes?
         modified_texts = [t.lower() for t in texts]  # Lower_case
 
-        modified_texts = self.replace('url', '~', modified_texts)
+        modified_texts = self.replace('url', 'U', modified_texts)
         modified_texts = self.replace('pic', 'P', modified_texts)
         modified_texts = self.replace('@', 'M', modified_texts)
         modified_texts = self.replace('#', 'H', modified_texts)
@@ -73,9 +75,25 @@ class Parser:
             content = " ".join(content.split()).strip()
         return content
 
+    def lemmatize(self, texts):
+        """
+        Given list of texts. Lemmatize all text terms
+        :param texts: list of texts
+        :return: lemmatized texts
+        """
+        lemmatized_texts = []
+        for t in texts:  # type: str
+            terms = t.split()
+            lemmatized_terms = [self.lemmatizer.lemmatize(w) for w in terms]
+            lemmatized_texts.append(" ".join(lemmatized_terms))
+
+        return lemmatized_texts
+
     def generate_character_vocabulary(self, texts):
         pass
 
     def generate_word_vocabulary(self, texts):
         pass
+
+
 
