@@ -48,7 +48,20 @@ class TF_IDF():
     #     return tf_idfs
 
 
+def shuffle(x_input, y_label):
+    if len(x_input) != len(y_label):
+        raise TypeError("Not Same Length")
+    else:
+        np.random.seed(1337)
+        indices = np.arange(len(x_input))
 
+        texts_and_indices = list(zip(x_input, indices))
+        np.random.shuffle(texts_and_indices)
+        x_input, indices = zip(*texts_and_indices)
+        x_input, indices = np.asarray(x_input), np.asarray(indices)
+        y_label = to_categorical(np.asarray(y_label))
+        y_label = y_label[indices]
+        return x_input, y_label
 
 if __name__ == "__main__":
     from preprocessors.parser import Parser
@@ -63,20 +76,9 @@ if __name__ == "__main__":
     print "Removing Stopwords..."
     parsed_texts = parser.remove_stopwords(texts)
 
-    np.random.seed(1337)
-    indices = np.arange(len(texts))
-    print texts[0]
-    texts_and_indices = list(zip(texts, indices))
-    print texts_and_indices[0]
-    np.random.shuffle(texts_and_indices)
-    # shuffled texts and indices
-    print texts_and_indices[0]
-    texts, indices = zip(*texts_and_indices)
-    texts, indices = np.asarray(texts), np.asarray(list(indices))
-    print "Indices", len(labels)
-    # shuffled labels
-    labels = to_categorical(np.asarray(labels))
-    labels = labels[indices]
+    # shuffle text and labels
+    texts, labels = shuffle(texts, labels)
+
     nb_validation_samples = int(0.15 * len(texts))
 
     tfidf = TF_IDF(texts[:-nb_validation_samples], feature_length)
@@ -99,7 +101,7 @@ if __name__ == "__main__":
 
     model = Model(inputs=inputs, outputs=predictions)
     model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
-    model.fit(x_train, y_train, validation_data=[x_val, y_val])
+    model.fit(x_train, y_train, epochs=10, batch_size=64, validation_data=[x_val, y_val])
 
 
     #
