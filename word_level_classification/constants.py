@@ -5,6 +5,7 @@ PREDICTION_TYPE = GENDER
 
 # Log directory
 LOGS_DIR = '../logs/word_level_classification'
+MODEL_DIR = '../models/character_level_classification'
 
 # Text pre-processing
 MAX_NB_WORDS = 50000

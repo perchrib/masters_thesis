@@ -41,5 +41,5 @@ Max sequence length: 80
 Model information:
 =========================================
  LSTM dropout = 0.2, 0.2
- No dense dropout
+ No dense dropout ---- MAybe because of this?
  No conv dropoutfilters = [256, 256]

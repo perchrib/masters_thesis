@@ -4,20 +4,12 @@ from keras import backend as K
 from keras.layers import Input, Dense, LSTM, Dropout, Lambda, Conv1D, MaxPooling1D, merge, Flatten
 from character_level_classification.constants import MAX_SEQUENCE_LENGTH
 
-# TODO: Try Conv2D layers?
-
-# Not ideal, but functioning fix for setting and accessing nb_chars in models
-
-nb_chars = None
 
 
 def get_char_model_3xConv_2xBiLSTM(num_output_nodes, char_num):
-    # Set number of chars for use in one hot encoder
-    global nb_chars
-    nb_chars = char_num
 
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
-    embedding = get_one_hot_layer(tweet_input)
+    embedding = get_one_hot_layer(tweet_input, char_num)
 
     kernel_size = [5, 3, 3]
     filters = [196, 196, 256]
@@ -35,7 +27,7 @@ def get_char_model_3xConv_2xBiLSTM(num_output_nodes, char_num):
                                   kernel_initializer='glorot_uniform',
                                   subsample_length=1)(embedding)
 
-        # embedding = Dropout(0.5)(embedding)
+        embedding = Dropout(0.5)(embedding)
         embedding = MaxPooling1D(pool_length=pool_length)(embedding)
 
     forward = LSTM(256, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu')(embedding)
@@ -43,24 +35,21 @@ def get_char_model_3xConv_2xBiLSTM(num_output_nodes, char_num):
                     go_backwards=True)(embedding)
 
     output = merge([forward, backward], mode='concat', concat_axis=-1)
-    # output = Dropout(0.5)(output)
+    output = Dropout(0.5)(output)
     output = Dense(128, activation='relu')(output)
-    # output = Dropout(0.5)(output)
+    output = Dropout(0.5)(output)
     output = Dense(num_output_nodes, activation='softmax')(output)
     model = Model(input=tweet_input, output=output, name='3xConv_2xBiLSTM')
 
-    model_info = ["LSTM dropout = 0.2, 0.2", "No dense dropout", "No conv dropout" "filters = [256, 256]"]
+    model_info = ["LSTM dropout = 0.2, 0.2"]
     return model, model_info
 
 
 
 def get_char_model_2xConv_BiLSTM(num_output_nodes, char_num):
-    # Set number of chars for use in one hot encoder
-    global nb_chars
-    nb_chars = char_num
 
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
-    embedding = get_one_hot_layer(tweet_input)
+    embedding = get_one_hot_layer(tweet_input, char_num)
 
     kernel_size = [5, 3, 3]
 
@@ -96,12 +85,10 @@ def get_char_model_2xConv_BiLSTM(num_output_nodes, char_num):
 
 
 def get_char_model_Conv_BiLSTM(num_output_nodes, char_num):
-    # Set number of chars for use in one hot encoder
-    global nb_chars
-    nb_chars = char_num
+
 
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
-    embedding = get_one_hot_layer(tweet_input)
+    embedding = get_one_hot_layer(tweet_input, char_num)
 
     kernel_size = [5, 3, 3]
     filters = [1024]
@@ -302,7 +289,7 @@ im=2
     return model, model_info
 
 
-def get_one_hot_layer(input_layer):
+def get_one_hot_layer(input_layer, nb_chars):
     return Lambda(K.one_hot, arguments={'num_classes': nb_chars}, output_shape=(input_layer.shape[1], nb_chars))(input_layer)
 
 def one_hot(x):

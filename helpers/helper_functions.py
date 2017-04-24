@@ -65,7 +65,7 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=1, barLength
     sys.stdout.flush()
 
 
-def log_session(log_dir, model, history, training_time, num_train, num_val, optimizer, batch_size, max_epochs,
+def log_session(log_dir, model, history, training_time, num_train, num_val, num_test, optimizer, batch_size, max_epochs,
                 max_sequence_length, test_results, model_info=None, extra_info=None):
 
     print("Writing log file...")
@@ -86,8 +86,11 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, opti
         log_file.write("\n\nTraining set size: %i" % num_train)
         log_file.write("\nValidation set size: %i" % num_val)
 
-        val_frac = float(num_val) / (num_train + num_val)  # Fraction of dataset used for validation
+        total_dataset_size = num_train + num_val + num_test
+        val_frac = float(num_val) / total_dataset_size  # Fraction of dataset used for validation
         log_file.write("\nValidation set fraction: %f" % val_frac)
+        test_frac = float(num_test) / total_dataset_size
+        log_file.write("\nTest set fraction: %f" % test_frac)
 
         log_file.write("\n\nHyperparameters\n=========================================")
         log_file.write("\nOptimizer: %s" % optimizer)

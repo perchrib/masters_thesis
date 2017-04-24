@@ -17,7 +17,7 @@ from word_level_classification.dataset_formatting import format_dataset_word_lev
 from word_level_classification.constants import PREDICTION_TYPE
 from word_level_classification.ann import train as w_train, get_embedding_layer
 from word_level_classification.models import *
-
+import keras.backend.tensorflow_backend as k_tf
 
 def char_sent_main():
     # Load dataset
@@ -57,13 +57,13 @@ def char_main():
 
     # ------- Insert models to train here -----------
     # Remember star before model getter
-    c_train(*get_char_model_3xConv_2xBiLSTM(num_output_nodes, num_chars), data=data)
+    # c_train(*get_char_model_3xConv_2xBiLSTM(num_output_nodes, num_chars), data=data)
     # c_train(*get_char_model_BiLSTM_full(num_output_nodes, num_chars), data=data)
     ##c_train(*get_char_model_3xConv(num_output_nodes), data=data)
     ##c_train(*get_char_model_3xConv_LSTM(num_output_nodes, num_chars), data=data)
     # c_train(*get_char_model_3xConv_4xBiLSTM(num_output_nodes, num_chars), data=data)
 
-    c_train(*get_char_model_2xConv_BiLSTM(num_output_nodes, num_chars), data=data)
+    # c_train(*get_char_model_2xConv_BiLSTM(num_output_nodes, num_chars), data=data)
     c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data)
 
 def word_main():
@@ -91,6 +91,12 @@ def word_main():
 
 
 if __name__ == '__main__':
+
+    # For more conservative memory usage
+    tf_config = k_tf.tf.ConfigProto()
+    tf_config.gpu_options.allow_growth = True
+    k_tf.set_session(k_tf.tf.Session(config=tf_config))
+
     # Train sent char
     # char_sent_main()
 
