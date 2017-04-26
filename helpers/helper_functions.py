@@ -1,4 +1,5 @@
 from keras_diagram import ascii
+from keras.callbacks import ModelCheckpoint
 import pickle
 import sys
 import os
@@ -63,6 +64,17 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=1, barLength
     if iteration == total:
         sys.stdout.write('\n')
     sys.stdout.flush()
+
+
+def get_model_checkpoint(model_name, model_dir, model_optimizer):
+    if not os.path.exists(model_dir):
+        os.makedirs(os.path.join(model_dir, model_name))
+
+    model_file_name = time.strftime(
+        "%d.%m.%Y_%H:%M:%S") + "_" + model_name + "_" + model_optimizer + "_{epoch:02d}_{val_acc:.2f}.hdf5"
+    checkpoint = ModelCheckpoint(os.path.join(model_dir, model_name, model_file_name), save_best_only=True)
+
+    return checkpoint
 
 
 def log_session(log_dir, model, history, training_time, num_train, num_val, num_test, optimizer, batch_size, max_epochs,

@@ -13,7 +13,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 from character_level_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE, \
     PREDICTION_TYPE, LOGS_DIR, MODEL_DIR
 from time import time, strftime
-from helpers.helper_functions import log_session
+from helpers.helper_functions import log_session, get_model_checkpoint
 import numpy as np
 
 np.random.seed(1337)
@@ -40,9 +40,11 @@ def train(model, model_info, data, save_model=False, extra_info=None):
     callbacks = [early_stopping]
 
     if save_model:
-        weights_file_path = strftime("%d.%m.%Y_%H:%M:%S") + "_" + model.name + "_" + MODEL_OPTIMIZER + "_{epoch:02d}_{val_acc:.2f}" + ".txt"
-        checkpoint = ModelCheckpoint(os.path.join(MODEL_DIR, weights_file_path), save_best_only=True)
-        callbacks.append(checkpoint)
+        if not os.path.exists(MODEL_DIR):
+            os.makedirs(os.path.join(MODEL_DIR, model.name))
+        model_file_name = strftime("%d.%m.%Y_%H:%M:%S") + "_" + model.name + "_" + MODEL_OPTIMIZER + "_{epoch:02d}_{val_acc:.2f}.hdf5"
+        checkpoint = ModelCheckpoint(os.path.join(MODEL_DIR, model_file_name), save_best_only=True)
+        callbacks.append(get_model_checkpoint(model.name, MODEL_DIR, MODEL_OPTIMIZER))
 
     # Time
     start_time = time()

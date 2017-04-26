@@ -7,11 +7,11 @@ import numpy as np
 # Append path to use modules outside pycharm environment, e.g. remote server
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 
-from word_level_classification.dataset_formatting import format_dataset_word_level, construct_embedding_matrix, \
+from word_embedding_classification.dataset_formatting import format_dataset_word_level, construct_embedding_matrix, \
     get_embedding_dim
-from word_level_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE, \
+from word_embedding_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE, \
     EMBEDDINGS_INDEX, MAX_SEQUENCE_LENGTH, LOGS_DIR
-from word_level_classification.models import *
+from word_embedding_classification.models import *
 from preprocessors.parser import Parser
 from preprocessors.dataset_preparation import prepare_dataset
 from keras.layers import Embedding

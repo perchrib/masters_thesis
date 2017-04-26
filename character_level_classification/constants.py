@@ -22,5 +22,5 @@ MAX_CHAR_SENT_LENGTH = 52
 MODEL_OPTIMIZER = 'adam'
 MODEL_LOSS = 'categorical_crossentropy'
 MODEL_METRICS = ['accuracy']
-NB_EPOCHS = 30
+NB_EPOCHS = 1  # TODO: Testing, purposes.. fix
 BATCH_SIZE = 128

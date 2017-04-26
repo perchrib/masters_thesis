@@ -83,43 +83,6 @@ def get_char_model_2xConv_BiLSTM(num_output_nodes, char_num):
     model_info = ["LSTM dropout = 0.2, 0.2", "No dense dropout", "filters = [256, 256]"]
     return model, model_info
 
-
-def get_char_model_Conv_BiLSTM(num_output_nodes, char_num):
-
-
-    tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
-    embedding = get_one_hot_layer(tweet_input, char_num)
-
-    kernel_size = [5, 3, 3]
-    filters = [1024]
-
-    pool_length = 2
-
-    # len of filters = num conv layers
-    for i in range(len(filters)):
-        embedding = Conv1D(filters=filters[i],
-                                  kernel_size=kernel_size[i],
-                                  activation='relu',
-                                  kernel_initializer='glorot_uniform',
-                                  subsample_length=1)(embedding)
-
-        embedding = Dropout(0.5)(embedding)
-        embedding = MaxPooling1D(pool_length=pool_length)(embedding)
-
-    forward = LSTM(256, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu')(embedding)
-    backward = LSTM(256, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu',
-                    go_backwards=True)(embedding)
-
-    output = merge([forward, backward], mode='concat', concat_axis=-1)
-    # output = Dropout(0.5)(output)
-    output = Dense(128, activation='relu')(output)
-    # output = Dropout(0.5)(output)
-    output = Dense(num_output_nodes, activation='softmax')(output)
-    model = Model(input=tweet_input, output=output, name='Conv_BiLSTM')
-
-    model_info = ["LSTM dropout = 0.2, 0.2", "No dense dropout", "filters = [1024]"]
-    return model, model_info
-
 def get_char_model_2x256_lstm_full(num_output_nodes, char_num):
     # Set number of chars for use in one hot encoder
     global nb_chars
@@ -288,6 +251,111 @@ im=2
     model_info = ["LSTM dropout = 0.5, 0.2"]
     return model, model_info
 
+
+def get_char_model_Conv_BiLSTM(num_output_nodes, char_num):
+    tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
+    embedding = get_one_hot_layer(tweet_input, char_num)
+
+    kernel_size = [5, 3, 3]
+    filters = [1024]
+
+    pool_length = 2
+
+    # len of filters = num conv layers
+    for i in range(len(filters)):
+        embedding = Conv1D(filters=filters[i],
+                                  kernel_size=kernel_size[i],
+                                  activation='relu',
+                                  kernel_initializer='glorot_uniform',
+                                  subsample_length=1)(embedding)
+
+        embedding = Dropout(0.5)(embedding)
+        embedding = MaxPooling1D(pool_length=pool_length)(embedding)
+
+    forward = LSTM(256, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu')(embedding)
+    backward = LSTM(256, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu',
+                    go_backwards=True)(embedding)
+
+    output = merge([forward, backward], mode='concat', concat_axis=-1)
+    # output = Dropout(0.5)(output)
+    output = Dense(128, activation='relu')(output)
+    # output = Dropout(0.5)(output)
+    output = Dense(num_output_nodes, activation='softmax')(output)
+    model = Model(input=tweet_input, output=output, name='Conv_BiLSTM')
+
+    model_info = ["LSTM dropout = 0.2, 0.2", "No dense dropout", "filters = [1024]"]
+    return model, model_info
+
+
+def get_char_model_Conv_BiLSTM_2(num_output_nodes, char_num):
+
+
+    tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
+    embedding = get_one_hot_layer(tweet_input, char_num)
+
+    kernel_size = [5, 3, 3]
+    filters = [1024]
+
+    pool_length = 2
+
+    # len of filters = num conv layers
+    for i in range(len(filters)):
+        embedding = Conv1D(filters=filters[i],
+                                  kernel_size=kernel_size[i],
+                                  activation='relu',
+                                  kernel_initializer='glorot_uniform',
+                                  subsample_length=1)(embedding)
+
+        embedding = Dropout(0.5)(embedding)
+        embedding = MaxPooling1D(pool_length=pool_length)(embedding)
+
+    forward = LSTM(512, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu')(embedding)
+    backward = LSTM(512, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu',
+                    go_backwards=True)(embedding)
+
+    output = merge([forward, backward], mode='concat', concat_axis=-1)
+    # output = Dropout(0.5)(output)
+    output = Dense(256, activation='relu')(output)
+    # output = Dropout(0.5)(output)
+    output = Dense(num_output_nodes, activation='softmax')(output)
+    model = Model(input=tweet_input, output=output, name='Conv_BiLSTM')
+
+    model_info = ["LSTM dropout = 0.2, 0.2", "No dense dropout", "filters = [1024]", "LSTM layers 512, Dense 256"]
+    return model, model_info
+
+def get_char_model_Conv_BiLSTM_3(num_output_nodes, char_num):
+    tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
+    embedding = get_one_hot_layer(tweet_input, char_num)
+
+    kernel_size = [5, 3, 2]
+    filters = [1024]
+
+    pool_length = 2
+
+    # len of filters = num conv layers
+    for i in range(len(filters)):
+        embedding = Conv1D(filters=filters[i],
+                                  kernel_size=kernel_size[i],
+                                  activation='relu',
+                                  kernel_initializer='glorot_uniform',
+                                  subsample_length=1)(embedding)
+
+        embedding = Dropout(0.5)(embedding)
+        embedding = MaxPooling1D(pool_length=pool_length)(embedding)
+
+    forward = LSTM(256, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu')(embedding)
+    backward = LSTM(256, return_sequences=False, dropout=0.2, recurrent_dropout=0.2, consume_less='gpu',
+                    go_backwards=True)(embedding)
+
+    output = merge([forward, backward], mode='concat', concat_axis=-1)
+    # output = Dropout(0.5)(output)
+    output = Dense(128, activation='relu')(output)
+    # output = Dropout(0.5)(output)
+    output = Dense(num_output_nodes, activation='softmax')(output)
+    model = Model(input=tweet_input, output=output, name='Conv_BiLSTM')
+
+    model_info = ["LSTM dropout = 0.2, 0.2", "No dense dropout", "filters = [1024]", "kernel_size = [5, 3, 2]"]
+    return model, model_info
 
 def get_one_hot_layer(input_layer, nb_chars):
     return Lambda(K.one_hot, arguments={'num_classes': nb_chars}, output_shape=(input_layer.shape[1], nb_chars))(input_layer)
