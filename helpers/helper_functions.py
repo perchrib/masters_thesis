@@ -81,11 +81,8 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, num_
                 max_sequence_length, test_results, model_info=None, extra_info=None):
 
     print("Writing log file...")
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-
-    if not os.path.exists(os.path.join(log_dir, model.name)):
-        os.makedirs(os.path.join(log_dir, model.name))
+    if not os.path.exists((os.path.join(log_dir, model.name))):
+        os.makedirs((os.path.join(log_dir, model.name)))
 
     # TODO: Construct filename from details
     file_name = time.strftime("%d.%m.%Y_%H:%M:%S") + "_" + model.name + "_" + optimizer + ".txt"
