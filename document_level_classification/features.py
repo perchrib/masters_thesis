@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 from sklearn.feature_extraction.text import TfidfTransformer, CountVectorizer
 import numpy as np
 import sys
@@ -6,6 +5,7 @@ sys.path.insert(0, "/Users/per/Documents/NTNU_Courses/5th_year/2-semester/master
 
 from text_mining.helpers import word_tokenize
 from text_mining.dataset_characteristics import most_common
+from keras.utils.np_utils import to_categorical
 
 from collections import Counter
 
@@ -52,6 +52,7 @@ def shuffle(x_input, y_label):
     if len(x_input) != len(y_label):
         raise TypeError("Not Same Length")
     else:
+        x_input, y_label = np.asarray(x_input), np.asarray(y_label)
         np.random.seed(1337)
         indices = np.arange(len(x_input))
 
@@ -59,7 +60,7 @@ def shuffle(x_input, y_label):
         np.random.shuffle(texts_and_indices)
         x_input, indices = zip(*texts_and_indices)
         x_input, indices = np.asarray(x_input), np.asarray(indices)
-        y_label = to_categorical(np.asarray(y_label))
+        y_label = to_categorical(y_label)
         y_label = y_label[indices]
         return x_input, y_label
 
@@ -87,21 +88,7 @@ if __name__ == "__main__":
     x_val = tfidf.fit_to_new_data(texts[-nb_validation_samples:])
     y_val = labels[-nb_validation_samples:]
 
-    # keras
-    from keras.layers import Input, Dense
-    from keras.models import Model
 
-
-
-    inputs = Input(shape=(feature_length,))
-    x = Dense(2048, activation='relu')(inputs)
-    x = Dense(1024, activation='relu')(x)
-    x = Dense(512, activation='relu')(x)
-    predictions = Dense(2, activation='softmax')(x)
-
-    model = Model(inputs=inputs, outputs=predictions)
-    model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
-    model.fit(x_train, y_train, epochs=10, batch_size=64, validation_data=[x_val, y_val])
 
 
     #
@@ -109,7 +96,7 @@ if __name__ == "__main__":
     # def tf_idf(documents):
     #     fe = FeatureExtraction(documents)
     #     np.set_printoptions(precision=2)
-    #     features = fe.tfidf.fit_transform(fe.count.fit_transform(fe.docs)).toarray()
-    #     print("SUM: ", sum(features[0]), " length: ", len(features[0]))
-    #     print features
-    #     return features
+    #     document_level_classification = fe.tfidf.fit_transform(fe.count.fit_transform(fe.docs)).toarray()
+    #     print("SUM: ", sum(document_level_classification[0]), " length: ", len(document_level_classification[0]))
+    #     print document_level_classification
+    #     return document_level_classification

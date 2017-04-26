@@ -9,7 +9,7 @@ from preprocessors.dataset_preparation import prepare_dataset
 
 from character_level_classification.dataset_formatting import format_dataset_char_level, format_dataset_char_level_sentences
 from character_level_classification.constants import PREDICTION_TYPE
-from character_level_classification.ann import train as c_train
+from character_level_classification.train import train as c_train
 from character_level_classification.models import *
 from character_level_classification.model_sent import get_char_model_3xConv_Bi_lstm_sent
 
@@ -88,6 +88,20 @@ def word_main():
     # ------- Insert models to train here -----------
     # Remember star before model getter
     # w_train(*get_word_model_2x512_256_lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info)
+
+
+def doument_main():
+    # Load dataset
+    texts, labels, metadata, labels_index = prepare_dataset(PREDICTION_TYPE)
+
+    # Clean texts with parser
+    text_parser = Parser()
+
+    data = {}
+    # Create format_dataset_tfidf
+
+    num_output_nodes = len(labels_index)
+
 
 
 if __name__ == '__main__':

@@ -6,6 +6,17 @@ import time
 import pandas
 import yaml
 
+def get_time_format(seconds):
+    """
+    
+    :param seconds: int seconds 
+    :return: a string with time format "hours:minutes:seconds"
+    """
+    m, s = divmod(seconds, 60)
+    h, m = divmod(m, 60)
+    training_time = "%dh:%02dm:%02ds" % (h, m, s)
+    return training_time
+
 
 def save_pickle(file_path, data):
     """
@@ -66,7 +77,7 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=1, barLength
 
 
 def log_session(log_dir, model, history, training_time, num_train, num_val, optimizer, batch_size, max_epochs,
-                max_sequence_length, test_results, model_info=None, extra_info=None):
+                test_results, model_info=None, extra_info=None, max_sequence_length=None):
 
     print("Writing log file...")
     if not os.path.exists(log_dir):
@@ -81,7 +92,7 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, opti
         log_file.write("Training_log - %s" % time.strftime("%d/%m/%Y %H:%M:%S"))
 
         log_file.write("\n\nModel name: %s" % model.name)
-        log_file.write("\nElapsed training time: %i minutes" % training_time)
+        log_file.write("\nElapsed training time: %s" % training_time)
 
         log_file.write("\n\nTraining set size: %i" % num_train)
         log_file.write("\nValidation set size: %i" % num_val)
@@ -93,7 +104,9 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, opti
         log_file.write("\nOptimizer: %s" % optimizer)
         log_file.write("\nBatch size: %i" % batch_size)
         log_file.write("\nMax number of epochs: %i" % max_epochs)
-        log_file.write("\nMax sequence length: %i" % max_sequence_length)
+
+        if max_sequence_length:
+            log_file.write("\nMax sequence length: %i" % max_sequence_length)
 
         # Write accuracies for training and validation set from callback history
         log_file.write("\n\n-----------Training statistics-----------\n")

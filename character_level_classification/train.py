@@ -12,8 +12,8 @@ from preprocessors.dataset_preparation import prepare_dataset
 from keras.callbacks import EarlyStopping
 from character_level_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE, \
     PREDICTION_TYPE, LOGS_DIR
-from time import time
-from helpers.helper_functions import log_session
+import time
+from helpers.helper_functions import log_session, get_time_format
 import numpy as np
 
 np.random.seed(1337)
@@ -39,7 +39,7 @@ def train(model, model_info, data, extra_info=None):
                   metrics=MODEL_METRICS)
 
     # Time
-    start_time = time()
+    start_time = time().time
 
     print('\nCommence training %s model' % model.name)
     history = model.fit(data['x_train'], data['y_train'],
@@ -49,8 +49,10 @@ def train(model, model_info, data, extra_info=None):
                         shuffle=True,
                         callbacks=[early_stopping]).history
 
-    training_time = (time() - start_time) / 60
-    print('Training time: %i' % training_time)
+    seconds = (time.time() - start_time)
+    training_time = get_time_format(seconds)
+
+    print "Training time: %s" % training_time
 
     # Evaluate on test set
     test_results = model.evaluate(data['x_test'], data['y_test'], batch_size=BATCH_SIZE)
