@@ -71,7 +71,7 @@ def get_model_checkpoint(model_name, model_dir, model_optimizer):
         os.makedirs(os.path.join(model_dir, model_name))
 
     model_file_name = time.strftime(
-        "%d.%m.%Y_%H:%M:%S") + "_" + model_name + "_" + model_optimizer + "_{epoch:02d}_{val_acc:.2f}.hdf5"
+        "%d.%m.%Y_%H:%M:%S") + "_" + model_name + "_" + model_optimizer + "_{epoch:02d}_{val_acc:.2f}.h5"
     checkpoint = ModelCheckpoint(os.path.join(model_dir, model_name, model_file_name), save_best_only=True)
 
     return checkpoint

@@ -63,5 +63,17 @@ def train(model, model_info, data, save_model=False, extra_info=None):
     # Evaluate on test set
     test_results = model.evaluate(data['x_test'], data['y_test'], batch_size=BATCH_SIZE)
 
-    log_session(LOGS_DIR, model, history, training_time, len(data['x_train']), len(data['x_val']), len(data['x_test']), MODEL_OPTIMIZER, BATCH_SIZE,
-                NB_EPOCHS, MAX_SEQUENCE_LENGTH,test_results, model_info, extra_info)
+    log_session(log_dir=LOGS_DIR,
+                model=model,
+                history=history,
+                training_time=training_time,
+                num_train=len(data['x_train']),
+                num_val=len(data['x_val']),
+                num_test=len(data['x_test']),
+                optimizer=MODEL_OPTIMIZER,
+                batch_size=BATCH_SIZE,
+                max_epochs=NB_EPOCHS,
+                max_sequence_length=MAX_SEQUENCE_LENGTH,
+                test_results=test_results,
+                model_info=model_info,
+                extra_info=extra_info)

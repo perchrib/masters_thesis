@@ -66,10 +66,13 @@ def char_main():
     # c_train(*get_char_model_3xConv_4xBiLSTM(num_output_nodes, num_chars), data=data)
 
     # c_train(*get_char_model_2xConv_BiLSTM(num_output_nodes, num_chars), data=data)
-    c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False)
-    c_train(*get_char_model_Conv_BiLSTM_2(num_output_nodes, num_chars), data=data)
-    c_train(*get_char_model_Conv_BiLSTM_3(num_output_nodes, num_chars), data=data)
+    # c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False)
+    # c_train(*get_char_model_Conv_BiLSTM_2(num_output_nodes, num_chars), data=data)
+    # c_train(*get_char_model_Conv_BiLSTM_3(num_output_nodes, num_chars), data=data)
 
+
+    ## Dummy model for fast train and save model --- DELETE
+    c_train(*get_dummy_model(num_output_nodes, num_chars), data=data, save_model=True)
 
 def word_main():
     # Load dataset
