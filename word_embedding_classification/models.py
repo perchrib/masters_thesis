@@ -1,6 +1,6 @@
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, Dropout, GRU
-from word_level_classification.constants import PREDICTION_TYPE
+from word_embedding_classification.constants import PREDICTION_TYPE
 
 
 def get_word_model_3xsimple_lstm(embedding_layer, nb_output_nodes):
@@ -99,6 +99,8 @@ def get_word_model_2x1024_512_lstm(embedding_layer, nb_output_nodes):
     model.add(Dense(nb_output_nodes, activation='softmax'))
 
     return model
+
+
 
 
 def get_num_output_nodes():
