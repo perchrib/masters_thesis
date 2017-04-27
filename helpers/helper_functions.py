@@ -1,5 +1,4 @@
 from keras_diagram import ascii
-from keras.callbacks import ModelCheckpoint
 import pickle
 import sys
 import os
@@ -93,18 +92,6 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=1, barLength
     sys.stdout.flush()
 
 
-
-def get_model_checkpoint(model_name, model_dir, model_optimizer):
-    if not os.path.exists(model_dir):
-        os.makedirs(os.path.join(model_dir, model_name))
-
-    model_file_name = time.strftime(
-        "%d.%m.%Y_%H:%M:%S") + "_" + model_name + "_" + model_optimizer + "_{epoch:02d}_{val_acc:.2f}.hdf5"
-    checkpoint = ModelCheckpoint(os.path.join(model_dir, model_name, model_file_name), save_best_only=True)
-
-    return checkpoint
-
-
 def log_session(log_dir, model, history, training_time, num_train, num_val, num_test, optimizer, batch_size, max_epochs,
                 test_results, model_info=None, extra_info=None, max_sequence_length=None):
 
@@ -112,7 +99,6 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, num_
     if not os.path.exists((os.path.join(log_dir, model.name))):
         os.makedirs((os.path.join(log_dir, model.name)))
 
-    # TODO: Construct filename from details
     file_name = time.strftime("%d.%m.%Y_%H:%M:%S") + "_" + model.name + "_" + optimizer + ".txt"
     with open(os.path.join(log_dir, model.name, file_name), 'wb') as log_file:
         log_file.write("Training_log - %s" % time.strftime("%d/%m/%Y %H:%M:%S"))

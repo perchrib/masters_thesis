@@ -10,12 +10,12 @@ from preprocessors.dataset_preparation import split_dataset
 from character_level_classification.constants import *
 from helpers.global_constants import VALIDATION_SPLIT
 
-np.random.seed(1337)
 
 
 def format_dataset_char_level(texts, labels, metadata):
     """
-    Split into training set and validation set
+    Format dataset into char indices for one hot encodings.
+    Split into training set, validation set and test set.
     :param texts: list of tweets
     :param labels: list of tweet labels
     :param metadata: list of dictionaries containing age and gender for each tweet
@@ -49,8 +49,6 @@ def format_dataset_char_level(texts, labels, metadata):
 
     return x_train, y_train, meta_train, x_val, y_val, meta_val,  x_test, y_test, meta_test, char_index
 
-
-# PUT ON HOLD -- METHOD FOR SPLITTING TWEETS IN SENTENCES FOR ENCODING, BUT TWEETS CONTAIN ON AVERAGE 1.3 SENTENCES
 
 def format_dataset_char_level_sentences(texts, labels, metadata):
     """
