@@ -6,8 +6,8 @@ from nltk import sent_tokenize
 import numpy as np
 
 from helpers.global_constants import TEXT_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT
+from helpers.helper_functions import shuffle
 
-np.random.seed(1337)
 
 
 def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
@@ -53,7 +53,7 @@ def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
     return texts, labels, metadata, labels_index
 
 
-def split_dataset(data, labels, metadata):
+def split_dataset(data, labels, metadata, data_type_is_string=False):
     """
     Given correctly formatted dataset, split into training, validation and test
     :param data: formatted dataset, i.e., sequences of char/word indices
@@ -61,10 +61,16 @@ def split_dataset(data, labels, metadata):
     """
 
     # shuffle and split the data into a training set and a validation set
-    indices = np.arange(data.shape[0])
-    np.random.shuffle(indices)
-    data = data[indices]
-    labels = labels[indices]
+    if data_type_is_string:
+        data, labels, indices = shuffle(data, labels)
+
+    else:
+        np.random.seed(1337)
+        indices = np.arange(data.shape[0])
+        np.random.shuffle(indices)
+        data = data[indices]
+        labels = labels[indices]
+
     metadata = [metadata[i] for i in indices]
     nb_validation_samples = int(VALIDATION_SPLIT * data.shape[0])
     nb_test_samples = int(TEST_SPLIT * data.shape[0])
@@ -79,9 +85,11 @@ def split_dataset(data, labels, metadata):
 
     x_test = data[-nb_test_samples:]
     y_test = labels[-nb_test_samples:]
-    meta_test = metadata[-nb_test_samples:]
+
+    meta_test = data[-nb_test_samples:]
 
     return x_train, y_train, meta_train, x_val, y_val, meta_val, x_test, y_test, meta_test
+
 
 def construct_labels_index(prediction_type):
     """
@@ -151,9 +159,9 @@ def display_gender_distribution(metadata):
     print("Number of female texts: %i Fraction of total: %f" % (num_females, float(num_females) / num_total))
 
 
-if __name__ == '__main__':
-    txts, labels, metadata, labels_index = prepare_dataset(GENDER)
-    # txts = ["LJ_Barca all UK is a bigger grain harvest and banking ! We all still get taken for mugs by the Gov ! UK will selfdestruct eventually", "Hei. Duasdfsadfasdf. sadf. asd. Jeg"]
-    parser = Parser()
-    txts = parser.replace_all(txts)
-    display_dataset_statistics(txts)
+# if __name__ == '__main__':
+#     txts, labels, metadata, labels_index = prepare_dataset(GENDER)
+#     # txts = ["LJ_Barca all UK is a bigger grain harvest and banking ! We all still get taken for mugs by the Gov ! UK will selfdestruct eventually", "Hei. Duasdfsadfasdf. sadf. asd. Jeg"]
+#     parser = Parser()
+#     txts = parser.replace_all(txts)
+#     display_dataset_statistics(txts)

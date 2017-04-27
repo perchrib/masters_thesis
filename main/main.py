@@ -9,16 +9,22 @@ from preprocessors.dataset_preparation import prepare_dataset
 
 from character_level_classification.dataset_formatting import format_dataset_char_level, format_dataset_char_level_sentences
 from character_level_classification.constants import PREDICTION_TYPE
-from character_level_classification.ann import train as c_train
+from character_level_classification.train import train as c_train
 from character_level_classification.models import *
 from character_level_classification.model_sent import get_char_model_3xConv_Bi_lstm_sent
 
+
 from word_embedding_classification.dataset_formatting import format_dataset_word_level
-from word_embedding_classification.constants import PREDICTION_TYPE
+from word_embedding_classification.constants import PREDICTION_TYPE as WORD_PREDICTION_TYPE
 from word_embedding_classification.ann import train as w_train, get_embedding_layer
 from word_embedding_classification.models import *
 import keras.backend.tensorflow_backend as k_tf
 
+
+from document_level_classification.constants import PREDICTION_TYPE as DOC_PREDICTION_TYPE
+from document_level_classification.models import get_2048_1024_512
+from document_level_classification.train import train as document_trainer
+from document_level_classification.dataset_formatting import format_dataset_doc_level
 
 
 def char_sent_main():
@@ -73,7 +79,7 @@ def char_main():
 
 def word_main():
     # Load dataset
-    texts, labels, metadata, labels_index = prepare_dataset(PREDICTION_TYPE)
+    texts, labels, metadata, labels_index = prepare_dataset(WORD_PREDICTION_TYPE)
 
     # Clean texts
     # text_parser = Parser()
@@ -95,6 +101,34 @@ def word_main():
     # w_train(*get_word_model_2x512_256_lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info)
 
 
+def doument_main():
+    # Load dataset
+    texts, labels, metadata, labels_index = prepare_dataset(DOC_PREDICTION_TYPE)
+
+    # Clean texts with parser
+    parser = Parser()
+    print("Remove Stopwords")
+    texts = parser.remove_stopwords(texts)
+
+    data = {}
+    # Create format_dataset_tfidf
+    print("Format Dataset to Document Level")
+    data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], \
+    data['meta_val'], data['x_test'], data['y_test'], data['meta_test'] = format_dataset_doc_level(texts, labels, metadata)
+
+    input_size = data['x_train'].shape[1]
+    output_size = len(labels_index)
+
+    document_trainer(*get_2048_1024_512(input_size, output_size), data=data)
+
+
+
+
+
+
+
+
+
 if __name__ == '__main__':
 
     # For more conservative memory usage
@@ -106,7 +140,8 @@ if __name__ == '__main__':
     # char_sent_main()
 
     # Train all models in character main
-    char_main()
+    #char_main()
+    doument_main()
 
     # Train all models in word main
     # word_main()

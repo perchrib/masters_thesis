@@ -54,16 +54,8 @@ def tag_counter(tokens, tag):
     return Counter(tags)
 
 def twitter_syntax_token_counter(texts):
-    parsed_texts = []
     parser = Parser()
-
-    for text in texts:
-        parsed_text = parser.replace("url", "URLs", text)
-        parsed_text = parser.replace("pic", "PICTURES", parsed_text)
-        parsed_text = parser.replace("@", "MENTIONS", parsed_text)
-        parsed_text = parser.replace("#", "HASHTAGS", parsed_text)
-        parsed_texts.append(parsed_text)
-
+    parsed_texts = parser.replace(texts, url="URLs", pic="PICTURES", mention="MENTIONS", hashtag="HASHTAGS")
     parsed_tokens = word_tokenize(parsed_texts)
     twitter_syntax_tokens = re.findall(r'(?:URLs|HASHTAGS|MENTIONS|PICTURES)', " ".join(parsed_tokens))
     return Counter(twitter_syntax_tokens)
@@ -71,13 +63,9 @@ def twitter_syntax_token_counter(texts):
 
 def length_of_texts_counter(texts):
     parser = Parser()
-    length_of_texts_chars = []
-    length_of_texts_words = []
-    for text in texts:
-        parsed_text = parser.replace("url", "", text)
-        parsed_text = parser.replace("pic", "", parsed_text)
-        length_of_texts_chars.append(len(parsed_text))
-        length_of_texts_words.append(len(parsed_text.split()))
+    parsed_texts = parser.replace(texts, pic="", url="")
+    length_of_texts_chars = [len(text) for text in parsed_texts]
+    length_of_texts_words = [len(text.split()) for text in parsed_texts]
     return Counter(length_of_texts_chars), Counter(length_of_texts_words)
 
 
