@@ -13,12 +13,11 @@ from character_level_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS
 from preprocessors.parser import Parser
 from preprocessors.dataset_preparation import prepare_dataset
 
+import time
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-
-
-from time import time, strftime
-from helpers.helper_functions import log_session
 from helpers.model_utils import get_model_checkpoint
+from character_level_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE, PREDICTION_TYPE, LOGS_DIR, MODEL_DIR
+from helpers.helper_functions import log_session, get_time_format
 import numpy as np
 
 np.random.seed(1337)
@@ -50,7 +49,7 @@ def train(model, model_info, data, save_model=False, extra_info=None, log_sess=T
         callbacks.append(get_model_checkpoint(model.name, MODEL_DIR, MODEL_OPTIMIZER))
 
     # Time
-    start_time = time()
+    start_time = time.time()
 
     print('\nCommence training %s model' % model.name)
     history = model.fit(data['x_train'], data['y_train'],
@@ -60,8 +59,10 @@ def train(model, model_info, data, save_model=False, extra_info=None, log_sess=T
                         shuffle=True,
                         callbacks=callbacks).history
 
-    training_time = (time() - start_time) / 60
-    print('Training time: %i' % training_time)
+    seconds = time.time() - start_time
+    training_time = get_time_format(seconds)
+
+    print("Training time: %s" % training_time)
 
     # Evaluate on test set
     test_results = model.evaluate(data['x_test'], data['y_test'], batch_size=BATCH_SIZE)

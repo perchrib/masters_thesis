@@ -58,29 +58,29 @@ if __name__ == '__main__':
     print "Number of Tweets Total: ", len(female_texts) + len(male_texts)
     print "Number of Male Tweets: ", len(male_texts)
     print "Number of Female Tweets: ", len(female_texts)
-    #male_data = Characteristics(male_texts)
-    #female_data = Characteristics(female_texts)
-    #print "Characteristics Objects Created..."
+    male_data = Characteristics(male_texts)
+    female_data = Characteristics(female_texts)
+    print "Characteristics Objects Created..."
 
     # tag_plotter(lower(male_data.hashtag_count), lower(female_data.hashtag_count), tag_type="Hashtags")
     # tag_plotter(lower(male_data.mention_count), lower(female_data.mention_count), tag_type="Mentions")
     #
-    # plot_two_counters(male_data.emoticon_count, female_data.emoticon_count, counter_type="Emoticons")
-    # plot_two_counters(male_data.twitter_syntax_token_count, female_data.twitter_syntax_token_count, counter_type="Twitter Syntax Tokens")
-    # plot_text_length(male_data.length_of_text_char_count, female_data.length_of_text_char_count, "Characters")
-    # plot_text_length(male_data.length_of_text_word_count, female_data.length_of_text_word_count, "Words")
+    plot_two_counters(male_data.emoticon_count, female_data.emoticon_count, counter_type="Emoticons")
+    plot_two_counters(male_data.twitter_syntax_token_count, female_data.twitter_syntax_token_count, counter_type="Twitter Syntax Tokens")
+    plot_text_length(male_data.length_of_text_char_count, female_data.length_of_text_char_count, "Characters")
+    plot_text_length(male_data.length_of_text_word_count, female_data.length_of_text_word_count, "Words")
 
     #plot_two_counters(male_data.stopwords_count, female_data.stopwords_count, counter_type="Stopwords")
     #plot_two_counters(stopwords_counter(male_texts), stopwords_counter(female_texts), counter_type="Stopwords")
 
-    import time
-    start = time.time()
-
-    plot_two_counters(pos_tag_counter(word_tokenize(male_texts)), pos_tag_counter(word_tokenize(female_texts)), counter_type="POS-tags")
-    end = time.time()
-    seconds = end - start
-    m, s = divmod(seconds, 60)
-    print m, "minutes ", s, " seconds"
+    # import time
+    # start = time.time()
+    #
+    # plot_two_counters(pos_tag_counter(word_tokenize(male_texts)), pos_tag_counter(word_tokenize(female_texts)), counter_type="POS-tags")
+    # end = time.time()
+    # seconds = end - start
+    # m, s = divmod(seconds, 60)
+    # print m, "minutes ", s, " seconds"
 
 
 
