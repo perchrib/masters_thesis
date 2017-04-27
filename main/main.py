@@ -13,10 +13,13 @@ from character_level_classification.train import train as c_train
 from character_level_classification.models import *
 from character_level_classification.model_sent import get_char_model_3xConv_Bi_lstm_sent
 
-from word_level_classification.dataset_formatting import format_dataset_word_level
-from word_level_classification.constants import PREDICTION_TYPE as WORD_PREDICTION_TYPE
-from word_level_classification.ann import train as w_train, get_embedding_layer
-from word_level_classification.models import *
+
+from word_embedding_classification.dataset_formatting import format_dataset_word_level
+from word_embedding_classification.constants import PREDICTION_TYPE as WORD_PREDICTION_TYPE
+from word_embedding_classification.ann import train as w_train, get_embedding_layer
+from word_embedding_classification.models import *
+import keras.backend.tensorflow_backend as k_tf
+
 
 from document_level_classification.constants import PREDICTION_TYPE as DOC_PREDICTION_TYPE
 from document_level_classification.models import get_2048_1024_512
@@ -62,14 +65,17 @@ def char_main():
 
     # ------- Insert models to train here -----------
     # Remember star before model getter
-    c_train(*get_char_model_3xConv_2xBiLSTM(num_output_nodes, num_chars), data=data)
+    # c_train(*get_char_model_3xConv_2xBiLSTM(num_output_nodes, num_chars), data=data)
     # c_train(*get_char_model_BiLSTM_full(num_output_nodes, num_chars), data=data)
     ##c_train(*get_char_model_3xConv(num_output_nodes), data=data)
     ##c_train(*get_char_model_3xConv_LSTM(num_output_nodes, num_chars), data=data)
     # c_train(*get_char_model_3xConv_4xBiLSTM(num_output_nodes, num_chars), data=data)
 
-    c_train(*get_char_model_2xConv_BiLSTM(num_output_nodes, num_chars), data=data)
-    c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data)
+    # c_train(*get_char_model_2xConv_BiLSTM(num_output_nodes, num_chars), data=data)
+    c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False)
+    c_train(*get_char_model_Conv_BiLSTM_2(num_output_nodes, num_chars), data=data)
+    c_train(*get_char_model_Conv_BiLSTM_3(num_output_nodes, num_chars), data=data)
+
 
 def word_main():
     # Load dataset
@@ -124,6 +130,12 @@ def doument_main():
 
 
 if __name__ == '__main__':
+
+    # For more conservative memory usage
+    tf_config = k_tf.tf.ConfigProto()
+    tf_config.gpu_options.allow_growth = True
+    k_tf.set_session(k_tf.tf.Session(config=tf_config))
+
     # Train sent char
     # char_sent_main()
 

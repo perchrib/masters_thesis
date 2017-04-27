@@ -8,7 +8,7 @@ from keras.utils.np_utils import to_categorical
 from preprocessors.dataset_preparation import split_dataset
 from helpers.global_constants import EMBEDDINGS_INDEX_DIR
 from helpers.helper_functions import load_pickle
-from word_level_classification.constants import *
+from word_embedding_classification.constants import *
 
 np.random.seed(1337)
 

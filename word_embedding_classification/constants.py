@@ -4,7 +4,8 @@ AGE = 'age'
 PREDICTION_TYPE = GENDER
 
 # Log directory
-LOGS_DIR = '../logs/word_level_classification'
+LOGS_DIR = '../logs/word_embedding_classification'
+MODEL_DIR = '../models/word_embedding_classification'
 
 # Text pre-processing
 MAX_NB_WORDS = 50000
