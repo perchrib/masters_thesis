@@ -59,7 +59,7 @@ def split_dataset(data, labels, metadata):
     :param data: formatted dataset, i.e., sequences of char/word indices
     :return: training set, validation set, test set and metadata
     """
-
+    np.random.seed(1337)
     # shuffle and split the data into a training set and a validation set
     indices = np.arange(data.shape[0])
     np.random.shuffle(indices)
@@ -82,6 +82,7 @@ def split_dataset(data, labels, metadata):
     meta_test = metadata[-nb_test_samples:]
 
     return x_train, y_train, meta_train, x_val, y_val, meta_val, x_test, y_test, meta_test
+
 
 def construct_labels_index(prediction_type):
     """

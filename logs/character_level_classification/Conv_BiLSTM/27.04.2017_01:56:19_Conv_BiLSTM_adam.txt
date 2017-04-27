@@ -1,0 +1,62 @@
+Training_log - 27/04/2017 01:56:19
+
+Model name: Conv_BiLSTM
+Elapsed training time: 318 minutes
+
+Training set size: 530222
+Validation set size: 66277
+Validation set fraction: 0.099999
+Test set fraction: 0.099999
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 256
+Max number of epochs: 50
+Max sequence length: 80
+
+-----------Training statistics-----------
+         acc      loss   val_acc  val_loss
+0   0.610537  0.650811  0.629117  0.630073
+1   0.643249  0.619772  0.655024  0.605830
+2   0.654854  0.604854  0.664710  0.596336
+3   0.663398  0.594156  0.666340  0.589295
+4   0.671489  0.584640  0.670112  0.585256
+5   0.678644  0.576523  0.677309  0.576466
+6   0.683514  0.570038  0.679632  0.578037
+7   0.688485  0.562979  0.679632  0.573430
+8   0.693894  0.556159  0.687192  0.566164
+9   0.698877  0.549691  0.688504  0.563770
+10  0.703683  0.543596  0.689591  0.563141
+11  0.708505  0.537706  0.691356  0.561564
+12  0.713558  0.531054  0.696863  0.555889
+13  0.717341  0.525258  0.698266  0.556041
+14  0.721139  0.519676  0.698372  0.555742
+15  0.725621  0.514289  0.701148  0.554745
+16  0.728727  0.508671  0.700680  0.554947
+17  0.733214  0.503808  0.700997  0.558958
+18  0.735852  0.499381  0.704347  0.559532
+
+--------------Test results---------------
+loss: 0.562520acc: 0.704510
+
+--------------Model Diagram---------------
+          InputLayer (None, 80)                           InputLayer (None, 80)                 
+              Lambda (None, Dimension(80), 78)                Lambda (None, Dimension(80), 78)  
+              Conv1D (None, Dimension(76), 1024)              Conv1D (None, Dimension(76), 1024)
+             Dropout (None, Dimension(76), 1024)             Dropout (None, Dimension(76), 1024)
+        MaxPooling1D (None, Dimension(38), 1024)        MaxPooling1D (None, Dimension(38), 1024)
+                   LSTM (None, 512)                                LSTM (None, 512)             
+                        \_____________________________________________/                         
+                                               |                                                
+                                          Merge (None, 1024)                                    
+                                          Dense (None, 256)                                     
+                                          Dense (None, 2)                                       
+
+
+Model information:
+=========================================
+ LSTM dropout = 0.2, 0.2
+ No dense dropout
+ filters = [1024]
+ LSTM layers 512, Dense 256

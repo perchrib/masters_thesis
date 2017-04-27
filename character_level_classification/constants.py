@@ -7,7 +7,7 @@ PREDICTION_TYPE = GENDER
 
 # Log directory
 LOGS_DIR = '../logs/character_level_classification'
-MODEL_DIR = '..models/character_level_classification'
+MODEL_DIR = '../models/character_level_classification'
 
 # Text pre-processing
 MAX_SEQUENCE_LENGTH = 80
@@ -22,5 +22,5 @@ MAX_CHAR_SENT_LENGTH = 52
 MODEL_OPTIMIZER = 'adam'
 MODEL_LOSS = 'categorical_crossentropy'
 MODEL_METRICS = ['accuracy']
-NB_EPOCHS = 1
+NB_EPOCHS = 50
 BATCH_SIZE = 256
