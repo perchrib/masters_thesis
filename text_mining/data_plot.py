@@ -71,6 +71,7 @@ class Visualizer():
         tokens = sorted(tc.keys())
         if subplot:
             self.subplot_checker()
+
         font_size = self.determine_fontsize(len(tokens))
         tc_freq = [tc[token] for token in tokens]
         plt.plot(tc_freq, color=color, label=label)
@@ -96,6 +97,7 @@ class Visualizer():
         if subplot:
             self.subplot_checker()
 
+
         plt.axvline(x=avg_length, color='black', label="avg length " + str(avg_length))
         #print "AVG length: ", avg_length, "total_elements: ", total_elements, " total_sum: ", total_sum_of_lengths
 
@@ -103,11 +105,14 @@ class Visualizer():
         plt.legend(loc='best', frameon=False)
         plt.tight_layout()
 
-
     def subplot_checker(self):
         plt.subplot(self.subplot_counter)
         if self.subplot_counter == 211:
             plt.title(self.title)
+            plt.ylabel(self.ylabel)
+        else:
+            plt.ylabel(self.ylabel)
+            plt.xlabel(self.xlabel)
         self.subplot_counter += 1
 
 

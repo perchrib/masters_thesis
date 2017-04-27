@@ -16,7 +16,7 @@ class Characteristics():
         self.emoticon_count = emoticon_counter(self.tokens)
         self.hashtag_count = tag_counter(self.tokens, "#")
         self.mention_count = tag_counter(self.tokens, "@")
-        self.twitter_syntax_token_count = twitter_syntax_token_counter(texts)
+        self.twitter_syntax_token_count = twitter_syntax_token_counter(texts, self.emoticon_count)
         self.length_of_text_char_count, self.length_of_text_word_count = length_of_texts_counter(texts)
         self.stopwords_count = stopwords_counter(texts)
 
@@ -53,12 +53,22 @@ def tag_counter(tokens, tag):
     tags = [t for t in tokens if t.startswith(tag) and len(t) > 1]
     return Counter(tags)
 
-def twitter_syntax_token_counter(texts):
+def twitter_syntax_token_counter(texts, emoticon_count=None):
     parser = Parser()
     parsed_texts = parser.replace(texts, url="URLs", pic="PICTURES", mention="MENTIONS", hashtag="HASHTAGS")
     parsed_tokens = word_tokenize(parsed_texts)
     twitter_syntax_tokens = re.findall(r'(?:URLs|HASHTAGS|MENTIONS|PICTURES)', " ".join(parsed_tokens))
+
+    if emoticon_counter:
+        num_of_emoticons = sum(emoticon_count.values())
+    else:
+        num_of_emoticons = sum(emoticon_counter(word_tokenize(texts)).values())
+
+    emoticons = ["EMOTICONS" for _ in range(num_of_emoticons)]
+    twitter_syntax_tokens.extend(emoticons)
+
     return Counter(twitter_syntax_tokens)
+
 
 
 def length_of_texts_counter(texts):
@@ -103,10 +113,14 @@ def stopwords_counter(texts):
     all_stopwords = [word for text in texts for word in text.lower().split() if word in stop]
     return Counter(all_stopwords)
 
-def pos_tag_counter(tokens):
+def pos_tag_counter(tokens, simple_pos_tags=True):
     postags = nltk.pos_tag(tokens)
-    simple_tags = [(word, map_tag('en-ptb', 'universal', tag)) for word, tag in postags]
-    pos_tag_counts = Counter([tag for word, tag in simple_tags])
+    if simple_pos_tags:
+        simple_tags = [(word, map_tag('en-ptb', 'universal', tag)) for word, tag in postags]
+        pos_tag_counts = Counter([tag for word, tag in simple_tags])
+    else:
+        ordinary_tags = [(word, tag) for word, tag in postags]
+        pos_tag_counts = Counter([tag for word, tag in ordinary_tags])
     return pos_tag_counts
 
 

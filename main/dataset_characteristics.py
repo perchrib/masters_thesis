@@ -51,6 +51,14 @@ def plot_text_length(male_counter, female_counter, length_type):
     visualizer_1.plot_avg_length_of_texts(female_counter, FEMALE_COLOR, "female", subplot=True)
     visualizer_1.save_plot()
 
+def plot_pos_tags(male_counter, female_counter, pos_tag_type):
+    visualizer_1 = Visualizer(title='Frequency of ' + pos_tag_type, xlabel='Pos-Tags',
+                              ylabel='Number of Tweets')
+    male, female = equal_token_count(male_counter, female_counter)
+    visualizer_1.plot_two_dataset_token_counts(male, female)
+    visualizer_1.save_plot()
+
+
 
 if __name__ == '__main__':
     authors, female_texts, male_texts = get_data(TEXT_DATA_DIR)
@@ -62,9 +70,10 @@ if __name__ == '__main__':
     female_data = Characteristics(female_texts)
     print "Characteristics Objects Created..."
 
-    # tag_plotter(lower(male_data.hashtag_count), lower(female_data.hashtag_count), tag_type="Hashtags")
-    # tag_plotter(lower(male_data.mention_count), lower(female_data.mention_count), tag_type="Mentions")
+    tag_plotter(lower(male_data.hashtag_count), lower(female_data.hashtag_count), tag_type="Hashtags")
+    tag_plotter(lower(male_data.mention_count), lower(female_data.mention_count), tag_type="Mentions")
     #
+
     plot_two_counters(male_data.emoticon_count, female_data.emoticon_count, counter_type="Emoticons")
     plot_two_counters(male_data.twitter_syntax_token_count, female_data.twitter_syntax_token_count, counter_type="Twitter Syntax Tokens")
     plot_text_length(male_data.length_of_text_char_count, female_data.length_of_text_char_count, "Characters")
@@ -73,15 +82,16 @@ if __name__ == '__main__':
     #plot_two_counters(male_data.stopwords_count, female_data.stopwords_count, counter_type="Stopwords")
     #plot_two_counters(stopwords_counter(male_texts), stopwords_counter(female_texts), counter_type="Stopwords")
 
-    # import time
-    # start = time.time()
-    #
-    # plot_two_counters(pos_tag_counter(word_tokenize(male_texts)), pos_tag_counter(word_tokenize(female_texts)), counter_type="POS-tags")
-    # end = time.time()
-    # seconds = end - start
-    # m, s = divmod(seconds, 60)
-    # print m, "minutes ", s, " seconds"
 
+    import time
+    start = time.time()
 
+    # plot simple pos tags
+    #plot_two_counters(pos_tag_counter(word_tokenize(male_texts)), pos_tag_counter(word_tokenize(female_texts)), counter_type="POS-tags")
 
-    #print(pos_tag_counter(word_tokenize(["At eight o'clock on Thursday film morning word line test best beautiful Ram Aaron design", "This is a test"])))
+    # plot all pos tags
+    #plot_pos_tags(pos_tag_counter(word_tokenize(male_texts), simple_pos_tags=False), pos_tag_counter(word_tokenize(female_texts), simple_pos_tags=False), pos_tag_type="All Pos-Tags Types")
+    end = time.time()
+    seconds = end - start
+    m, s = divmod(seconds, 60)
+    print m, "minutes ", s, " seconds"
