@@ -10,7 +10,7 @@ LOGS_DIR = '../logs/document_level_classification'
 
 
 # Text pre-processing
-MAX_SEQUENCE_LENGTH = 80
+MAX_FEATURE_LENGTH = 5000
 
 
 

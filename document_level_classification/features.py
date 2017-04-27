@@ -18,34 +18,25 @@ class TF_IDF():
         self.train_vocabulary = self.train_unique_tokens.keys()
 
         # contains the vocabulary, count word frequencies
-        self.train_cv = CountVectorizer(vocabulary=self.train_vocabulary, ngram_range=ngram_range)
-        # Construct the bag of word model
-        self.train_bow = self.train_cv.fit_transform(self.train_docs)
+        self.train_counts = CountVectorizer(vocabulary=self.train_vocabulary, ngram_range=ngram_range)
+
+        # Construct the bag of word model and transform documnets into sparse features vectors
+        self.train_bow = self.train_counts.fit_transform(self.train_docs)
 
         self.tfidf_transformer = TfidfTransformer()
+
 
     def fit_to_training_data(self):
         tfidf_features = self.tfidf_transformer.fit_transform(self.train_bow)
         return tfidf_features.toarray()
 
     def fit_to_new_data(self, new_texts):
-        new_cv = self.train_cv.transform(np.asarray(new_texts))
+        new_cv = self.train_counts.transform(np.asarray(new_texts))
         new_tfidf_features = self.tfidf_transformer.transform(new_cv)
         return new_tfidf_features.toarray()
 
     def n_frequent_words_in_texts(self):
         return most_common(Counter(word_tokenize(self.train_docs)), self.train_max_len_features)
-
-
-    # def tf_idf_1(documents):
-    #     vocabulary = n_frequent_words_in_texts(documents, 2000)
-    #     cv = CountVectorizer(vocabulary=vocabulary)
-    #     counts = cv.fit_transform(np.asarray(documents))
-    #     # print "Count " , counts.__dict__,cv.vocabulary_, "\n"
-    #     tfidf_transformer = TfidfTransformer()
-    #     tf_idfs = tfidf_transformer.fit_transform(counts)
-    #     print tf_idfs.shape
-    #     return tf_idfs
 
 
 def shuffle(x_input, y_label):
@@ -79,24 +70,13 @@ if __name__ == "__main__":
 
     # shuffle text and labels
     texts, labels = shuffle(texts, labels)
-
+    print "dataset size: " , texts.shape, " 0 ", texts.shape[0]
     nb_validation_samples = int(0.15 * len(texts))
 
     tfidf = TF_IDF(texts[:-nb_validation_samples], feature_length)
+
     x_train = tfidf.fit_to_training_data()
+    print "TFIDF shape ", x_train.shape, " 0 ", x_train.shape[0]
     y_train = labels[:-nb_validation_samples]
     x_val = tfidf.fit_to_new_data(texts[-nb_validation_samples:])
     y_val = labels[-nb_validation_samples:]
-
-
-
-
-    #
-    #
-    # def tf_idf(documents):
-    #     fe = FeatureExtraction(documents)
-    #     np.set_printoptions(precision=2)
-    #     document_level_classification = fe.tfidf.fit_transform(fe.count.fit_transform(fe.docs)).toarray()
-    #     print("SUM: ", sum(document_level_classification[0]), " length: ", len(document_level_classification[0]))
-    #     print document_level_classification
-    #     return document_level_classification

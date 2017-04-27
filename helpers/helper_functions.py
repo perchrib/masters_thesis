@@ -5,7 +5,7 @@ import os
 import time
 import pandas
 import yaml
-
+import numpy as np
 def get_time_format(seconds):
     """
     
@@ -17,6 +17,22 @@ def get_time_format(seconds):
     training_time = "%dh:%02dm:%02ds" % (h, m, s)
     return training_time
 
+
+def shuffle(x_input, y_label):
+    """shuffles a texts of list with the given labels"""
+    if len(x_input) != len(y_label):
+        raise TypeError("Not Same Length")
+    else:
+        x_input, y_label = np.asarray(x_input), np.asarray(y_label)
+        indices = np.arange(len(x_input))
+
+        texts_and_indices = list(zip(x_input, indices))
+        np.random.seed(1337)
+        np.random.shuffle(texts_and_indices)
+        x_input, indices = zip(*texts_and_indices)
+        x_input, indices = np.asarray(x_input), np.asarray(indices)
+        y_label = y_label[indices]
+        return x_input, y_label, indices
 
 def save_pickle(file_path, data):
     """

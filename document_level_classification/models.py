@@ -10,4 +10,6 @@ def get_2048_1024_512(input_length, output_length):
     x = Dense(512, activation='relu')(x)
     predictions = Dense(output_length, activation='softmax')(x)
     model = Model(inputs=inputs, outputs=predictions)
-    return model
+
+    model_info = ["Feed Forward Netwotk"]
+    return model, model_info

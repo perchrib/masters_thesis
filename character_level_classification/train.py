@@ -52,7 +52,7 @@ def train(model, model_info, data, extra_info=None):
     seconds = (time.time() - start_time)
     training_time = get_time_format(seconds)
 
-    print "Training time: %s" % training_time
+    print("Training time: %s" % training_time)
 
     # Evaluate on test set
     test_results = model.evaluate(data['x_test'], data['y_test'], batch_size=BATCH_SIZE)
