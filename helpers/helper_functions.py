@@ -6,6 +6,7 @@ import time
 import pandas
 import yaml
 import numpy as np
+
 def get_time_format(seconds):
     """
     
@@ -33,6 +34,7 @@ def shuffle(x_input, y_label):
         x_input, indices = np.asarray(x_input), np.asarray(indices)
         y_label = y_label[indices]
         return x_input, y_label, indices
+
 
 def save_pickle(file_path, data):
     """

@@ -1,6 +1,6 @@
-from keras.models import Sequential
-from keras.layers import Dense, LSTM, Dropout, GRU
-from word_embedding_classification.constants import PREDICTION_TYPE
+from keras.models import Sequential, Model
+from keras.layers import Dense, LSTM, Dropout, GRU, MaxPooling1D, Conv1D, merge, Input
+from word_embedding_classification.constants import PREDICTION_TYPE, MAX_SEQUENCE_LENGTH
 
 
 def get_word_model_3xsimple_lstm(embedding_layer, nb_output_nodes):
@@ -99,6 +99,42 @@ def get_word_model_2x1024_512_lstm(embedding_layer, nb_output_nodes):
     model.add(Dense(nb_output_nodes, activation='softmax'))
 
     return model
+
+
+
+def get_word_model_Conv_BiLSTM(embedding_layer, nb_output_nodes):
+    tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
+    embedding = embedding_layer(tweet_input)
+
+    kernel_size = 5
+    filters = 1024
+    pool_length = 2
+    conv_dropout = 0.5
+    lstm_drop = 0.2
+    lstm_drop_rec = 0.2
+
+    embedding = Conv1D(filters=filters,
+                       kernel_size=kernel_size,
+                       activation='relu',
+                       kernel_initializer='glorot_uniform')(embedding)
+
+    embedding = Dropout(conv_dropout)(embedding)
+    embedding = MaxPooling1D(pool_length=pool_length)(embedding)
+
+    forward = LSTM(256, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu')(embedding)
+    backward = LSTM(256, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu',
+                    go_backwards=True)(embedding)
+
+    output = merge([forward, backward], mode='concat', concat_axis=-1)
+    # output = Dropout(0.5)(output)
+    output = Dense(128, activation='relu')(output)
+    # output = Dropout(0.5)(output)
+    output = Dense(nb_output_nodes, activation='softmax')(output)
+    model = Model(input=tweet_input, output=output, name='Conv_BiLSTM')
+
+    model_info = ["Kernel_size: %i" % kernel_size, "Filters: %i" % filters, "Pool length: %i" % pool_length, "LSTM dropout: %f, LSTM recurrent dropout %f" % (lstm_drop, lstm_drop_rec), "Conv dropout: %f" % conv_dropout, "No dense dropout"]
+    return model, model_info
+
 
 
 

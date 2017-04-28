@@ -38,5 +38,5 @@ fiddle.py
 # MG aws key
 key_apr17.pem
 
-# To be removed
-char-models-offbit/*
+# Models
+models/*

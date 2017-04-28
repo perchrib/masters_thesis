@@ -15,7 +15,7 @@ from preprocessors.dataset_preparation import prepare_dataset
 
 import time
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-from helpers.model_utils import get_model_checkpoint
+from helpers.model_utils import get_model_checkpoint, save_trained_model
 from character_level_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE, PREDICTION_TYPE, LOGS_DIR, MODEL_DIR
 from helpers.helper_functions import log_session, get_time_format
 import numpy as np
@@ -45,8 +45,8 @@ def train(model, model_info, data, save_model=False, extra_info=None, log_sess=T
     early_stopping = EarlyStopping(monitor='val_loss', patience=2)
     callbacks = [early_stopping]
 
-    if save_model:
-        callbacks.append(get_model_checkpoint(model.name, MODEL_DIR, MODEL_OPTIMIZER))
+    # if save_model:
+    #     callbacks.append(get_model_checkpoint(model.name, MODEL_DIR, MODEL_OPTIMIZER))
 
     # Time
     start_time = time.time()
@@ -83,3 +83,5 @@ def train(model, model_info, data, save_model=False, extra_info=None, log_sess=T
                     model_info=model_info,
                     extra_info=extra_info)
 
+    if save_model:
+        save_trained_model(model, MODEL_DIR, MODEL_OPTIMIZER)
