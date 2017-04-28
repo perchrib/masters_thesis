@@ -13,6 +13,8 @@ class Characteristics():
     def __init__(self, texts):
         self.tokens = word_tokenize(texts)
         self.token_count = Counter(self.tokens)
+        self.clean_token_count = Counter(clean_text(texts))
+
         self.emoticon_count = emoticon_counter(self.tokens)
         self.hashtag_count = tag_counter(self.tokens, "#")
         self.mention_count = tag_counter(self.tokens, "@")
@@ -20,15 +22,28 @@ class Characteristics():
         self.length_of_text_char_count, self.length_of_text_word_count = length_of_texts_counter(texts)
         self.stopwords_count = stopwords_counter(texts)
 
-    def most_common(self, counter, n_freq):
+    def most_common(self, n_freq):
         """
         :param counter, Counter object
         :param n_freq, number of most frequent tokens 
         :returns most_common_counter, a Counter object with the most common tokens (and the frequency)
         """
 
-        return most_common(counter, n_freq)
+        return most_common(self.clean_token_count, n_freq)
 
+    def least_common(self, n_freq):
+        """
+        :param counter, Counter object
+        :param n_freq, number of least frequent tokens 
+        :returns most_common_counter, a Counter object with the most common tokens (and the frequency)
+        """
+        return least_common(self.clean_token_count, n_freq)
+
+
+def least_common(counter, n_freq):
+    least_common = counter.most_common()[-n_freq:]
+    least_common_counter = Counter({k: v for k,v in least_common})
+    return least_common_counter
 
 
 def most_common(counter, n_freq):
@@ -70,6 +85,14 @@ def twitter_syntax_token_counter(texts, emoticon_count=None):
     return Counter(twitter_syntax_tokens)
 
 
+def clean_text(texts):
+    parser = Parser()
+    clean_texts = parser.remove_stopwords(texts)
+    clean_texts = parser.replace_all(clean_texts)
+    clean_tokens = word_tokenize(clean_texts)
+    return clean_tokens
+
+
 
 def length_of_texts_counter(texts):
     parser = Parser()
@@ -89,7 +112,6 @@ def unequal_token_count(dist_1, dist_2, n_frequent_tokens=None):
         dist_2 = most_common(dist_2, n_frequent_tokens)
 
     return dist_1, dist_2
-
 
 
 def equal_token_count(dist_1, dist_2, n_frequent_tokens=None):
