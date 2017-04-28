@@ -30,7 +30,7 @@ class Parser:
         """
         Strips the input string from html code
         :param content: string containing html syntax
-        :return: a string with no html syntax
+        :return: a string with no html  syntax
         """
         # strip html tags
         p = re.compile(r'<.*?>')

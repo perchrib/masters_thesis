@@ -8,7 +8,8 @@ from preprocessors.dataset_preparation import split_dataset
 
 def format_dataset_doc_level(texts, labels, metadata):
     """
-    Split into training set, validation and test set. It also transform the text into doc_level features ie TFIDF  
+    Split into training set, validation and test set. It also transform the text into doc_level features ie TFIDF
+     POS-Tags etc
     :param texts: list of tweets
     :param labels: list of tweet labels
     :param metadata: list of dictionaries containing age and gender for each tweet
