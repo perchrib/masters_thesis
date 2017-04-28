@@ -15,7 +15,6 @@ np.random.seed(1337)
 
 def format_dataset_word_level(texts, labels, metadata):
     """
-    This is a sub-procedure.
     Format text samples and labels into tensors. Convert text samples into sequences of word indices.
     Split into training set and validation set
     :param texts: list of tweets

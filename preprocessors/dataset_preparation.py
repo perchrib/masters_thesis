@@ -59,7 +59,7 @@ def split_dataset(data, labels, metadata, data_type_is_string=False):
     :param data: formatted dataset, i.e., sequences of char/word indices
     :return: training set, validation set, test set and metadata
     """
-
+    np.random.seed(1337)
     # shuffle and split the data into a training set and a validation set
     if data_type_is_string:
         data, labels, indices = shuffle(data, labels)
