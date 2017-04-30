@@ -2,7 +2,7 @@ import numpy as np
 from keras.utils import to_categorical
 
 from document_level_classification.features import TF_IDF
-from constants import MAX_FEATURE_LENGTH
+from constants import MAX_FEATURE_LENGTH, N_GRAM
 from preprocessors.dataset_preparation import split_dataset
 
 
@@ -22,8 +22,9 @@ def format_dataset_doc_level(texts, labels, metadata):
                                                                                                     data_type_is_string=True)
 
 
+    # create vocabulary for n words!!!
 
-    tfidf = TF_IDF(x_train, MAX_FEATURE_LENGTH)
+    tfidf = TF_IDF(x_train, y_train, MAX_FEATURE_LENGTH, N_GRAM)
     x_train = tfidf.fit_to_training_data()
     x_test = tfidf.fit_to_new_data(x_test)
     x_val = tfidf.fit_to_new_data(x_val)

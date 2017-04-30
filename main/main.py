@@ -116,14 +116,16 @@ def char_main(operation, trained_model_path=None):
 
 
 
-def doument_main():
+def document_main():
     # Load dataset
     texts, labels, metadata, labels_index = prepare_dataset(DOC_PREDICTION_TYPE)
 
     # Clean texts with parser
     parser = Parser()
-    print("Remove Stopwords")
+    print("Remove Stopwords...")
     texts = parser.remove_stopwords(texts)
+    print("Parsing Twitter Specific Syntax...")
+    texts = parser.replace_all(texts)
 
     data = {}
     # Create format_dataset_tfidf
@@ -137,13 +139,6 @@ def doument_main():
     document_trainer(*get_2048_1024_512(input_size, output_size), data=data)
 
 
-
-
-
-
-
-
-
 if __name__ == '__main__':
 
     # For more conservative memory usage
@@ -152,10 +147,10 @@ if __name__ == '__main__':
     k_tf.set_session(k_tf.tf.Session(config=tf_config))
 
     # Train all models in character main
-    char_main(operation=TRAIN)
+    # char_main(operation=TRAIN)
 
     # Train all models in doc main
-    doument_main()
+    document_main()
 
     # Train all models in word main
     # word_main()

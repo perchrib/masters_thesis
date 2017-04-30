@@ -33,6 +33,7 @@ embeddings_native/*
 
 # Test and fiddle python file
 fiddle.py
+testing.py
 
 
 # MG aws key

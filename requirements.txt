@@ -1,0 +1,9 @@
+keras
+tensorflow
+h5py
+numpy
+nltk
+pandas
+keras_diagram
+sklearn
+matplotlib

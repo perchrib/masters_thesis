@@ -148,3 +148,16 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, num_
                 log_file.write("\n %s" % info)
 
     print("Done")
+
+
+def sum_col(array):
+    sum_ = []
+    row_dim = array.shape[0]
+    col_dim = array.shape[1]
+    for i in range(col_dim):
+        sum_i = 0
+        for j in range(row_dim):
+            sum_i += array[j, i]
+        sum_.append(sum_i)
+    return np.asarray(sum_)
+
