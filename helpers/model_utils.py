@@ -39,8 +39,9 @@ def save_trained_model(model, model_dir, model_optimizer):
     if not os.path.exists(model_dir):
         os.makedirs(os.path.join(model_dir, model.name))
 
+    # _{epoch:02d}_{val_acc:.4f}
     model_file_name = time.strftime(
-        "%d.%m.%Y_%H:%M:%S") + "_" + model.name + "_" + model_optimizer + "_{epoch:02d}_{val_acc:.4f}.h5"
+        "%d.%m.%Y_%H:%M:%S") + "_" + model.name + "_" + model_optimizer + ".h5"
 
     model.save(os.path.join(model_dir, model.name, model_file_name))
     print("Model saved")

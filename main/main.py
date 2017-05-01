@@ -27,28 +27,11 @@ from document_level_classification.models import get_2048_1024_512
 from document_level_classification.train import train as document_trainer
 from document_level_classification.dataset_formatting import format_dataset_doc_level
 
+from char_word_combined.models import get_cw_model
+from char_word_combined.train import train as cw_train
+
 TRAIN = "train"
 TEST = "test"
-
-
-def char_sent_main():
-    # Load dataset
-    texts, labels, metadata, labels_index = prepare_dataset(PREDICTION_TYPE)
-
-    # Clean texts
-    text_parser = Parser()
-    texts = text_parser.replace_all(texts)
-    # texts = text_parser.replace_urls(texts)
-
-    data = {}
-    data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], data['meta_val'], data['x_test'], data['y_test'], data['meta_test'], data[
-        'char_index'] = format_dataset_char_level_sentences(texts, labels,
-                                                  metadata)
-    num_chars = len(data['char_index'])
-    num_output_nodes = len(labels_index)
-
-    c_train(*get_char_model_3xConv_Bi_lstm_sent(num_output_nodes, num_chars), data=data)
-
 
 def word_main():
     # Load dataset
@@ -71,8 +54,12 @@ def word_main():
 
     # ------- Insert models to train here -----------
     # Remember star before model getter
-    # w_train(*get_word_model_2x512_256_lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info)
-    w_train(*get_word_model_Conv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=True)
+    # w_train(*get_word_model_2x512_256_lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+    # w_train(*get_word_model_Conv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+    # w_train(*get_word_model_3xConv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+    # w_train(*get_word_model_2x512_256_lstm_128_full(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+    w_train(*get_word_test(embedding_layer, num_output_nodes), data=data,
+            extra_info=extra_info, save_model=False)
 
 
 def char_main(operation, trained_model_path=None):
@@ -106,7 +93,9 @@ def char_main(operation, trained_model_path=None):
         c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=True, extra_info=extra_info)
         # c_train(*get_char_model_Conv_BiLSTM_2(num_output_nodes, num_chars), data=data, save_model=True)
         # c_train(*get_char_model_Conv_BiLSTM_3(num_output_nodes, num_chars), data=data, save_model=True)
-        # c_train(*get_char_model_Conv_BiLSTM_4(num_output_nodes, num_chars), data=data, save_model=True)
+        # c_train(*get_char_model_Conv_BiLSTM_mask(num_output_nodes, num_chars), data=data, save_model=False,
+        #         extra_info=extra_info)
+        c_train(*get_char_model_Conv_BiLSTM_4(num_output_nodes, num_chars), data=data, save_model=False, extra_info=extra_info)
 
         # Dummy model for fast train and save model --- DELETE
         # c_train(*get_dummy_model(num_output_nodes, num_chars), data=data, save_model=True, log_sess=False)
@@ -138,10 +127,34 @@ def doument_main():
     document_trainer(*get_2048_1024_512(input_size, output_size), data=data)
 
 
+def char_word_main():
+    # Load dataset
+    texts, labels, metadata, labels_index = prepare_dataset(c_PREDICTION_TYPE)
 
+    # Clean texts
+    text_parser = Parser()
+    texts = text_parser.replace_all(texts)
+    # texts = text_parser.replace_urls(texts)
 
+    # Format for character model
+    c_data = {}
+    c_data['x_train'], c_data['y_train'], c_data['meta_train'], c_data['x_val'], c_data['y_val'], c_data['meta_val'], c_data[
+        'x_test'], c_data['y_test'], c_data['meta_test'], c_data['char_index'] = format_dataset_char_level(texts, labels,
+                                                                                                     metadata)
+    # Format for word model
+    w_data = {}
+    w_data['x_train'], w_data['y_train'], w_data['meta_train'], w_data['x_val'], w_data['y_val'], w_data['meta_val'], w_data[
+        'x_test'], w_data['y_test'], w_data['meta_test'], w_data[
+        'word_index'] = format_dataset_word_level(texts, labels,
+                                                  metadata)
 
+    embedding_layer = get_embedding_layer(w_data['word_index'])
+    num_chars = len(c_data['char_index'])
+    num_output_nodes = len(labels_index)
 
+    extra_info = []
+
+    cw_train(*get_cw_model(embedding_layer, num_output_nodes, num_chars), c_data=c_data, w_data=w_data, save_model=True, extra_info=extra_info)
 
 
 
@@ -161,5 +174,9 @@ if __name__ == '__main__':
     # Train all models in word main
     # word_main()
 
+    # Train char-word models in char word main
+    char_word_main()
+
+
     # Load model and run test data on model
-    char_main(TEST, "Conv_BiLSTM/27.04.2017_21:07:34_Conv_BiLSTM_adam_31_0.70.h5")
+    # char_main(TEST, "Conv_BiLSTM/27.04.2017_21:07:34_Conv_BiLSTM_adam_31_0.70.h5")

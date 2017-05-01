@@ -97,11 +97,13 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=1, barLength
 def log_session(log_dir, model, history, training_time, num_train, num_val, num_test, optimizer, batch_size, max_epochs,
                 test_results, model_info=None, extra_info=None, max_sequence_length=None):
 
-    print("Writing log file...")
     if not os.path.exists((os.path.join(log_dir, model.name))):
         os.makedirs((os.path.join(log_dir, model.name)))
 
     file_name = time.strftime("%d.%m.%Y_%H:%M:%S") + "_" + model.name + "_" + optimizer + ".txt"
+
+    print("Writing log file - %s...")
+
     with open(os.path.join(log_dir, model.name, file_name), 'wb') as log_file:
         log_file.write("Training_log - %s" % time.strftime("%d/%m/%Y %H:%M:%S"))
 
@@ -123,7 +125,7 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, num_
         log_file.write("\nMax number of epochs: %i" % max_epochs)
 
         if max_sequence_length:
-            log_file.write("\nMax sequence length: %i" % max_sequence_length)
+            log_file.write("\nMax sequence length: %s" % max_sequence_length)
 
         # Write accuracies for training and validation set from callback history
         log_file.write("\n\n-----------Training statistics-----------\n")

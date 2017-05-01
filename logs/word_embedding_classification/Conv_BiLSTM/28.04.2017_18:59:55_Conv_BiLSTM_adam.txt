@@ -1,0 +1,60 @@
+Training_log - 28/04/2017 18:59:55
+
+Model name: Conv_BiLSTM
+Elapsed training time: 122.484565683
+
+Training set size: 530222
+Validation set size: 66277
+Validation set fraction: 0.099999
+Test set fraction: 0.099999
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 30
+Max sequence length: 25
+
+-----------Training statistics-----------
+         acc      loss   val_acc  val_loss
+0   0.646237  0.610854  0.664574  0.589075
+1   0.669967  0.580051  0.676041  0.569182
+2   0.684581  0.561959  0.682952  0.559741
+3   0.696501  0.546519  0.690888  0.552528
+4   0.706546  0.533779  0.692473  0.547531
+5   0.713933  0.522617  0.699715  0.540903
+6   0.721645  0.512062  0.701510  0.540886
+7   0.729172  0.502976  0.703185  0.536321
+8   0.734564  0.494346  0.705584  0.535211
+9   0.740820  0.486010  0.709160  0.534807
+10  0.746118  0.478061  0.709009  0.534075
+11  0.751580  0.470108  0.713008  0.531871
+12  0.756536  0.462889  0.712178  0.535438
+13  0.761111  0.456490  0.717534  0.534270
+14  0.765523  0.450111  0.715904  0.533393
+
+--------------Test results---------------
+loss: 0.533730acc: 0.714970
+
+--------------Model Diagram---------------
+       InputLayer (None, 25)              InputLayer (None, 25)       
+        Embedding (None, 25, 200)          Embedding (None, 25, 200)  
+           Conv1D (None, 21, 1024)            Conv1D (None, 21, 1024) 
+          Dropout (None, 21, 1024)           Dropout (None, 21, 1024) 
+     MaxPooling1D (None, 10, 1024)      MaxPooling1D (None, 10, 1024) 
+             LSTM (None, 256)                   LSTM (None, 256)      
+                  \________________________________/                  
+                                  |                                   
+                             Merge (None, 512)                        
+                             Dense (None, 128)                        
+                             Dense (None, 2)                          
+
+
+Model information:
+=========================================
+ Kernel_size: 5
+ Filters: 1024
+ Pool length: 2
+ LSTM dropout: 0.200000, LSTM recurrent dropout 0.200000
+ Conv dropout: 0.500000
+ No dense dropout
