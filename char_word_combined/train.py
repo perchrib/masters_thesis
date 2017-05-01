@@ -1,17 +1,16 @@
-from __future__ import print_function
+
 import os
 import sys
 
 # Append path to use modules outside pycharm environment, e.g. remote server
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 
-from char_word_combined.constants import MAX_CHAR_SEQUENCE_LENGTH, MAX_WORD_SEQUENCE_LENGTH
+from char_word_combined.constants import MAX_CHAR_SEQUENCE_LENGTH, MAX_WORD_SEQUENCE_LENGTH, MODEL_OPTIMIZER, MODEL_DIR, MODEL_METRICS, MODEL_LOSS, NB_EPOCHS, LOGS_DIR, BATCH_SIZE
 
 import time
 from keras.models import Model
-from keras.callbacks import EarlyStopping, ModelCheckpoint
-from helpers.model_utils import get_model_checkpoint, save_trained_model
-from character_level_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE, PREDICTION_TYPE, LOGS_DIR, MODEL_DIR
+from keras.callbacks import EarlyStopping
+from helpers.model_utils import save_trained_model
 from helpers.helper_functions import log_session, get_time_format
 import numpy as np
 
@@ -61,7 +60,7 @@ def train(model, model_info, c_data, w_data, save_model=False, extra_info=None, 
     print("Training time: %s" % training_time)
 
     # Evaluate on test set
-    test_results = model.evaluate([c_data['x_train'], w_data['x_train']], [c_data['y_train'], w_data['y_train']], batch_size=BATCH_SIZE)
+    test_results = model.evaluate({'c_input': c_data['x_test'], 'w_input': w_data['x_test']}, c_data['y_test'], batch_size=BATCH_SIZE)
 
     if log_sess:
         log_session(log_dir=LOGS_DIR,

@@ -54,12 +54,10 @@ def word_main():
 
     # ------- Insert models to train here -----------
     # Remember star before model getter
-    # w_train(*get_word_model_2x512_256_lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+    w_train(*get_word_model_2x512_256_lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=True)
     # w_train(*get_word_model_Conv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
     # w_train(*get_word_model_3xConv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
     # w_train(*get_word_model_2x512_256_lstm_128_full(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
-    w_train(*get_word_test(embedding_layer, num_output_nodes), data=data,
-            extra_info=extra_info, save_model=False)
 
 
 def char_main(operation, trained_model_path=None):
@@ -172,10 +170,10 @@ if __name__ == '__main__':
     # doument_main()
 
     # Train all models in word main
-    # word_main()
+    word_main()
 
     # Train char-word models in char word main
-    char_word_main()
+    # char_word_main()
 
 
     # Load model and run test data on model
