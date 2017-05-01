@@ -1,6 +1,6 @@
 from keras.models import Sequential, Model
 from keras.layers import Dense, LSTM, Dropout, GRU, MaxPooling1D, Conv1D, merge, Input
-from keras.regularizers import l2
+from keras.regularizers import l2, l1, l1_l2
 
 from word_embedding_classification.constants import PREDICTION_TYPE, MAX_SEQUENCE_LENGTH
 
@@ -36,11 +36,11 @@ def get_word_model_2x512_256_lstm(embedding_layer, nb_output_nodes):
     embedding = Dropout(0.5)(embedding)
     embedding = LSTM(512, return_sequences=True)(embedding)
     embedding = Dropout(0.5)(embedding)
-    embedding = LSTM(256, kernel_regularizer=l2(), return_sequences=False)(embedding)
+    embedding = LSTM(256, return_sequences=False)(embedding)
 
     output = Dense(nb_output_nodes, activation='softmax')(embedding)
     model = Model(input=tweet_input, output=output, name="2x512_256LSTM")
-    extra_info = ["Dropout: 0.5", "L1_l2 regularization used"]
+    extra_info = ["Dropout: 0.5", "L1 regularization used"]
 
     return model, extra_info
 

@@ -1,6 +1,7 @@
 from character_level_classification.models import get_one_hot_layer
 from char_word_combined.constants import MAX_CHAR_SEQUENCE_LENGTH as c_MAX_SEQUENCE_LENGTH, MAX_WORD_SEQUENCE_LENGTH as w_MAX_SEQUENCE_LENGTH
 
+from keras.regularizers import l2
 from keras.layers import Input, Dense, LSTM, Dropout, Lambda, Conv1D, MaxPooling1D, concatenate, Flatten, Masking
 from keras.models import Model
 
@@ -47,9 +48,9 @@ def get_cw_model(embedding_layer, num_output_nodes, char_num):
 
     ## Merge
     encoding = concatenate([char_output, word_output])
-    encoding = Dense(512, activation='relu')(encoding)
+    encoding = Dense(512, kernel_regularizer=l2(), activation='relu')(encoding)
     encoding = Dropout(dense_drop)(encoding)
-    encoding = Dense(256, activation='relu')(encoding)
+    encoding = Dense(256, kernel_regularizer=l2(), activation='relu')(encoding)
     output = Dense(num_output_nodes, activation='softmax')(encoding)
     model = Model(inputs=[c_tweet_input, w_tweet_input], output=output, name="Conv_BiLSTM_3xLSTM")
 

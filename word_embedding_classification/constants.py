@@ -17,4 +17,4 @@ MODEL_OPTIMIZER = 'adam'
 MODEL_LOSS = 'categorical_crossentropy'
 MODEL_METRICS = ['accuracy']
 NB_EPOCHS = 30
-BATCH_SIZE = 128
+BATCH_SIZE = 2048   # TODO: Fix
