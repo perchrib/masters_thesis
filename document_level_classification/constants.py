@@ -10,7 +10,8 @@ LOGS_DIR = '../logs/document_level_classification'
 
 
 # Text pre-processing
-MAX_FEATURE_LENGTH = 5000
+MAX_FEATURE_LENGTH = 10000
+N_GRAM = (1, 3)
 
 
 
@@ -18,5 +19,5 @@ MAX_FEATURE_LENGTH = 5000
 MODEL_OPTIMIZER = 'adam'
 MODEL_LOSS = 'categorical_crossentropy'
 MODEL_METRICS = ['accuracy']
-NB_EPOCHS = 30
-BATCH_SIZE = 128
+NB_EPOCHS = 50
+BATCH_SIZE = 256

@@ -1,5 +1,5 @@
 from keras.callbacks import EarlyStopping
-from character_level_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE, \
+from document_level_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE, \
     PREDICTION_TYPE, LOGS_DIR
 
 from helpers.helper_functions import get_time_format, log_session
@@ -17,7 +17,7 @@ def train(model, model_info, data, extra_info=None):
 
 
     # Callbacks
-    early_stopping = EarlyStopping(monitor='val_loss', patience=2)
+    early_stopping = EarlyStopping(monitor='val_acc', patience=2)
 
     model.compile(optimizer=MODEL_OPTIMIZER,
                   loss=MODEL_LOSS,
@@ -49,6 +49,7 @@ def train(model, model_info, data, extra_info=None):
                 training_time=training_time,
                 num_train=len(data['x_train']),
                 num_val=len(data['x_val']),
+                num_test=len(data['x_test']),
                 optimizer=MODEL_OPTIMIZER,
                 batch_size=BATCH_SIZE,
                 max_epochs=NB_EPOCHS,

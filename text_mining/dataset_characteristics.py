@@ -1,3 +1,4 @@
+from __future__ import print_function
 from helpers import word_tokenize
 from collections import Counter
 import re
@@ -42,7 +43,7 @@ class Characteristics():
 
 def least_common(counter, n_freq):
     least_common = counter.most_common()[-n_freq:]
-    least_common_counter = Counter({k: v for k,v in least_common})
+    least_common_counter = Counter({k: v for k, v in least_common})
     return least_common_counter
 
 
@@ -104,6 +105,12 @@ def length_of_texts_counter(texts):
 
 
 def unequal_token_count(dist_1, dist_2, n_frequent_tokens=None):
+    """
+    :param dist_1: Counter object from distribution_1  
+    :param dist_2: Counter object from distribution_2 
+    :param n_frequent_tokens: number of frequent tokens
+    :return: n 
+    """
     common_tokens = (dist_1 & dist_2).keys()
     dist_1 = Counter({k: v for k, v in dist_1.iteritems() if k not in common_tokens})
     dist_2 = Counter({k: v for k, v in dist_2.iteritems() if k not in common_tokens})
@@ -115,6 +122,12 @@ def unequal_token_count(dist_1, dist_2, n_frequent_tokens=None):
 
 
 def equal_token_count(dist_1, dist_2, n_frequent_tokens=None):
+    """
+    :param dist_1: Counter object from distribution_1  
+    :param dist_2: Counter object from distribution_2 
+    :param n_frequent_tokens: number of frequent tokens
+    :return: n common words in both distributions
+    """
     if n_frequent_tokens:
         common_tokens = map(lambda x: x[0], (dist_1 & dist_2).most_common(n_frequent_tokens))
     else:
@@ -134,6 +147,7 @@ def stopwords_counter(texts):
     stop = set(stopwords.words('english'))
     all_stopwords = [word for text in texts for word in text.lower().split() if word in stop]
     return Counter(all_stopwords)
+
 
 def pos_tag_counter(tokens, simple_pos_tags=True):
     postags = nltk.pos_tag(tokens)

@@ -1,3 +1,4 @@
+from __future__ import print_function
 from helpers.global_constants import TEXT_DATA_DIR
 from text_mining.helpers import get_data, word_tokenize
 from text_mining.dataset_characteristics import Characteristics, equal_token_count, unequal_token_count, most_common, \
@@ -70,13 +71,13 @@ def plot_frequent_tokens(male_counter, female_counter, counter_type):
 
 if __name__ == '__main__':
     authors, female_texts, male_texts = get_data(TEXT_DATA_DIR)
-    print "Retrieved Data..."
-    print "Number of Tweets Total: ", len(female_texts) + len(male_texts)
-    print "Number of Male Tweets: ", len(male_texts)
-    print "Number of Female Tweets: ", len(female_texts)
+    print("Retrieved Data...")
+    print("Number of Tweets Total: ", len(female_texts), len(male_texts))
+    print("Number of Male Tweets: ", len(male_texts))
+    print("Number of Female Tweets: ", len(female_texts))
     male_data = Characteristics(male_texts)
     female_data = Characteristics(female_texts)
-    print "Characteristics Objects Created..."
+    print("Characteristics Objects Created...")
 
     # tag_plotter(lower(male_data.hashtag_count), lower(female_data.hashtag_count), tag_type="Hashtags")
     # tag_plotter(lower(male_data.mention_count), lower(female_data.mention_count), tag_type="Mentions")
@@ -108,4 +109,4 @@ if __name__ == '__main__':
     end = time.time()
     seconds = end - start
     m, s = divmod(seconds, 60)
-    print m, "minutes ", s, " seconds"
+    print(m, "minutes ", s, " seconds")
