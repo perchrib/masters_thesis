@@ -1,0 +1,59 @@
+Training_log - 01/05/2017 15:14:42
+
+Model name: Conv_BiLSTM_3xLSTM
+Elapsed training time: 1h:57m:09s
+
+Training set size: 530222
+Validation set size: 66277
+Validation set fraction: 0.099999
+Test set fraction: 0.099999
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 256
+Max number of epochs: 50
+Max sequence length: (Char:55, Word:25)
+
+-----------Training statistics-----------
+        acc      loss   val_acc  val_loss
+0  0.645047  0.620189  0.663307  0.596954
+1  0.677018  0.580725  0.682273  0.570884
+2  0.700922  0.549429  0.695294  0.555166
+3  0.726011  0.513929  0.704694  0.550032
+4  0.752990  0.472463  0.709311  0.560934
+5  0.778664  0.430798  0.719601  0.561261
+6  0.802024  0.390526  0.722498  0.590145
+
+--------------Test results---------------
+loss: 0.590630acc: 0.719220
+
+--------------Model Diagram---------------
+       InputLayer (None, 55)              InputLayer (None, 55)                                          
+           Lambda (None, 55, 78)              Lambda (None, 55, 78)                                      
+           Conv1D (None, 51, 1024)            Conv1D (None, 51, 1024)                                    
+          Dropout (None, 51, 1024)           Dropout (None, 51, 1024)        InputLayer (None, 25)       
+     MaxPooling1D (None, 25, 1024)      MaxPooling1D (None, 25, 1024)         Embedding (None, 25, 200)  
+             LSTM (None, 256)                   LSTM (None, 256)                   LSTM (None, 25, 512)  
+                  \________________________________/                            Dropout (None, 25, 512)  
+                                  |                                                LSTM (None, 25, 512)  
+                       Concatenate (None, 512)                                  Dropout (None, 25, 512)  
+                             Dense (None, 256)                                     LSTM (None, 256)      
+                                   \__________________________________________________/                  
+                                                    |                                                    
+                                         Concatenate (None, 512)                                         
+                                               Dense (None, 512)                                         
+                                             Dropout (None, 512)                                         
+                                               Dense (None, 256)                                         
+                                               Dense (None, 2)                                           
+
+
+Model information:
+=========================================
+ Kernel_size: 5
+ Filters: 1024
+ Pool length: 2
+ LSTM char dropout: 0.200000, LSTM char recurrent dropout 0.200000
+ Conv dropout: 0.500000
+ No dense drop on char
+ Dense drop 0.500000
