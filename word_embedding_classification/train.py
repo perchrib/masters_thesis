@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 import os
 import sys
 
@@ -10,12 +10,13 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 from word_embedding_classification.dataset_formatting import format_dataset_word_level, construct_embedding_matrix, \
     get_embedding_dim
 from word_embedding_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE, \
-    EMBEDDINGS_INDEX, MAX_SEQUENCE_LENGTH, LOGS_DIR
+    EMBEDDINGS_INDEX, MAX_SEQUENCE_LENGTH, LOGS_DIR, MODEL_DIR
+from helpers.model_utils import get_model_checkpoint, save_trained_model
 from word_embedding_classification.models import *
 from preprocessors.parser import Parser
 from preprocessors.dataset_preparation import prepare_dataset
 from keras.layers import Embedding
-from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.callbacks import EarlyStopping
 from time import time, strftime
 from helpers.helper_functions import log_session
 
@@ -31,11 +32,9 @@ def train(model, model_info, data, save_model=False, extra_info=None):
     # Callbacks
     early_stopping = EarlyStopping(monitor='val_loss', patience=2)
     callbacks = [early_stopping]
-    #
+
     # if save_model:
-    #     weights_file_path = strftime("%d.%m.%Y_%H:%M:%S") + "_" + model.name + "_" + MODEL_OPTIMIZER + "_{epoch:02d}_{val_acc:.2f}" + ".txt"
-    #     checkpoint = ModelCheckpoint(os.path.join(MODEL_DIR, weights_file_path), save_best_only=True)
-    #     callbacks.append(checkpoint)
+    #     callbacks.append(get_model_checkpoint(model.name, MODEL_DIR, MODEL_OPTIMIZER))
 
     # Time
     start_time = time()
@@ -70,6 +69,9 @@ def train(model, model_info, data, save_model=False, extra_info=None):
                 test_results=test_results,
                 model_info=model_info,
                 extra_info=extra_info)
+
+    if save_model:
+        save_trained_model(model, MODEL_DIR, MODEL_OPTIMIZER)
 
 
 def get_embedding_layer(word_index):

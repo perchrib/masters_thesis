@@ -1,0 +1,62 @@
+Training_log - 29/04/2017 18:03:19
+
+Model name: Conv_BiLSTM
+Elapsed training time: 79.4583829006
+
+Training set size: 530222
+Validation set size: 66277
+Validation set fraction: 0.099999
+Test set fraction: 0.099999
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 30
+Max sequence length: 25
+
+-----------Training statistics-----------
+         acc      loss   val_acc  val_loss
+0   0.639642  0.619122  0.660772  0.589641
+1   0.664863  0.588570  0.675483  0.575992
+2   0.677916  0.571914  0.679391  0.567137
+3   0.689513  0.557734  0.683706  0.557039
+4   0.698436  0.545675  0.693106  0.551026
+5   0.706110  0.535498  0.696924  0.546086
+6   0.712590  0.525952  0.698960  0.547405
+7   0.719983  0.516670  0.701012  0.545251
+8   0.725964  0.508666  0.704724  0.540247
+9   0.731733  0.500635  0.705750  0.535363
+10  0.736940  0.493634  0.707938  0.540167
+11  0.740980  0.487188  0.708345  0.539746
+12  0.745627  0.480769  0.709507  0.540482
+
+--------------Test results---------------
+loss: 0.539650acc: 0.708210
+
+--------------Model Diagram---------------
+       InputLayer (None, 25)              InputLayer (None, 25)              InputLayer (None, 25)              InputLayer (None, 25)       
+                  \________________________________/                                    \________________________________/                  
+                                  |                                                                     |                                   
+                         Embedding (None, 25, 200)                                             Embedding (None, 25, 200)                    
+                            Conv1D (None, 21, 1024)                                               Conv1D (None, 21, 1024)                   
+                           Dropout (None, 21, 1024)                                              Dropout (None, 21, 1024)                   
+                      MaxPooling1D (None, 10, 1024)                                         MaxPooling1D (None, 10, 1024)                   
+                              LSTM (None, 256)                                                      LSTM (None, 256)                        
+                                   \___________________________________________________________________/                                    
+                                                                     |                                                                      
+                                                                Merge (None, 512)                                                           
+                                                              Dropout (None, 512)                                                           
+                                                                Dense (None, 128)                                                           
+                                                              Dropout (None, 128)                                                           
+                                                                Dense (None, 2)                                                             
+
+
+Model information:
+=========================================
+ Kernel_size: 5
+ Filters: 1024
+ Pool length: 2
+ LSTM dropout: 0.200000, LSTM recurrent dropout 0.200000
+ Conv dropout: 0.500000
+ Dense dropout: 0.500000
