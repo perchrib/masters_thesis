@@ -23,7 +23,7 @@ import keras.backend.tensorflow_backend as k_tf
 from helpers.model_utils import load_and_evaluate
 
 from document_level_classification.constants import PREDICTION_TYPE as DOC_PREDICTION_TYPE
-from document_level_classification.models import get_2048_1024_512
+from document_level_classification.models import get_2048_1024_512, get_4096_2048_1024_512
 from document_level_classification.train import train as document_trainer
 from document_level_classification.dataset_formatting import format_dataset_doc_level
 
@@ -136,8 +136,8 @@ def document_main():
     input_size = data['x_train'].shape[1]
     output_size = len(labels_index)
 
-    document_trainer(*get_2048_1024_512(input_size, output_size), data=data)
-
+    #document_trainer(*get_2048_1024_512(input_size, output_size), data=data)
+    document_trainer(*get_4096_2048_1024_512(input_size, output_size), data=data)
 
 if __name__ == '__main__':
 

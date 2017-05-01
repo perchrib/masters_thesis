@@ -1,4 +1,4 @@
-from __future__ import division
+from __future__ import division, print_function
 from sklearn.feature_extraction.text import TfidfTransformer, CountVectorizer
 import numpy as np
 import sys
@@ -29,7 +29,7 @@ class TF_IDF():
         # Construct the bag of word model and transform documnets into sparse features vectors
         self.train_bow = self.train_counts.fit_transform(self.train_docs)
 
-        self.tfidf_transformer = TfidfTransformer()
+        self.tfidf_transformer = TfidfTransformer(use_idf=False)
 
 
     def fit_to_training_data(self):
@@ -48,21 +48,20 @@ class TF_IDF():
         return most_common(Counter(word_tokenize(self.train_docs)), self.train_max_len_features)
 
     def n_frequent_ngram_token_dissimilarity_vocabulary(self):
-        print "male texts"
         male_texts = [text for i, text in enumerate(self.train_docs) if self.labels[i] == 0]
-        print "female texts"
         female_texts = [text for i, text in enumerate(self.train_docs) if self.labels[i] == 1]
 
-        print "all token voc"
-        all_token_vocabulary_counts = self.get_ngram_occurrences_counter(self.train_docs, self.ngram_range, self.train_max_len_features)
-        print "male token voc"
-        male_token_vocabulary_counts = self.get_ngram_occurrences_counter(male_texts, self.ngram_range, self.train_max_len_features)
-        print "female token voc"
-        female_token_vocabulary_counts = self.get_ngram_occurrences_counter(female_texts, self.ngram_range, self.train_max_len_features)
+        print("Create ngram-Token (n = %s) Vocabulary for Training Set" %(self.ngram_range,))
+        all_token_vocabulary_counts = self.get_ngram_occurrences_counter(self.train_docs, self.ngram_range, self.train_max_len_features, "training")
+        print("Create ngram-Token (n = %s) Vocabulary for Male in Training Set" %(self.ngram_range,))
+        male_token_vocabulary_counts = self.get_ngram_occurrences_counter(male_texts, self.ngram_range, self.train_max_len_features, "male")
+        print("Create ngram-Token (n = %s) Vocabulary for Female in Training Set" %(self.ngram_range,))
+        female_token_vocabulary_counts = self.get_ngram_occurrences_counter(female_texts, self.ngram_range, self.train_max_len_features, "female")
         total_men_tokens = sum(male_token_vocabulary_counts.values())
         total_female_tokens = sum(female_token_vocabulary_counts.values())
 
         different_value_vocabulary_counts = dict()
+        print("Create Vocabulary for Training Set (%i Most Distinct ngram-Token (n = %s) Between Gender in Training Set)" %(self.train_max_len_features, self.ngram_range,))
         for token in all_token_vocabulary_counts.keys():
             number_of_men_token = male_token_vocabulary_counts[token]
             number_of_female_token = female_token_vocabulary_counts[token]
@@ -78,13 +77,13 @@ class TF_IDF():
 
 
 
-    def get_ngram_occurrences_counter(self, texts, ngram_range, max_features):
-        print("CV create...")
+    def get_ngram_occurrences_counter(self, texts, ngram_range, max_features, type):
+        print("CountVectorize for %s set create..." %type)
         CV = CountVectorizer(ngram_range=ngram_range, lowercase=False, token_pattern="[^ ]+", max_features=max_features)
-        print("CV created")
-        print("bow create...")
+        print("CountVectorize for %s set created" %type)
+        print("BoW for %s set create..." %type)
         bag_of_words = CV.fit_transform(texts)
-        print("bow created")
+        print("CountVectorize for %s set created" %type)
         # represent vocabulary for arbitrary ngrams
         vocabulary = CV.vocabulary_
 
@@ -92,11 +91,11 @@ class TF_IDF():
 
         #n_occurrences = np.sum(bag_of_words.toarray(), axis=0)
         bag_of_words_array = bag_of_words.toarray()
-        print bag_of_words_array.shape
+        print(bag_of_words_array.shape)
         #n_occurrences = sum_col(bag_of_words_array)
-        print "sum..."
+        print("Summing %s BoW..." %type)
         n_occurrences = np.sum(bag_of_words_array, axis=0)
-        print "Summed"
+        print("Summed")
         n_counts = Counter({k: n_occurrences[v] for k, v in vocabulary.iteritems()})
         return n_counts
 
@@ -139,11 +138,12 @@ if __name__ == "__main__":
     #labels = labels[:1000]
     texts, labels = shuffle(texts, labels)
     #print "dataset size: " , texts.shape, " 0 ", texts.shape[0]
-    print len(labels), len(texts)
-    print texts.shape
+    print(len(labels), len(texts))
+    print(texts.shape)
     #nb_validation_samples = int(0.15 * len(texts))
 
     tfidf = TF_IDF(parsed_texts, labels, feature_length, ngram_range=(1, 3))
+
     
 
     # x_train = tfidf.fit_to_training_data()
