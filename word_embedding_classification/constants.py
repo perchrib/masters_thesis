@@ -16,5 +16,5 @@ EMBEDDINGS_INDEX = 'glove.twitter.27B.200d'
 MODEL_OPTIMIZER = 'adam'
 MODEL_LOSS = 'categorical_crossentropy'
 MODEL_METRICS = ['accuracy']
-NB_EPOCHS = 30
-BATCH_SIZE = 2048   # TODO: Fix
+NB_EPOCHS = 50
+BATCH_SIZE = 128

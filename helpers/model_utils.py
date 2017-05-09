@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 
 def get_model_checkpoint(model_name, model_dir, model_optimizer):
-    if not os.path.exists(model_dir):
+    if not os.path.exists(model_dir, model_name):
         os.makedirs(os.path.join(model_dir, model_name))
 
     model_file_name = time.strftime(
@@ -36,7 +36,7 @@ def save_trained_model(model, model_dir, model_optimizer):
 
     print("Saving trained model")
 
-    if not os.path.exists(model_dir):
+    if not os.path.exists(os.path.join(model_dir, model.name)):
         os.makedirs(os.path.join(model_dir, model.name))
 
     # _{epoch:02d}_{val_acc:.4f}
@@ -63,21 +63,45 @@ def load_and_evaluate(model_path, data):
     print("%s: %f" % (model.metrics_names[1], round(test_results[1], 5)))
 
 
-def load_and_predict(model_path, data, prediction_type):
+def load_and_predict(model_path, data, prediction_type, normalize):
     """
     Load model and predict/classify dataset; then graph confusion matrix
     :param model_path: file path to model
     :param data: dictionary of data; need data['x_test']
-    :param prediction_type:
+    :param prediction_type: generalization in case of multiple prediction types; 'GENDER'
+    :param normalize: True if values should be normalized by number of elements in the class
     :return:
     """
 
     model = load_model(model_path)
-    y_pred = model.predict(data['x_test'])
+    predictions = model.predict(data['x_test'])  # List of lists with confidence in each class, for each test sample
 
+    # List of indices of highest value in each list in predictions. Corresponds to the prediction class
+    y_pred = np.asarray([np.argmax(preds) for preds in predictions])
+    y_test = np.asarray([np.argmax(categorical_labels) for categorical_labels in data['y_test']])
+
+    print("SHAPE pred", y_pred.shape)
+    print("SHAPE test", data['y_test'].shape)
     class_names = get_class_names(prediction_type)
 
-    create_and_plot_confusion_matrix(y_test=data['y_test'], y_pred=y_pred, class_names=class_names)
+    create_and_plot_confusion_matrix(y_test=y_test, y_pred=y_pred, class_names=class_names, normalize=normalize)
+
+
+def create_and_plot_confusion_matrix(y_test, y_pred, class_names, normalize):
+    # Compute confusion matrix
+    cnf_matrix = confusion_matrix(y_test, y_pred)
+    # np.set_printoptions(precision=2)
+
+    # Plot non-normalized confusion matrix
+    plt.figure()
+    plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=normalize)
+
+    # # Plot normalized confusion matrix
+    # plt.figure()
+    # plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=True,
+    #                       title='Normalized confusion matrix')
+
+    plt.show()
 
 
 def plot_confusion_matrix(cm, classes,
@@ -101,8 +125,6 @@ def plot_confusion_matrix(cm, classes,
     else:
         print('Confusion matrix, without normalization')
 
-    print(cm)
-
     thresh = cm.max() / 2.
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
         plt.text(j, i, cm[i, j],
@@ -114,27 +136,11 @@ def plot_confusion_matrix(cm, classes,
     plt.xlabel('Predicted label')
 
 
-def create_and_plot_confusion_matrix(y_test, y_pred, class_names):
-    # Compute confusion matrix
-    cnf_matrix = confusion_matrix(y_test, y_pred)
-    # np.set_printoptions(precision=2)
-
-    # Plot non-normalized confusion matrix
-    plt.figure()
-    plot_confusion_matrix(cnf_matrix, classes=class_names,
-                          title='Confusion matrix, without normalization')
-
-    # # Plot normalized confusion matrix
-    # plt.figure()
-    # plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=True,
-    #                       title='Normalized confusion matrix')
-
-    plt.show()
-
-
 def get_class_names(prediction_type):
     if prediction_type == GENDER:
         return ["Male", "Female"]
 
-# if __name__ == '__main__':
-#     create_and_plot_confusion_matrix([1, 1, 1], [1, 0, 0], ["Male", "Female"])
+if __name__ == '__main__':
+    predictions = [[0.4, 0.6], [0.7, 0.3], [0.8, 0.2]]
+    y_pred = [np.argmax(x) for x in predictions]
+    create_and_plot_confusion_matrix([1, 1, 0], y_pred, ["Male", "Female"], normalize=False)
