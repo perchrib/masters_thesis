@@ -7,10 +7,7 @@ sys.path.insert(0, "/Users/per/Documents/NTNU_Courses/5th_year/2-semester/master
 from text_mining.helpers import word_tokenize
 from text_mining.dataset_characteristics import most_common
 from collections import Counter
-from helpers.helper_functions import sum_col
 
-
-from collections import Counter
 
 class TF_IDF():
     def __init__(self, documents, labels, max_len_features, ngram_range=(1, 1)):
@@ -29,7 +26,7 @@ class TF_IDF():
         # Construct the bag of word model and transform documnets into sparse features vectors
         self.train_bow = self.train_counts.fit_transform(self.train_docs)
 
-        self.tfidf_transformer = TfidfTransformer(use_idf=False)
+        self.tfidf_transformer = TfidfTransformer()
 
 
     def fit_to_training_data(self):
@@ -98,56 +95,3 @@ class TF_IDF():
         print("Summed")
         n_counts = Counter({k: n_occurrences[v] for k, v in vocabulary.iteritems()})
         return n_counts
-
-
-
-
-
-def shuffle(x_input, y_label):
-    if len(x_input) != len(y_label):
-        raise TypeError("Not Same Length")
-    else:
-        x_input, y_label = np.asarray(x_input), np.asarray(y_label)
-        np.random.seed(1337)
-        indices = np.arange(len(x_input))
-
-        texts_and_indices = list(zip(x_input, indices))
-        np.random.shuffle(texts_and_indices)
-        x_input, indices = zip(*texts_and_indices)
-        x_input, indices = np.asarray(x_input), np.asarray(indices)
-        y_label = to_categorical(y_label)
-        y_label = y_label[indices]
-        return x_input, y_label
-
-if __name__ == "__main__":
-    from preprocessors.parser import Parser
-    from helpers.global_constants import GENDER
-    from preprocessors.dataset_preparation import prepare_dataset, prepare_dataset_women, prepare_dataset_men
-    from keras.utils.np_utils import to_categorical
-
-    parser = Parser()
-    texts, labels, metadata, labels_index = prepare_dataset(GENDER)
-    feature_length = 5000
-    #texts = ["This is a test for a given input", "we are the world, we are the people", "this is it"]
-    #print "Removing Stopwords..."
-
-    parsed_texts = parser.replace_all(texts)
-
-    # shuffle text and labels
-    #texts = texts[:1000]
-    #labels = labels[:1000]
-    texts, labels = shuffle(texts, labels)
-    #print "dataset size: " , texts.shape, " 0 ", texts.shape[0]
-    print(len(labels), len(texts))
-    print(texts.shape)
-    #nb_validation_samples = int(0.15 * len(texts))
-
-    tfidf = TF_IDF(parsed_texts, labels, feature_length, ngram_range=(1, 3))
-
-    
-
-    # x_train = tfidf.fit_to_training_data()
-    # print "TFIDF shape ", x_train.shape, " 0 ", x_train.shape[0]
-    # y_train = labels[:-nb_validation_samples]
-    # x_val = tfidf.fit_to_new_data(texts[-nb_validation_samples:])
-    # y_val = labels[-nb_validation_samples:]

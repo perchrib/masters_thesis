@@ -191,9 +191,10 @@ if __name__ == '__main__':
     # char_main(operation=TRAIN)
 
     # Train all models in doc main
-    # doument_main()
+    document_main()
 
     # Train all models in word main
+
     # word_main(operation=TRAIN)
 
     # Train char-word models in char word main

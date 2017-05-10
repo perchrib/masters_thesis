@@ -38,3 +38,18 @@ def get_data(path):
                 female_texts.append(new_author.tweets)
 
     return all_authors, flatten(female_texts), flatten(male_texts)
+
+
+def seperate_authors_by_gender(authors):
+    male_authors = []
+    female_authors = []
+
+    for author in authors:
+        if author.gender == 'MALE':
+            male_authors.append(author)
+        elif author.gender == "FEMALE":
+            female_authors.append(author)
+        else:
+            raise TypeError("Gender not Set in Author Object")
+
+    return female_authors, male_authors

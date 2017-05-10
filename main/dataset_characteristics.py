@@ -1,11 +1,10 @@
-from __future__ import print_function
+from __future__ import print_function, division
 from helpers.global_constants import TEXT_DATA_DIR
-from text_mining.helpers import get_data, word_tokenize
+from text_mining.helpers import get_data, word_tokenize, seperate_authors_by_gender
 from text_mining.dataset_characteristics import Characteristics, equal_token_count, unequal_token_count, most_common, \
     lower, stopwords_counter, pos_tag_counter, least_common
 from text_mining.data_plot import Visualizer
-
-
+import numpy as np
 import nltk
 
 MALE_COLOR = "C0"
@@ -47,11 +46,13 @@ def plot_two_counters(male_counter, female_counter, counter_type):
     visualizer.plot_two_dataset_token_counts(male, female)
     visualizer.save_plot()
 
+
 def plot_text_length(male_counter, female_counter, length_type):
     visualizer = Visualizer(title='Length of Tweets in ' + length_type, xlabel='Tweet Length', ylabel='Number of Tweets')
     visualizer.plot_avg_length_of_texts(male_counter, MALE_COLOR, "male", subplot=True)
     visualizer.plot_avg_length_of_texts(female_counter, FEMALE_COLOR, "female", subplot=True)
     visualizer.save_plot()
+
 
 def plot_pos_tags(male_counter, female_counter, pos_tag_type):
     visualizer = Visualizer(title='Frequency of ' + pos_tag_type, xlabel='Pos-Tags',
@@ -60,6 +61,7 @@ def plot_pos_tags(male_counter, female_counter, pos_tag_type):
     visualizer.plot_two_dataset_token_counts(male, female)
     visualizer.save_plot()
 
+
 def plot_frequent_tokens(male_counter, female_counter, counter_type):
     visualizer = Visualizer(title=counter_type +' Common Tokens', xlabel='Tokens', ylabel='Frequency')
     visualizer.plot_one_dataset_token_counts(male_counter, MALE_COLOR, "male", subplot=True)
@@ -67,17 +69,79 @@ def plot_frequent_tokens(male_counter, female_counter, counter_type):
     visualizer.save_plot()
 
 
+def plot_dataset_distribution_men_female(num_male, num_female, ylabel):
+    visualizer = Visualizer(title="Distribution of " + ylabel +  " by Gender", xlabel="Gender", ylabel="Number of " + ylabel)
+    visualizer.plot_simple_histograms(["Male", "Female"], [num_male, num_female])
+    visualizer.save_plot(filename=ylabel, topic="gender-distribution")
 
+
+def plot_length_of_tweet_by_gender_and_the_total(male, female, total):
+    s = np.random.uniform(0, 100, 1000)
+    s[999] = 300
+    visualizer = Visualizer(title="Number of Tweets by Gender", xlabel="",
+                            ylabel="Number of Tweets")
+    visualizer.plot_boxplot(distributions=[male, female, s], xlabel=["Male", "Female", "Both"])
+    visualizer.save_plot(filename="Number of Tweets by Gender")
+
+
+def find_avg_and_median_tweet_amount_by_author(authors):
+    avg_total = 0
+    med_total = []
+    med = 0
+    avg = 0
+    for author in authors:
+        avg_total += len(author.tweets)
+        med_total.append(len(author.tweets))
+    med_total = sorted(med_total)
+    if len(authors) % 2 == 0:
+
+        i = int(len(authors)/2)
+        med = round((med_total[i] + med_total[i-1])/2, 3)
+    else:
+        i = len(authors) // 2
+        med = med_total[i]
+    avg = round(avg_total / len(authors), 3)
+    return avg, med
+
+def get_distribution_of_tweets(authors):
+    total = []
+    for author in authors:
+        total.append(len(author.tweets))
+    return np.asarray(total)
 
 if __name__ == '__main__':
     authors, female_texts, male_texts = get_data(TEXT_DATA_DIR)
+    female_authors, male_authors = seperate_authors_by_gender(authors)
     print("Retrieved Data...")
-    print("Number of Tweets Total: ", len(female_texts), len(male_texts))
+    print("*"*20, "--Twitter--", "*"*20)
+    print("Number of Tweets Total: ", len(female_texts) + len(male_texts))
     print("Number of Male Tweets: ", len(male_texts))
     print("Number of Female Tweets: ", len(female_texts))
-    male_data = Characteristics(male_texts)
-    female_data = Characteristics(female_texts)
+    print("\n")
+    print("*"*20, "--Authors--", "*"*20)
+    print("Number of Different Authors: ", len(authors))
+    print("Number of Male Authors: ", len(male_authors))
+    print("Number of Female Authors: ", len(female_authors))
+    print("\n")
+    avg, med = find_avg_and_median_tweet_amount_by_author(authors)
+    print("AVG of the Amount of Tweets by Author: ", avg)
+    print("Median of the Amount of Tweets by Author: ", med)
+    #male_data = Characteristics(male_texts)
+    #female_data = Characteristics(female_texts)
+
     print("Characteristics Objects Created...")
+
+    #plot_dataset_distribution_men_female(len(male_authors), len(female_authors), ylabel="Authors")
+    #plot_dataset_distribution_men_female(len(male_texts), len(female_texts), ylabel="Tweets")
+
+    #print(get_distribution_of_tweets(male_authors))
+
+    # plot_length_of_tweet_by_gender_and_the_total(male_data.length_of_text_char_count.values(),
+    #                                              sorted(get_distribution_of_tweets(female_authors)),
+    #                                              get_distribution_of_tweets(authors))
+
+
+
 
     # tag_plotter(lower(male_data.hashtag_count), lower(female_data.hashtag_count), tag_type="Hashtags")
     # tag_plotter(lower(male_data.mention_count), lower(female_data.mention_count), tag_type="Mentions")

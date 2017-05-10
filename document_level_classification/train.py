@@ -1,11 +1,15 @@
 from keras.callbacks import EarlyStopping
 from document_level_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE, \
-    PREDICTION_TYPE, LOGS_DIR
+    PREDICTION_TYPE, LOGS_DIR, MODEL_DIR
+
+from helpers.model_utils import save_trained_model
+
+
 
 from helpers.helper_functions import get_time_format, log_session
 import time
 
-def train(model, model_info, data, extra_info=None):
+def train(model, model_info, data, save_model=False, extra_info=None):
     """
     
     :param model: Model object, the model that is going to be trained
@@ -17,7 +21,7 @@ def train(model, model_info, data, extra_info=None):
 
 
     # Callbacks
-    early_stopping = EarlyStopping(monitor='val_acc', patience=2)
+    early_stopping = EarlyStopping(monitor='val_loss', patience=2)
 
     model.compile(optimizer=MODEL_OPTIMIZER,
                   loss=MODEL_LOSS,
@@ -57,5 +61,11 @@ def train(model, model_info, data, extra_info=None):
                 model_info=model_info,
                 extra_info=extra_info,
                 max_sequence_length=data['x_train'].shape[1])
+
+    if save_model:
+        save_trained_model(model, MODEL_DIR, MODEL_OPTIMIZER)
+
+
+
 
 
