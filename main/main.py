@@ -33,6 +33,7 @@ from char_word_combined.train import train as cw_train
 TRAIN = "train"
 TEST = "test"
 
+
 def word_main(operation, trained_model_path=None):
     # Load dataset
     texts, labels, metadata, labels_index = prepare_dataset(w_PREDICTION_TYPE)
@@ -78,7 +79,7 @@ def char_main(operation, trained_model_path=None):
     # Clean texts
     text_parser = Parser()
     texts = text_parser.replace_all(texts)
-    texts = text_parser.remove_stopwords(texts)
+    # texts = text_parser.remove_stopwords(texts)  # TODO: FIX
     # texts = text_parser.replace_urls(texts)
 
     # Add extra info, e.g., about parsing here
@@ -109,10 +110,10 @@ def char_main(operation, trained_model_path=None):
         #         extra_info=extra_info)
         # c_train(*get_char_model_Conv_BiLSTM_4(num_output_nodes, num_chars), data=data, save_model=False, extra_info=extra_info)
 
-        c_train(*get_char_model_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False,
-                extra_info=extra_info)
+        # c_train(*get_char_model_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False,
+        #         extra_info=extra_info)
 
-        c_train(*get_word_model_4x512lstm(num_output_nodes, num_chars), data=data, save_model=False,
+        c_train(*get_char_model_4x512lstm(num_output_nodes, num_chars), data=data, save_model=False,
                 extra_info=extra_info)
 
 
@@ -191,16 +192,16 @@ if __name__ == '__main__':
     # char_main(operation=TRAIN)
 
     # Train all models in doc main
-    document_main()
+    # document_main()
 
     # Train all models in word main
 
-    # word_main(operation=TRAIN)
+    word_main(operation=TRAIN)
 
     # Train char-word models in char word main
     # char_word_main()
 
 
     # Load model and run test data on model
-    char_main(operation=TEST, trained_model_path="Conv_BiLSTM/27.04.2017_21:07:34_Conv_BiLSTM_adam_31_0.70.h5")
-    word_main(operation=TEST, trained_model_path="Conv_BiLSTM/28.04.2017_18:59:55_Conv_BiLSTM_adam_{epoch:02d}_{val_acc:.4f}.h5")
+    # char_main(operation=TEST, trained_model_path="Conv_BiLSTM/27.04.2017_21:07:34_Conv_BiLSTM_adam_31_0.70.h5")
+    # word_main(operation=TEST, trained_model_path="Conv_BiLSTM/28.04.2017_18:59:55_Conv_BiLSTM_adam_{epoch:02d}_{val_acc:.4f}.h5")

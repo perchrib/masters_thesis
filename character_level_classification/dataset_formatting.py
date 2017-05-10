@@ -37,7 +37,6 @@ def format_dataset_char_level(texts, labels, metadata):
     print('Shape of data tensor:', data.shape)
     print('Shape of label tensor:', labels.shape)
 
-    #TODO: Try chars reversed
     for i, tweet in enumerate(texts):
         for j, char in enumerate(tweet):
             if j < MAX_SEQUENCE_LENGTH:
@@ -74,7 +73,6 @@ def format_dataset_char_level_sentences(texts, labels, metadata):
     print('Shape of data tensor:', data.shape)
     print('Shape of label tensor:', labels.shape)
 
-    #TODO: Try chars reversed
     for i, tweet in enumerate(texts):
         sentences = sent_tokenize(tweet)
         for j, sent in enumerate(sentences):

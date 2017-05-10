@@ -78,6 +78,7 @@ class Parser:
 
             modified_texts.append(content)
 
+        modified_texts = [t.lower() for t in modified_texts]  # Lower_case
         return modified_texts
 
     def replace_urls(self, texts):

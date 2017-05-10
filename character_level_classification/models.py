@@ -5,7 +5,7 @@ from character_level_classification.constants import MAX_SEQUENCE_LENGTH
 
 
 
-def get_word_model_4x512lstm(num_output_nodes, char_num):
+def get_char_model_4x512lstm(num_output_nodes, char_num):
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
     embedding = get_one_hot_layer(tweet_input, char_num)
 
@@ -23,6 +23,7 @@ def get_word_model_4x512lstm(num_output_nodes, char_num):
     extra_info = ["No dropout"]
 
     return model, extra_info
+
 
 def get_char_model_3xConv_2xBiLSTM(num_output_nodes, char_num):
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
