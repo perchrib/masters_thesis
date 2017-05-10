@@ -1,0 +1,39 @@
+Training_log - 09/05/2017 19:48:02
+
+Model name: 4x512LSTM
+Elapsed training time: 121.4081689
+
+Training set size: 530222
+Validation set size: 66277
+Validation set fraction: 0.099999
+Test set fraction: 0.099999
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 50
+Max sequence length: 25
+
+-----------Training statistics-----------
+        acc      loss   val_acc  val_loss
+0  0.644155  0.617503  0.661225  0.594428
+1  0.680866  0.570908  0.685351  0.566461
+2  0.719484  0.517281  0.697874  0.556090
+3  0.765800  0.446402  0.708722  0.570728
+4  0.811869  0.369074  0.715482  0.605946
+5  0.850813  0.299731  0.715829  0.676537
+
+--------------Test results---------------
+loss: 0.686200acc: 0.711330
+
+--------------Model Diagram---------------
+      InputLayer (None, 25)      
+       Embedding (None, 25, 200) 
+            LSTM (None, 25, 512) 
+            LSTM (None, 25, 512) 
+            LSTM (None, 25, 512) 
+            LSTM (None, 512)     
+           Dense (None, 2)       
+
+Stopwords removed

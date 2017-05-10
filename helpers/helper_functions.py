@@ -134,7 +134,7 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, num_
         # Write Test results
         log_file.write("\n\n--------------Test results---------------\n")
         log_file.write("%s: %f" % (model.metrics_names[0], round(test_results[0], 5)))  # loss
-        log_file.write("%s: %f" % (model.metrics_names[1], round(test_results[1], 5)))  # accuracy
+        log_file.write(" %s: %f" % (model.metrics_names[1], round(test_results[1], 5)))  # accuracy
 
         # Write model diagram
         log_file.write("\n\n--------------Model Diagram---------------\n")

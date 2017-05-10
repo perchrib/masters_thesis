@@ -26,7 +26,7 @@ np.random.seed(1337)
 def train(model, model_info, data, save_model=False, extra_info=None, log_sess=True):
     """
 
-    :type: model: Model
+    :type model: Model
 
     :param model:
     :param model_info:

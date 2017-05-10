@@ -1,0 +1,46 @@
+Training_log - 01/05/2017 20:58:51
+
+Model name: 2x512_256LSTM
+Elapsed training time: 207.067029051
+
+Training set size: 530222
+Validation set size: 66277
+Validation set fraction: 0.099999
+Test set fraction: 0.099999
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 256
+Max number of epochs: 30
+Max sequence length: 25
+
+-----------Training statistics-----------
+        acc      loss   val_acc  val_loss
+0  0.641907  3.048531  0.661979  1.202292
+1  0.683331  1.165303  0.689108  1.148620
+2  0.711915  1.114680  0.706022  1.122113
+3  0.740611  1.071243  0.715542  1.115510
+4  0.765809  1.029939  0.722468  1.105613
+5  0.789781  0.990632  0.727115  1.136043
+6  0.811539  0.954129  0.729484  1.166768
+7  0.830422  0.921657  0.732139  1.211052
+
+--------------Test results---------------
+loss: 1.219430acc: 0.730340
+
+--------------Model Diagram---------------
+      InputLayer (None, 25)      
+       Embedding (None, 25, 200) 
+            LSTM (None, 25, 512) 
+         Dropout (None, 25, 512) 
+            LSTM (None, 25, 512) 
+         Dropout (None, 25, 512) 
+            LSTM (None, 256)     
+           Dense (None, 2)       
+
+
+Model information:
+=========================================
+ Dropout: 0.5
+ L1 regularization used

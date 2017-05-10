@@ -1,6 +1,6 @@
 from keras.models import Sequential, Model
 from keras.layers import Dense, LSTM, Dropout, GRU, MaxPooling1D, Conv1D, merge, Input
-from keras.regularizers import l2
+from keras.regularizers import l2, l1, l1_l2
 
 from word_embedding_classification.constants import PREDICTION_TYPE, MAX_SEQUENCE_LENGTH
 
@@ -20,27 +20,17 @@ def get_word_model_3xsimple_lstm(embedding_layer, nb_output_nodes):
 
 
 def get_word_model_2x512_256_lstm(embedding_layer, nb_output_nodes):
-    # model = Sequential(name="2x512_256LSTM")
-    #
-    # model.add(embedding_layer)
-    # model.add(LSTM(512, return_sequences=True))
-    # model.add(Dropout(0.5))
-    # model.add(LSTM(512, return_sequences=True))
-    # model.add(Dropout(0.5))
-    # model.add(LSTM(256))
-    # model.add(Dense(nb_output_nodes, activation='softmax'))
-
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
     embedding = embedding_layer(tweet_input)
     embedding = LSTM(512, return_sequences=True)(embedding)
     embedding = Dropout(0.5)(embedding)
     embedding = LSTM(512, return_sequences=True)(embedding)
     embedding = Dropout(0.5)(embedding)
-    embedding = LSTM(256, kernel_regularizer=l2(), return_sequences=False)(embedding)
+    embedding = LSTM(256, return_sequences=False)(embedding)
 
     output = Dense(nb_output_nodes, activation='softmax')(embedding)
     model = Model(input=tweet_input, output=output, name="2x512_256LSTM")
-    extra_info = ["Dropout: 0.5", "L1_l2 regularization used"]
+    extra_info = ["Dropout: 0.5"]
 
     return model, extra_info
 
@@ -98,10 +88,38 @@ def get_word_model_3x512_256_lstm_128_full(embedding_layer, nb_output_nodes):
     return model, model_info
 
 
-def get_word_model_3x512_lstm(embedding_layer, nb_output_nodes):
+def get_word_model_3x512lstm(embedding_layer, nb_output_nodes):
     model = Sequential(name="3x512_LSTM")
 
     model.add(embedding_layer)
+    model.add(LSTM(512, return_sequences=True))
+    model.add(LSTM(512, return_sequences=True))
+    model.add(LSTM(512))
+    model.add(Dense(nb_output_nodes, activation='softmax'))
+
+    model_info = []
+    return model, model_info
+
+
+def get_word_model_3x512_128lstm(embedding_layer, nb_output_nodes):
+    model = Sequential(name="3x512_128LSTM")
+
+    model.add(embedding_layer)
+    model.add(LSTM(512, return_sequences=True))
+    model.add(LSTM(512, return_sequences=True))
+    model.add(LSTM(512, return_sequences=True))
+    model.add(LSTM(128))
+    model.add(Dense(nb_output_nodes, activation='softmax'))
+
+    model_info = []
+    return model, model_info
+
+
+def get_word_model_4x512lstm(embedding_layer, nb_output_nodes):
+    model = Sequential(name="4x512LSTM")
+
+    model.add(embedding_layer)
+    model.add(LSTM(512, return_sequences=True))
     model.add(LSTM(512, return_sequences=True))
     model.add(LSTM(512, return_sequences=True))
     model.add(LSTM(512))

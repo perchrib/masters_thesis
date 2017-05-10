@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
-
+import numpy as np
+import math
 # Markers and
 marker = [u'+', u'o', u'o']
 col = ['r', 'b', 'g']
@@ -24,12 +25,26 @@ def plot_svm_mockup():
     plot_2_classes(class1, class2)
 
 
+def plot_sigmoid_mockup():
+    x = np.arange(-10, 10, 0.01)
+    y = [sigmoid(i) for i in x]
+
+    plt.grid(True)
+    plt.plot(x, y)
+    plt.show()
+
+
 def plot_xor():
     class1 = [(1,0), (0,1)]
     class2 = [(0,0), (1,1)]
 
     plot_2_classes(class1, class2)
 
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
 if __name__ == '__main__':
     # plot_svm_mockup()
-    plot_xor()
+    # plot_xor()
+    plot_sigmoid_mockup()
