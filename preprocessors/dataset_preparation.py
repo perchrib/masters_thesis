@@ -159,9 +159,8 @@ def display_gender_distribution(metadata):
     print("Number of female texts: %i Fraction of total: %f" % (num_females, float(num_females) / num_total))
 
 
-# if __name__ == '__main__':
-#     txts, labels, metadata, labels_index = prepare_dataset(GENDER)
-#     # txts = ["LJ_Barca all UK is a bigger grain harvest and banking ! We all still get taken for mugs by the Gov ! UK will selfdestruct eventually", "Hei. Duasdfsadfasdf. sadf. asd. Jeg"]
-#     parser = Parser()
-#     txts = parser.replace_all(txts)
-#     display_dataset_statistics(txts)
+if __name__ == '__main__':
+    txts, labels, metadata, labels_index = prepare_dataset(GENDER)
+    parser = Parser()
+    txts = parser.replace_all(txts)
+    display_dataset_statistics(txts)

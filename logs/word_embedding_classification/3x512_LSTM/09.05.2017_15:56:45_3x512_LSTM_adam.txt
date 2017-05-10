@@ -35,3 +35,4 @@ loss: 0.693080acc: 0.715740
             LSTM (None, 512)     
            Dense (None, 2)       
 
+Stopwords removed

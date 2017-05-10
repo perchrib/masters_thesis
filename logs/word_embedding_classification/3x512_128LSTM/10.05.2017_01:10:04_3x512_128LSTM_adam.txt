@@ -1,7 +1,7 @@
-Training_log - 09/05/2017 19:48:02
+Training_log - 10/05/2017 01:10:04
 
-Model name: 4x512LSTM
-Elapsed training time: 121.4081689
+Model name: 3x512_128LSTM
+Elapsed training time: 107.486477383
 
 Training set size: 530222
 Validation set size: 66277
@@ -17,15 +17,15 @@ Max sequence length: 25
 
 -----------Training statistics-----------
         acc      loss   val_acc  val_loss
-0  0.644155  0.617503  0.661225  0.594428
-1  0.680866  0.570908  0.685351  0.566461
-2  0.719484  0.517281  0.697874  0.556090
-3  0.765800  0.446402  0.708722  0.570728
-4  0.811869  0.369074  0.715482  0.605946
-5  0.850813  0.299731  0.715829  0.676537
+0  0.647014  0.615401  0.664665  0.594038
+1  0.685977  0.567096  0.685547  0.563947
+2  0.723205  0.514658  0.701209  0.549681
+3  0.767463  0.447651  0.712208  0.553754
+4  0.811619  0.373741  0.715437  0.600225
+5  0.850747  0.304717  0.717700  0.676816
 
 --------------Test results---------------
-loss: 0.686200acc: 0.711330
+loss: 0.673440acc: 0.720670
 
 --------------Model Diagram---------------
       InputLayer (None, 25)      
@@ -33,7 +33,10 @@ loss: 0.686200acc: 0.711330
             LSTM (None, 25, 512) 
             LSTM (None, 25, 512) 
             LSTM (None, 25, 512) 
-            LSTM (None, 512)     
+            LSTM (None, 128)     
            Dense (None, 2)       
 
-Stopwords removed
+
+Extra information:
+=========================================
+ All Internet terms are replaced with tags

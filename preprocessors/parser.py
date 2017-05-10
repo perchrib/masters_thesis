@@ -1,3 +1,4 @@
+from __future__ import print_function
 from nltk.tokenize import TweetTokenizer
 from nltk import WordNetLemmatizer
 import re
@@ -21,6 +22,10 @@ class Parser:
         self.lemmatizer = WordNetLemmatizer()
 
     def replace_all(self, texts):
+        # Raise error if texts not lists
+        if type(texts) is not list:
+            raise Exception("Parser must be passed a list of texts")
+
         modified_texts = [t.lower() for t in texts]  # Lower_case
         modified_texts = self.replace(modified_texts, url=URL_REPLACE, pic=PIC_REPLACE, mention=MENTION_REPLACE, hashtag=HASHTAG_REPLACE)
 
@@ -52,6 +57,10 @@ class Parser:
         :param texts: list of texts to be modified
         :return: the modified string :param content:
         """
+        # Raise error if texts not lists
+        if type(texts) is not list:
+            raise Exception("Parser must be passed a list of texts")
+
         modified_texts = []
         for txt in texts:
             content = txt
@@ -79,7 +88,7 @@ class Parser:
         :param content: text string
         :returns: a string with no more than one whitespace between words (max 10 spaces)
         """
-        for _ in range(10):
+        for _ in range(20):
             content = " ".join(content.split()).strip()
         return content
 
@@ -90,15 +99,20 @@ class Parser:
         :param content: list of text strings  
         :return: list of text strings with removed stopwords
         """
+
+        # Raise error if texts not lists
+        if type(texts) is not list:
+            raise Exception("Parser must be passed a list of texts")
+
         parsed_texts = []
         stop_words = set(stopwords.words('english'))
-        for text in texts:
-            words = text.split()
+        for text in texts:  # type: str
+            words = re.split("'| ", text)  # split words with space and apostrophes as delimiters
             sustain_words = [word for word in words if word not in stop_words]
             new_text = " ".join(sustain_words)
             parsed_texts.append(new_text)
-        return parsed_texts
 
+        return parsed_texts
 
     def lemmatize(self, texts):
         """

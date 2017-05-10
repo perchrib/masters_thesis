@@ -40,10 +40,10 @@ def word_main(operation, trained_model_path=None):
     # Clean texts
     text_parser = Parser()
     texts = text_parser.replace_all(texts)
-    texts = text_parser.remove_stopwords(texts)
+    # texts = text_parser.remove_stopwords(texts)
 
     # Add extra info, e.g., about parsing here
-    extra_info = ["Stopwords removed", "All Internet terms are replaced with tags"]
+    extra_info = ["All Internet terms are replaced with tags"]
 
     data = {}
     data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], data['meta_val'], data['x_test'], data['y_test'], data['meta_test'], data[
@@ -188,18 +188,18 @@ if __name__ == '__main__':
     k_tf.set_session(k_tf.tf.Session(config=tf_config))
 
     # Train all models in character main
-    char_main(operation=TRAIN)
+    # char_main(operation=TRAIN)
 
     # Train all models in doc main
     # doument_main()
 
     # Train all models in word main
-    # word_main()
+    # word_main(operation=TRAIN)
 
     # Train char-word models in char word main
     # char_word_main()
 
 
     # Load model and run test data on model
-    # char_main(operation=TEST, trained_model_path="Conv_BiLSTM/27.04.2017_21:07:34_Conv_BiLSTM_adam_31_0.70.h5")
-    # word_main(operation=TEST, trained_model_path="Conv_BiLSTM/28.04.2017_18:59:55_Conv_BiLSTM_adam_{epoch:02d}_{val_acc:.4f}.h5")
+    char_main(operation=TEST, trained_model_path="Conv_BiLSTM/27.04.2017_21:07:34_Conv_BiLSTM_adam_31_0.70.h5")
+    word_main(operation=TEST, trained_model_path="Conv_BiLSTM/28.04.2017_18:59:55_Conv_BiLSTM_adam_{epoch:02d}_{val_acc:.4f}.h5")
