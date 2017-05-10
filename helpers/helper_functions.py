@@ -102,7 +102,7 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, num_
 
     file_name = time.strftime("%d.%m.%Y_%H:%M:%S") + "_" + model.name + "_" + optimizer + ".txt"
 
-    print("Writing log file - %s...")
+    print("Writing log file - %s..." % file_name)
 
     with open(os.path.join(log_dir, model.name, file_name), 'wb') as log_file:
         log_file.write("Training_log - %s" % time.strftime("%d/%m/%Y %H:%M:%S"))

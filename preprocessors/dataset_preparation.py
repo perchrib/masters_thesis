@@ -8,7 +8,8 @@ import numpy as np
 from helpers.global_constants import TEXT_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT
 from helpers.helper_functions import shuffle
 
-
+#SEED = 1337
+SEED = 1338
 
 def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
     """
@@ -59,13 +60,13 @@ def split_dataset(data, labels, metadata, data_type_is_string=False):
     :param data: formatted dataset, i.e., sequences of char/word indices
     :return: training set, validation set, test set and metadata
     """
-    np.random.seed(1337)
+    np.random.seed(SEED)
     # shuffle and split the data into a training set and a validation set
     if data_type_is_string:
         data, labels, indices = shuffle(data, labels)
 
     else:
-        np.random.seed(1337)
+        np.random.seed(SEED)
         indices = np.arange(data.shape[0])
         np.random.shuffle(indices)
         data = data[indices]

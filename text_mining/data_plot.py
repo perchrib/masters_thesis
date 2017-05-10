@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt 
 import os
+import numpy as np
 save_dir = "../text_mining/data_visualization_figs/"
 file_format = 'png'#'eps'
 quality = 750 #1200 high
@@ -13,12 +14,10 @@ class Visualizer():
 
             self.figure = plt.figure()
 
-            plt.title(self.title)
-            plt.xlabel(self.xlabel)
-            plt.ylabel(self.ylabel)
-
+            plt.title(self.title, fontsize=18)
+            plt.xlabel(self.xlabel, size=15)
+            plt.ylabel(self.ylabel, size=15)
             self.subplot_counter = 211
-
 
 
         plt.grid(True, color="silver")
@@ -105,14 +104,58 @@ class Visualizer():
         plt.legend(loc='best', frameon=False)
         plt.tight_layout()
 
+    def plot_simple_histograms(self, x_labels, y_labels, color=["C0", "C1"]):
+        """
+        :param x_labels: list of labels name that will be plottet in the x axis 
+        :param y_labels: list of labels values that will be the histogram value in the plot
+        """
+        if len(x_labels) != len(y_labels):
+            raise TypeError("Not Same Length")
+        x = np.arange(len(x_labels))
+
+        plt.bar(x, height=y_labels, color=color)
+        plt.xticks(x, x_labels)
+        plt.grid(False)
+        plt.tight_layout()
+
+    def plot_boxplot(self, distribution=None, distributions=None, xlabel=None):
+        colors = ["C0", "C1", "C2"]
+        #ax = self.figure.add_subplot(111)
+        #plt.set_xticklabels(xlabel)
+        if distributions:
+            bp = plt.boxplot(distributions, patch_artist=True)
+        else:
+            bp = plt.boxplot(distribution)
+        i = 0
+        for box in bp['boxes']:
+            box.set(linewidth=1)
+            box.set_facecolor(colors[i])
+            i += 1
+        for median in bp['medians']:
+            median.set(color='C3', linewidth=2)
+
+        for flier in bp['fliers']:
+            flier.set(marker='x', color='C3', alpha=0.5)
+
+        plt.xticks(range(1, len(xlabel) + 1), xlabel)
+
+
+
+
+
+
+
+
+
+
     def subplot_checker(self):
         plt.subplot(self.subplot_counter)
         if self.subplot_counter == 211:
-            plt.title(self.title)
-            plt.ylabel(self.ylabel)
+            plt.title(self.title, fontsize=18)
+            plt.ylabel(self.ylabel, size=15)
         else:
-            plt.ylabel(self.ylabel)
-            plt.xlabel(self.xlabel)
+            plt.ylabel(self.ylabel, size=15)
+            plt.xlabel(self.xlabel, size=15)
         self.subplot_counter += 1
 
 
