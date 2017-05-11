@@ -84,7 +84,6 @@ def split_dataset(data, labels, metadata, data_type_is_string=False):
 
     x_test = data[-nb_test_samples:]
     y_test = labels[-nb_test_samples:]
-
     meta_test = data[-nb_test_samples:]
 
     return x_train, y_train, meta_train, x_val, y_val, meta_val, x_test, y_test, meta_test

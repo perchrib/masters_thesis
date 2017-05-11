@@ -5,17 +5,14 @@ import sys
 # Append path to use modules outside pycharm environment, e.g. remote server
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 
-from character_level_classification.dataset_formatting import format_dataset_char_level
 from character_level_classification.models import *
-from character_level_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE, \
-    PREDICTION_TYPE, LOGS_DIR, MODEL_DIR
 
 from preprocessors.parser import Parser
 from preprocessors.dataset_preparation import prepare_dataset
 
 import time
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-from helpers.model_utils import get_model_checkpoint, save_trained_model
+from helpers.model_utils import get_model_checkpoint, save_trained_model, get_precision_recall_f_score
 from character_level_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE, PREDICTION_TYPE, LOGS_DIR, MODEL_DIR
 from helpers.helper_functions import log_session, get_time_format
 import numpy as np
@@ -25,7 +22,7 @@ np.random.seed(1337)
 
 def train(model, model_info, data, save_model=False, extra_info=None, log_sess=True):
     """
-
+    Train a given character model with given data
     :type model: Model
 
     :param model:
@@ -66,6 +63,8 @@ def train(model, model_info, data, save_model=False, extra_info=None, log_sess=T
 
     # Evaluate on test set
     test_results = model.evaluate(data['x_test'], data['y_test'], batch_size=BATCH_SIZE)
+    prf = get_precision_recall_f_score(model, data['x_test'], data['y_test'])
+
 
     if log_sess:
         log_session(log_dir=LOGS_DIR,
@@ -81,7 +80,8 @@ def train(model, model_info, data, save_model=False, extra_info=None, log_sess=T
                     max_sequence_length=MAX_SEQUENCE_LENGTH,
                     test_results=test_results,
                     model_info=model_info,
-                    extra_info=extra_info)
+                    extra_info=extra_info,
+                    prf=prf)
 
     if save_model:
         save_trained_model(model, MODEL_DIR, MODEL_OPTIMIZER)

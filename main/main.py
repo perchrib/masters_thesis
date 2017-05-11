@@ -38,13 +38,27 @@ def word_main(operation, trained_model_path=None):
     # Load dataset
     texts, labels, metadata, labels_index = prepare_dataset(w_PREDICTION_TYPE)
 
+    rem_stopwords = True
+    lemmatize = True
+    rem_punctuation = False
+    rem_emoticons = False
+
     # Clean texts
     text_parser = Parser()
     texts = text_parser.replace_all(texts)
-    # texts = text_parser.remove_stopwords(texts)
+
+    if rem_stopwords:
+        texts = text_parser.remove_stopwords(texts)
+
+    if lemmatize:
+        texts = text_parser.lemmatize(texts)
 
     # Add extra info, e.g., about parsing here
-    extra_info = ["All Internet terms are replaced with tags"]
+    extra_info = ["Remove stopwords %s" % rem_stopwords,
+                  "Lemmatize %s" % lemmatize,
+                  "Remove punctuation %s" % rem_punctuation,
+                  "Remove emoticons %s" % rem_emoticons,
+                  "All Internet terms are replaced with tags"]
 
     data = {}
     data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], data['meta_val'], data['x_test'], data['y_test'], data['meta_test'], data[
@@ -58,7 +72,7 @@ def word_main(operation, trained_model_path=None):
         # ------- Insert models to train here -----------
         # Remember star before model getter
         # w_train(*get_word_model_2x512_256_lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=True)
-        # w_train(*get_word_model_Conv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+        w_train(*get_word_model_Conv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
         # w_train(*get_word_model_3xConv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
         # w_train(*get_word_model_2x512_256_lstm_128_full(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
         w_train(*get_word_model_3x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info,
@@ -72,25 +86,39 @@ def word_main(operation, trained_model_path=None):
         load_and_predict(os.path.join(w_MODEL_DIR, trained_model_path), data=data, prediction_type=w_PREDICTION_TYPE,
                          normalize=True)
 
+
 def char_main(operation, trained_model_path=None):
     # Load dataset
     texts, labels, metadata, labels_index = prepare_dataset(c_PREDICTION_TYPE)
 
+    rem_stopwords = True
+    lemmatize = True
+    rem_punctuation = False
+    rem_emoticons = False
+
     # Clean texts
     text_parser = Parser()
-    texts = text_parser.replace_all(texts)
-    # texts = text_parser.remove_stopwords(texts)  # TODO: FIX
-    # texts = text_parser.replace_urls(texts)
+    texts = text_parser.replace_all(texts)  # Base filtering, i.e lowercase and tags
+
+    if rem_stopwords:
+        texts = text_parser.remove_stopwords(texts)
+
+    if lemmatize:
+        texts = text_parser.lemmatize(texts)
 
     # Add extra info, e.g., about parsing here
-    extra_info = ["Stopwords removed", "All Internet terms are replaced with tags"]
+    extra_info = ["Remove stopwords %s" % rem_stopwords,
+                  "Lemmatize %s" % lemmatize,
+                  "Remove punctuation %s" % rem_punctuation,
+                  "Remove emoticons %s" % rem_emoticons,
+                  "All Internet terms are replaced with tags"]
+
 
     data = {}
     data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], data['meta_val'], data['x_test'], data['y_test'], data['meta_test'], data['char_index'] = format_dataset_char_level(texts, labels,
                                                                                                  metadata)
     num_chars = len(data['char_index'])
     num_output_nodes = len(labels_index)
-
 
     if operation == TRAIN:
         # ------- Insert models to train here -----------
@@ -103,7 +131,7 @@ def char_main(operation, trained_model_path=None):
 
         # c_train(*get_char_model_2xConv_BiLSTM(num_output_nodes, num_chars), data=data)
 
-        # c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=True, extra_info=extra_info)
+        c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=True, extra_info=extra_info)
         # c_train(*get_char_model_Conv_BiLSTM_2(num_output_nodes, num_chars), data=data, save_model=False)
         # c_train(*get_char_model_Conv_BiLSTM_3(num_output_nodes, num_chars), data=data, save_model=True)
         # c_train(*get_char_model_Conv_BiLSTM_mask(num_output_nodes, num_chars), data=data, save_model=False,
@@ -113,8 +141,11 @@ def char_main(operation, trained_model_path=None):
         # c_train(*get_char_model_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False,
         #         extra_info=extra_info)
 
-        c_train(*get_char_model_4x512lstm(num_output_nodes, num_chars), data=data, save_model=False,
+        c_train(*get_char_model_512lstm(num_output_nodes, num_chars), data=data, save_model=False,
                 extra_info=extra_info)
+
+        # c_train(*get_char_model_4x512lstm(num_output_nodes, num_chars), data=data, save_model=False,
+        #         extra_info=extra_info)
 
 
 
@@ -189,7 +220,7 @@ if __name__ == '__main__':
     k_tf.set_session(k_tf.tf.Session(config=tf_config))
 
     # Train all models in character main
-    # char_main(operation=TRAIN)
+    char_main(operation=TRAIN)
 
     # Train all models in doc main
     # document_main()

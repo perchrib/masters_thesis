@@ -3,7 +3,7 @@ import pickle
 import sys
 import os
 import time
-import pandas
+import pandas as pd
 import yaml
 import numpy as np
 
@@ -95,7 +95,8 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=1, barLength
 
 
 def log_session(log_dir, model, history, training_time, num_train, num_val, num_test, optimizer, batch_size, max_epochs,
-                test_results, model_info=None, extra_info=None, max_sequence_length=None):
+                test_results, model_info=None, extra_info=None, max_sequence_length=None, prf=None):
+
 
     if not os.path.exists((os.path.join(log_dir, model.name))):
         os.makedirs((os.path.join(log_dir, model.name)))
@@ -129,12 +130,17 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, num_
 
         # Write accuracies for training and validation set from callback history
         log_file.write("\n\n-----------Training statistics-----------\n")
-        log_file.write(pandas.DataFrame(history).__repr__())
+        log_file.write(pd.DataFrame(history).__repr__())
 
         # Write Test results
         log_file.write("\n\n--------------Test results---------------\n")
         log_file.write("%s: %f" % (model.metrics_names[0], round(test_results[0], 5)))  # loss
         log_file.write(" %s: %f" % (model.metrics_names[1], round(test_results[1], 5)))  # accuracy
+
+        if prf:
+            log_file.write("\n")
+            prf_df = pd.DataFrame(data=prf, index=pd.Index(["Precision", "Recall", "F-score", "Support"]))
+            log_file.write(pd.DataFrame(prf_df).__repr__())
 
         # Write model diagram
         log_file.write("\n\n--------------Model Diagram---------------\n")

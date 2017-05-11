@@ -11,3 +11,6 @@ EMBEDDINGS_INDEX_DIR = '../embeddings_index/'
 VALIDATION_SPLIT = 0.1
 TEST_SPLIT = 0.1
 
+# Used in prec, rec, f1 score dict
+OVERALL_MACRO = 'Overall Macro'  # Used in prec, rec, f1 score dict for macro average
+OVERALL_MICRO = 'Overall Micro'  # Used in prec, rec, f1 score dict for micro average
