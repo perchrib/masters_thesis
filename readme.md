@@ -7,6 +7,7 @@
 - nltk (corpus content must downloaded using nltk.download)
 - pandas (for logging)
 - keras_diagram (for logging)
+- langdetect (for language detection preprocessing?)
 
 
 ## Other

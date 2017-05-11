@@ -5,6 +5,7 @@ from preprocessors.parser import Parser
 from nltk import sent_tokenize
 import numpy as np
 
+from preprocessors.language_detection import detect_languages_and_print
 from helpers.global_constants import TEXT_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT
 from helpers.helper_functions import shuffle
 
@@ -44,6 +45,7 @@ def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
                     gender_author = gender
                 if gender == gender_author:
                     for tweet in data_samples:
+                        # detect_languages_and_print(tweet)  # TODO: Remove or fix
                         texts.append(tweet)
                         metadata.append({GENDER: author_data[1].upper(), AGE: author_data[2]})
                         labels.append(labels_index[metadata[-1][prediction_type]])
@@ -159,6 +161,6 @@ def display_gender_distribution(metadata):
 
 if __name__ == '__main__':
     txts, labels, metadata, labels_index = prepare_dataset(GENDER)
-    parser = Parser()
-    txts = parser.replace_all(txts)
-    display_dataset_statistics(txts)
+    # parser = Parser()
+    # txts = parser.replace_all(txts)
+    # display_dataset_statistics(txts)
