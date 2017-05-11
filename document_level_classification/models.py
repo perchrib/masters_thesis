@@ -5,18 +5,18 @@ from keras.models import Model
 
 def get_2048_1024_512(input_length, output_length):
     dropout = 0.5
-
+    activation = "relu"
     inputs = Input(shape=(input_length,))
     #x = BatchNormalization()(inputs)
-    x = Dense(2048, activation='sigmoid')(inputs)
+    x = Dense(2048, activation=activation)(inputs)
     x = Dropout(dropout)(x)
-    x = Dense(1024, activation='sigmoid')(x)
+    x = Dense(1024, activation=activation)(x)
     x = Dropout(dropout)(x)
-    x = Dense(512, activation='sigmoid')(x)
+    x = Dense(512, activation=activation)(x)
     predictions = Dense(output_length, activation='softmax')(x)
     model = Model(inputs=inputs, outputs=predictions, name="2048_1024_512")
 
-    model_info = ["Dropout: %f" % dropout, "Feed Forward Network"]
+    model_info = ["Dropout: %f" % dropout, "Feed Forward Network With Encoder Reduction"]
     return model, model_info
 
 
@@ -37,15 +37,15 @@ def get_4096_2048_1024_512(input_length, output_length):
     model_info = ["Dropout: %f" % dropout, "Feed Forward Network"]
     return model, model_info
 
-def get_50_10_(input_length, output_length):
-    dropout = None
+def get_1024_512(input_length, output_length):
+    dropout = 0.5
     activation = "relu"
     inputs = Input(shape=(input_length,))
-    x = Dense(50, activation=activation)(inputs)
-    #x = Dropout(dropout)(x)
-    x = Dense(10, activation=activation)(x)
+    x = Dense(1024, activation=activation)(inputs)
+    x = Dropout(dropout)(x)
+    x = Dense(512, activation=activation)(x)
     predictions = Dense(output_length, activation='softmax')(x)
-    model = Model(inputs=inputs, outputs=predictions, name="50_10")
+    model = Model(inputs=inputs, outputs=predictions, name="1024_512")
 
-    model_info = ["Dropout: %f" % dropout, "Feed Forward Network with PCA Reduction"]
+    model_info = ["Dropout: %f" %dropout, "Feed Forward Network with encoder Reduction"]
     return model, model_info
