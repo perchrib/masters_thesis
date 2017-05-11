@@ -3,6 +3,7 @@ from nltk.tokenize import TweetTokenizer
 from nltk import WordNetLemmatizer
 import re
 from nltk.corpus import stopwords
+import string
 
 
 URL_KEY = 'url'
@@ -128,12 +129,31 @@ class Parser:
 
         return lemmatized_texts
 
+    def remove_punctuation(self, texts):
+        new_texts = []
+        for t in texts:
+            emoticons_in_t = re.findall('(?::|;|=)(?:-)?(?:\)|\(|D|P)|(?:<3)', t)
+            t = re.sub('(?::|;|=)(?:-)?(?:\)|\(|D|P)|(?:<3)', "EMO", t)
+            t = ' '.join(word.strip(string.punctuation) for word in t.split())
+            new_t = []
+            for word in t.split():
+                if word == "EMO":
+                    word = emoticons_in_t[0]
+                    del emoticons_in_t[0]
+                new_t.append(word)
+            new_texts.append(' '.join(new_t))
+        return new_texts
 
+    def remove_emoticons(self, texts):
+        new_texts = []
+        for t in texts:
+            t = re.sub('(?::|;|=)(?:-)?(?:\)|\(|D|P)|(?:<3)', "", t)
+            new_texts.append(t)
+        return new_texts
     def generate_character_vocabulary(self, texts):
         pass
 
     def generate_word_vocabulary(self, texts):
         pass
-
 
 

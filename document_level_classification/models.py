@@ -36,3 +36,16 @@ def get_4096_2048_1024_512(input_length, output_length):
 
     model_info = ["Dropout: %f" % dropout, "Feed Forward Network"]
     return model, model_info
+
+def get_50_10_(input_length, output_length):
+    dropout = None
+    activation = "relu"
+    inputs = Input(shape=(input_length,))
+    x = Dense(50, activation=activation)(inputs)
+    #x = Dropout(dropout)(x)
+    x = Dense(10, activation=activation)(x)
+    predictions = Dense(output_length, activation='softmax')(x)
+    model = Model(inputs=inputs, outputs=predictions, name="50_10")
+
+    model_info = ["Dropout: %f" % dropout, "Feed Forward Network with PCA Reduction"]
+    return model, model_info

@@ -51,7 +51,7 @@ class Visualizer():
         tc2_freq = [tc2[token] for token in common_tokens]
 
         plt.plot(tc1_freq, label=tc1_label)
-        plt.plot(tc2_freq, label=tc2_label)
+        plt.plot(tc2_freq, label=tc2_label, alpha=0.7)
 
         plt.xticks(range(len(common_tokens)), common_tokens, rotation=rotation, fontsize=font_size)
         plt.legend(loc='best', frameon=False)

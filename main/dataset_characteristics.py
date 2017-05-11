@@ -5,11 +5,13 @@ from text_mining.dataset_characteristics import Characteristics, equal_token_cou
     lower, stopwords_counter, pos_tag_counter, least_common
 from text_mining.data_plot import Visualizer
 import numpy as np
+from collections import Counter
 import nltk
 
 MALE_COLOR = "C0"
 FEMALE_COLOR = "C1"
 
+SCALE = 1.1825
 
 def tag_plotter(male_tags, female_tags, tag_type):
     # TODO maybe take visualizer_1 and visualizer_2 in same figure using subplot
@@ -109,7 +111,18 @@ def get_distribution_of_tweets(authors):
         total.append(len(author.tweets))
     return np.asarray(total)
 
+def normalize(counts, scale):
+    """Normalice a distribution depending on a scaled factor
+    :param counts, Counter object with frequency of an occurence
+    :return a scaled Counter object
+    """
+    scaled_values = map(lambda x: int(x * scale), counts.values())
+    scaled_counts = Counter({k: v for k, v in zip(counts.keys(), scaled_values)})
+    return scaled_counts
+
+
 if __name__ == '__main__':
+
     authors, female_texts, male_texts = get_data(TEXT_DATA_DIR)
     female_authors, male_authors = seperate_authors_by_gender(authors)
     print("Retrieved Data...")
@@ -126,15 +139,15 @@ if __name__ == '__main__':
     avg, med = find_avg_and_median_tweet_amount_by_author(authors)
     print("AVG of the Amount of Tweets by Author: ", avg)
     print("Median of the Amount of Tweets by Author: ", med)
-    #male_data = Characteristics(male_texts)
-    #female_data = Characteristics(female_texts)
+    male_data = Characteristics(male_texts)
+    female_data = Characteristics(female_texts)
 
     print("Characteristics Objects Created...")
 
+    """Plot gender distribution for tweets and authors in the dataset"""
     #plot_dataset_distribution_men_female(len(male_authors), len(female_authors), ylabel="Authors")
     #plot_dataset_distribution_men_female(len(male_texts), len(female_texts), ylabel="Tweets")
 
-    #print(get_distribution_of_tweets(male_authors))
 
     # plot_length_of_tweet_by_gender_and_the_total(male_data.length_of_text_char_count.values(),
     #                                              sorted(get_distribution_of_tweets(female_authors)),
@@ -142,34 +155,35 @@ if __name__ == '__main__':
 
 
 
+    """Plots Five Different Graphs of Each Distribution"""
+    #tag_plotter(lower(male_data.hashtag_count), normalize(lower(female_data.hashtag_count), SCALE), tag_type="Hashtags")
+    #tag_plotter(lower(male_data.mention_count), normalize(lower(female_data.mention_count), SCALE), tag_type="Mentions")
 
-    # tag_plotter(lower(male_data.hashtag_count), lower(female_data.hashtag_count), tag_type="Hashtags")
-    # tag_plotter(lower(male_data.mention_count), lower(female_data.mention_count), tag_type="Mentions")
+    #plot_frequent_tokens(male_data.most_common(50), female_data.most_common(50), counter_type="Most")
+    #plot_frequent_tokens(male_data.least_common(50), female_data.least_common(50), counter_type="Least")
     # #
     #
-    # plot_two_counters(male_data.emoticon_count, female_data.emoticon_count, counter_type="Emoticons")
-    # plot_two_counters(male_data.twitter_syntax_token_count, female_data.twitter_syntax_token_count, counter_type="Twitter Syntax Tokens")
+
+    #plot_two_counters(male_data.emoticon_count, normalize(female_data.emoticon_count, SCALE), counter_type="Emoticons")
+    #plot_two_counters(male_data.twitter_syntax_token_count, normalize(female_data.twitter_syntax_token_count, SCALE), counter_type="Twitter Syntax Tokens")
+
     # plot_text_length(male_data.length_of_text_char_count, female_data.length_of_text_char_count, "Characters")
     # plot_text_length(male_data.length_of_text_word_count, female_data.length_of_text_word_count, "Words")
 
     # Frequency of word accurance
-    #plot_two_counters(male_data.stopwords_count, female_data.stopwords_count, counter_type="Stopwords")
-    #plot_two_counters(stopwords_counter(male_texts), stopwords_counter(female_texts), counter_type="Stopwords")
-
-
-    #plot_frequent_tokens(male_data.most_common(50), female_data.most_common(50), counter_type="Most")
-    #plot_frequent_tokens(male_data.least_common(50), female_data.least_common(50), counter_type="Least")
-
+    plot_two_counters(male_data.stopwords_count, normalize(female_data.stopwords_count, SCALE), counter_type="Stopwords")
+    plot_two_counters(stopwords_counter(male_texts), normalize(stopwords_counter(female_texts), SCALE), counter_type="Stopwords")
 
 
     import time
     start = time.time()
-
+    print("Starting Plotting POS-TAGS")
     # plot simple pos tags
-    #plot_two_counters(pos_tag_counter(word_tokenize(male_texts)), pos_tag_counter(word_tokenize(female_texts)), counter_type="POS-tags")
+    #plot_two_counters(pos_tag_counter(word_tokenize(male_texts)), normalize(pos_tag_counter(word_tokenize(female_texts)), SCALE), counter_type="POS-tags")
 
     # plot all pos tags
-    #plot_pos_tags(pos_tag_counter(word_tokenize(male_texts), simple_pos_tags=False), pos_tag_counter(word_tokenize(female_texts), simple_pos_tags=False), pos_tag_type="All Pos-Tags Types")
+    #plot_pos_tags(pos_tag_counter(word_tokenize(male_texts), simple_pos_tags=False), normalize(pos_tag_counter(word_tokenize(female_texts), simple_pos_tags=False), SCALE), pos_tag_type="All Pos-Tags Types")
+
     end = time.time()
     seconds = end - start
     m, s = divmod(seconds, 60)

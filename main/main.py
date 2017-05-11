@@ -23,7 +23,7 @@ import keras.backend.tensorflow_backend as k_tf
 from helpers.model_utils import load_and_evaluate, load_and_predict
 
 from document_level_classification.constants import PREDICTION_TYPE as DOC_PREDICTION_TYPE
-from document_level_classification.models import get_2048_1024_512, get_4096_2048_1024_512
+from document_level_classification.models import get_2048_1024_512, get_4096_2048_1024_512, get_50_10_
 from document_level_classification.train import train as document_trainer
 from document_level_classification.dataset_formatting import format_dataset_doc_level
 
@@ -147,7 +147,9 @@ def document_main():
     output_size = len(labels_index)
 
     # document_trainer(*get_2048_1024_512(input_size, output_size), data=data)
-    document_trainer(*get_4096_2048_1024_512(input_size, output_size), data=data)
+    # document_trainer(*get_4096_2048_1024_512(input_size, output_size), data=data)
+    document_trainer(*get_50_10_(input_size, output_size), data=data)
+
 
 def char_word_main():
     # Load dataset
@@ -202,5 +204,5 @@ if __name__ == '__main__':
 
 
     # Load model and run test data on model
-    char_main(operation=TEST, trained_model_path="Conv_BiLSTM/27.04.2017_21:07:34_Conv_BiLSTM_adam_31_0.70.h5")
-    word_main(operation=TEST, trained_model_path="Conv_BiLSTM/28.04.2017_18:59:55_Conv_BiLSTM_adam_{epoch:02d}_{val_acc:.4f}.h5")
+    #char_main(operation=TEST, trained_model_path="Conv_BiLSTM/27.04.2017_21:07:34_Conv_BiLSTM_adam_31_0.70.h5")
+    #word_main(operation=TEST, trained_model_path="Conv_BiLSTM/28.04.2017_18:59:55_Conv_BiLSTM_adam_{epoch:02d}_{val_acc:.4f}.h5")

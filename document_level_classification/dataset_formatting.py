@@ -6,6 +6,7 @@ from constants import MAX_FEATURE_LENGTH, N_GRAM
 from preprocessors.dataset_preparation import split_dataset
 import time
 from helpers.helper_functions import get_time_format
+from sklearn.decomposition import PCA
 
 def format_dataset_doc_level(texts, labels, metadata):
     """
@@ -34,6 +35,13 @@ def format_dataset_doc_level(texts, labels, metadata):
     x_test = tfidf.fit_to_new_data(x_test)
     x_val = tfidf.fit_to_new_data(x_val)
 
+    #PCA reduction
+    print("PCA Reduction")
+    pca = PCA(n_components=100)
+    x_train = pca.fit_transform(x_train)
+    x_test = pca.fit_transform(x_test)
+
+    x_val = pca.fit_transform(x_val)
     y_train = to_categorical(y_train)
     y_test = to_categorical(y_test)
     y_val = to_categorical(y_val)
