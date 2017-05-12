@@ -52,8 +52,9 @@ def train(model, model_info, data, save_model=False, extra_info=None):
     training_time = (time() - start_time) / 60
     print('Training time: %i' % training_time)
 
-    # Evaluate on test set
-    test_results = model.evaluate(data['x_test'], data['y_test'], batch_size=BATCH_SIZE)
+    if data['x_test']:
+        # Evaluate on test set
+        test_results = model.evaluate(data['x_test'], data['y_test'], batch_size=BATCH_SIZE)
 
     log_session(log_dir=LOGS_DIR,
                 model=model,

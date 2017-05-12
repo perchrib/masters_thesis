@@ -11,4 +11,5 @@
 
 
 ## Other
-- To use GloVe embeddings, download glove.twitter.27B.zip and placefrom https://nlp.stanford.edu/projects/glove/
+- To use GloVe embeddings, download glove.twitter.27B.zip and from https://nlp.stanford.edu/projects/glove/
+    * Place this in the <i>embeddings_native</i> directory and run parse_glove() in preprocessors/embedding_parser.py

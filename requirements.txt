@@ -7,3 +7,4 @@ pandas
 keras_diagram
 sklearn
 matplotlib
+langdetect

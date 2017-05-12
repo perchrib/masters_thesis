@@ -61,9 +61,12 @@ def train(model, model_info, data, save_model=False, extra_info=None, log_sess=T
 
     print("Training time: %s" % training_time)
 
-    # Evaluate on test set
-    test_results = model.evaluate(data['x_test'], data['y_test'], batch_size=BATCH_SIZE)
-    prf = get_precision_recall_f_score(model, data['x_test'], data['y_test'])
+    # Evaluate on test set, if supplied
+    if 'x_test' in data:
+        test_results = model.evaluate(data['x_test'], data['y_test'], batch_size=BATCH_SIZE)
+        prf = get_precision_recall_f_score(model, data['x_test'], data['y_test'], PREDICTION_TYPE)
+    else:
+        test_results = None
 
 
     if log_sess:
@@ -81,7 +84,7 @@ def train(model, model_info, data, save_model=False, extra_info=None, log_sess=T
                     test_results=test_results,
                     model_info=model_info,
                     extra_info=extra_info,
-                    prf=prf)
+                    prf_test=prf)
 
     if save_model:
         save_trained_model(model, MODEL_DIR, MODEL_OPTIMIZER)

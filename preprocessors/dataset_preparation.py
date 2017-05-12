@@ -6,7 +6,7 @@ from nltk import sent_tokenize
 import numpy as np
 
 from preprocessors.language_detection import detect_languages_and_print
-from helpers.global_constants import TEXT_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT
+from helpers.global_constants import TEXT_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT, TEST_DATA_DIR
 from helpers.helper_functions import shuffle
 
 SEED = 1337
@@ -74,21 +74,16 @@ def split_dataset(data, labels, metadata, data_type_is_string=False):
 
     metadata = [metadata[i] for i in indices]
     nb_validation_samples = int(VALIDATION_SPLIT * data.shape[0])
-    nb_test_samples = int(TEST_SPLIT * data.shape[0])
 
-    x_train = data[:-nb_validation_samples-nb_test_samples]
-    y_train = labels[:-nb_validation_samples-nb_test_samples]
-    meta_train = metadata[:-nb_validation_samples-nb_test_samples]
+    x_train = data[:-nb_validation_samples]
+    y_train = labels[:-nb_validation_samples]
+    meta_train = metadata[:-nb_validation_samples]
 
-    x_val = data[-nb_validation_samples-nb_test_samples:-nb_test_samples]
-    y_val = labels[-nb_validation_samples-nb_test_samples:-nb_test_samples]
-    meta_val = metadata[-nb_validation_samples-nb_test_samples:-nb_test_samples]
+    x_val = data[-nb_validation_samples:]
+    y_val = labels[-nb_validation_samples:]
+    meta_val = metadata[-nb_validation_samples:]
 
-    x_test = data[-nb_test_samples:]
-    y_test = labels[-nb_test_samples:]
-    meta_test = data[-nb_test_samples:]
-
-    return x_train, y_train, meta_train, x_val, y_val, meta_val, x_test, y_test, meta_test
+    return x_train, y_train, meta_train, x_val, y_val, meta_val
 
 
 def construct_labels_index(prediction_type):

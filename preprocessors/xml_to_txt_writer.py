@@ -82,7 +82,7 @@ def get_parsed_data_from_xml_file(file, dir):
                 # for c in chars:
                 #    characters.add(c)
 
-                if clean_text not in all_parsed_data: # Avoid duplicate tweets
+                if clean_text not in all_parsed_data:  # Avoid duplicate tweets
                     if clean_text:  # Avoid adding empty strings
                         all_parsed_data.append(clean_text)
             else:

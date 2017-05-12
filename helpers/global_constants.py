@@ -4,8 +4,14 @@ AGE = 'age'
 
 # Directories
 TEXT_DATA_DIR = '../data/txt/'
+TEST_DATA_DIR = '../data/test'
+
+CROWDFLOWER_CSV_PATH = '../data/csv/gender-classifier-DFE-791531.csv'
+
 EMBEDDINGS_NATIVE_DIR = '../embeddings_native/'
 EMBEDDINGS_INDEX_DIR = '../embeddings_index/'
+
+
 
 # Dataset split fractions
 VALIDATION_SPLIT = 0.1

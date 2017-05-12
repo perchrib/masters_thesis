@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 from preprocessors.parser import Parser
 from preprocessors.dataset_preparation import prepare_dataset
 
-from character_level_classification.dataset_formatting import format_dataset_char_level, format_dataset_char_level_sentences
+from character_level_classification.dataset_formatting import format_dataset_char_level
 from character_level_classification.constants import PREDICTION_TYPE as c_PREDICTION_TYPE, MODEL_DIR as c_MODEL_DIR
 from character_level_classification.train import train as c_train
 from character_level_classification.models import *
@@ -38,8 +38,8 @@ def word_main(operation, trained_model_path=None):
     # Load dataset
     texts, labels, metadata, labels_index = prepare_dataset(w_PREDICTION_TYPE)
 
-    rem_stopwords = True
-    lemmatize = True
+    rem_stopwords = False
+    lemmatize = False
     rem_punctuation = False
     rem_emoticons = False
 
@@ -60,10 +60,7 @@ def word_main(operation, trained_model_path=None):
                   "Remove emoticons %s" % rem_emoticons,
                   "All Internet terms are replaced with tags"]
 
-    data = {}
-    data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], data['meta_val'], data['x_test'], data['y_test'], data['meta_test'], data[
-        'word_index'] = format_dataset_word_level(texts, labels,
-                                                  metadata)
+    data = format_dataset_word_level(texts, labels, metadata)
 
     if operation == TRAIN:
         embedding_layer = get_embedding_layer(data['word_index'])
@@ -77,8 +74,8 @@ def word_main(operation, trained_model_path=None):
         # w_train(*get_word_model_2x512_256_lstm_128_full(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
         w_train(*get_word_model_3x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info,
                 save_model=False)
-        w_train(*get_word_model_3x512_128lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
-        w_train(*get_word_model_4x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+        # w_train(*get_word_model_3x512_128lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+        # w_train(*get_word_model_4x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
 
     elif operation == TEST:
         # Evaluate model on test set
@@ -113,10 +110,8 @@ def char_main(operation, trained_model_path=None):
                   "Remove emoticons %s" % rem_emoticons,
                   "All Internet terms are replaced with tags"]
 
+    data = format_dataset_char_level(texts, labels, metadata)
 
-    data = {}
-    data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], data['meta_val'], data['x_test'], data['y_test'], data['meta_test'], data['char_index'] = format_dataset_char_level(texts, labels,
-                                                                                                 metadata)
     num_chars = len(data['char_index'])
     num_output_nodes = len(labels_index)
 
@@ -220,7 +215,7 @@ if __name__ == '__main__':
     k_tf.set_session(k_tf.tf.Session(config=tf_config))
 
     # Train all models in character main
-    char_main(operation=TRAIN)
+    # char_main(operation=TRAIN)
 
     # Train all models in doc main
     # document_main()
