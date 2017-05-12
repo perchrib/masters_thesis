@@ -113,4 +113,4 @@ if __name__ == '__main__':
     # language = stopwords_detect_and_print(text)
     # print language
 
-    print(detect_languages_and_print("Please tag entries #onexmascaption"))
+    print(detect_languages_and_print("Berliner Gerichtsurteil : Apples Datenschutz ist rechtswidrig"))
