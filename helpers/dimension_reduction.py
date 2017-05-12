@@ -15,8 +15,8 @@ class Autoencoder:
     def build_model(self, input_dim):
         input_vector = Input(shape=(input_dim,))
 
-        encoded = Dense(self.reduction_dim, activation='relu', activity_regularizer=regularizers.l1(10e-5))(input_vector)
-        decoded = Dense(input_dim, activation='sigmoid')(encoded)
+        encoded = Dense(self.reduction_dim, activation='tanh', activity_regularizer=regularizers.l1(10e-5))(input_vector)
+        decoded = Dense(input_dim, activation='tanh')(encoded)
 
         # build autoencoder
         autoencoder = Model(input_vector, decoded)
@@ -29,14 +29,14 @@ class Autoencoder:
         decoder_layer = autoencoder.layers[-1]
         decoder = Model(encoded_input, decoder_layer(encoded_input))
 
-        autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
+        autoencoder.compile(optimizer='rmsprop', loss='mean_squared_error')
 
         return autoencoder, encoder, decoder
 
     def train_model(self, x_samples, x_test_samples):
         early_stopping = EarlyStopping(monitor='val_loss', patience=1)
         self.model.fit(x_samples, x_samples,
-                        epochs=100,
+                        epochs=15,
                         batch_size=256,
                         shuffle=True,
                         validation_data=(x_test_samples, x_test_samples),

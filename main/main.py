@@ -23,7 +23,8 @@ import keras.backend.tensorflow_backend as k_tf
 from helpers.model_utils import load_and_evaluate, load_and_predict
 
 from document_level_classification.constants import PREDICTION_TYPE as DOC_PREDICTION_TYPE
-from document_level_classification.models import get_2048_1024_512, get_4096_2048_1024_512, get_1024_512
+from document_level_classification.models import get_2048_1024_512, get_4096_2048_1024_512, get_1024_512,\
+    get_logistic_regression, get_512_256_128
 from document_level_classification.train import train as document_trainer
 from document_level_classification.dataset_formatting import format_dataset_doc_level
 
@@ -128,6 +129,11 @@ def char_main(operation, trained_model_path=None):
 
 def document_main():
     # Load dataset
+    from document_level_classification.constants import Log_Reg
+    categorical = True
+    if Log_Reg:
+        categorical = False
+
     texts, labels, metadata, labels_index = prepare_dataset(DOC_PREDICTION_TYPE)
 
     # Clean texts with parser
@@ -141,14 +147,20 @@ def document_main():
     # Create format_dataset_tfidf
     print("Format Dataset to Document Level")
     data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], \
-    data['meta_val'], data['x_test'], data['y_test'], data['meta_test'] = format_dataset_doc_level(texts, labels, metadata)
+    data['meta_val'], data['x_test'], data['y_test'], data['meta_test'] = format_dataset_doc_level(texts, labels, metadata, categorical=categorical)
 
     input_size = data['x_train'].shape[1]
     output_size = len(labels_index)
 
     # document_trainer(*get_2048_1024_512(input_size, output_size), data=data)
     # document_trainer(*get_4096_2048_1024_512(input_size, output_size), data=data)
-    document_trainer(*get_1024_512(input_size, output_size), data=data)
+    # document_trainer(*get_1024_512(input_size, output_size), data=data)
+    document_trainer(*get_512_256_128(input_size, output_size), data=data)
+
+    # Logistic Regression
+    # output_size = data['y_train'].shape[1]
+    # print("Output Size Log_Reg: ", output_size)
+    # document_trainer(*get_logistic_regression(input_size, output_size), data=data)
 
 
 def char_word_main():
