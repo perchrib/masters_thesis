@@ -150,7 +150,7 @@ def document_main():
     data['meta_val'], data['x_test'], data['y_test'], data['meta_test'] = format_dataset_doc_level(texts, labels, metadata, categorical=categorical)
 
     input_size = data['x_train'].shape[1]
-    output_size = len(labels_index)
+    output_size = data['y_train'].shape[1]
 
     # document_trainer(*get_2048_1024_512(input_size, output_size), data=data)
     # document_trainer(*get_4096_2048_1024_512(input_size, output_size), data=data)

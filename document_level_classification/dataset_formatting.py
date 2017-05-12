@@ -8,6 +8,7 @@ import time
 from helpers.helper_functions import get_time_format
 from sklearn.decomposition import SparsePCA
 from helpers.dimension_reduction import DimReduction
+import numpy as np
 
 def format_dataset_doc_level(texts, labels, metadata, categorical=True):
     """
@@ -50,7 +51,7 @@ def format_dataset_doc_level(texts, labels, metadata, categorical=True):
     # print("Transforming x_val")
     # x_val = pca.fit_transform(x_val)
     if DIM_REDUCTION:
-        print("Starting With Dimensonality Reduction...")
+        print("Starting With Dimensonality Reduction From Size %i to %i..." % (x_train.shape[1], DIM_REDUCTION_SIZE))
         dr = DimReduction(DIM_REDUCTION_SIZE)
         x_train = dr.fit_transform(x_train, x_val)
         x_val = dr.fit_transform(x_val)
@@ -65,10 +66,9 @@ def format_dataset_doc_level(texts, labels, metadata, categorical=True):
         y_test = to_categorical(y_test)
         y_val = to_categorical(y_val)
     else:
-        y_train = [[i] for i in y_train]
-        y_val = [[i] for i in y_val]
-        y_test = [[i] for i in y_test]
-
+        y_train = np.asarray([[i] for i in y_train])
+        y_val = np.asarray([[i] for i in y_val])
+        y_test = np.asarray([[i] for i in y_test])
 
     return x_train, y_train, meta_train, x_val, y_val, meta_val, x_test, y_test, meta_test
 

@@ -11,9 +11,9 @@ def get_512_256_128(input_length, output_length):
     x = Dropout(dropout)(x)
     x = Dense(128, activation=activation)(x)
     predictions = Dense(output_length, activation='softmax')(x)
-    model = Model(inputs=inputs, outputs=predictions, name="512_256_128 WIth encoder Reduction size 200")
+    model = Model(inputs=inputs, outputs=predictions, name="512_256_128 WIth encoder Reduction size: %i" % input_length)
 
-    model_info = ["Dropout: %f" %dropout, "Feed Forward Network with encoder Reduction"]
+    model_info = ["Dropout: %f" % dropout, "Feed Forward Network with encoder Reduction"]
     return model, model_info
 
 def get_2048_1024_512(input_length, output_length):

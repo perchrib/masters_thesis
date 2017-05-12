@@ -13,7 +13,7 @@ MODEL_DIR = '../models/document_level_classification'
 MAX_FEATURE_LENGTH = 10000
 N_GRAM = (1, 1)
 DIM_REDUCTION = True
-DIM_REDUCTION_SIZE = 200
+DIM_REDUCTION_SIZE = 50
 
 
 

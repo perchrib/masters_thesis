@@ -13,10 +13,16 @@ class Autoencoder:
         self.model, self.encoder, self.decoder = self.build_model(self.input_dim)
 
     def build_model(self, input_dim):
+        activation = 'tanh'
+        activation_last_layer = 'softmax'
+
         input_vector = Input(shape=(input_dim,))
 
-        encoded = Dense(self.reduction_dim, activation='tanh', activity_regularizer=regularizers.l1(10e-5))(input_vector)
-        decoded = Dense(input_dim, activation='tanh')(encoded)
+        encoded = Dense(1000, activation=activation, activity_regularizer=regularizers.l1(10e-5))(input_vector)
+        encoded = Dense(self.reduction_dim, activation=activation, activity_regularizer=regularizers.l1(10e-5))(encoded)
+
+        decoded = Dense(1000, activation=activation, activity_regularizer=regularizers.l1(10e-5))(encoded)
+        decoded = Dense(input_dim, activation=activation_last_layer)(decoded)
 
         # build autoencoder
         autoencoder = Model(input_vector, decoded)
@@ -26,17 +32,21 @@ class Autoencoder:
 
         # build decoder
         encoded_input = Input(shape=(self.reduction_dim,))
-        decoder_layer = autoencoder.layers[-1]
-        decoder = Model(encoded_input, decoder_layer(encoded_input))
+        decoder_layer_1 = autoencoder.layers[-2](encoded_input)
+        decoder_layer_2 = autoencoder.layers[-1](decoder_layer_1)
+        decoder = Model(encoded_input, decoder_layer_2)
 
-        autoencoder.compile(optimizer='rmsprop', loss='mean_squared_error')
+        loss = 'categorical_crossentropy'
+        #loss = 'mean_squared_error'
+
+        autoencoder.compile(optimizer='adam', loss=loss)
 
         return autoencoder, encoder, decoder
 
     def train_model(self, x_samples, x_test_samples):
         early_stopping = EarlyStopping(monitor='val_loss', patience=1)
         self.model.fit(x_samples, x_samples,
-                        epochs=15,
+                        epochs=100,
                         batch_size=256,
                         shuffle=True,
                         validation_data=(x_test_samples, x_test_samples),
