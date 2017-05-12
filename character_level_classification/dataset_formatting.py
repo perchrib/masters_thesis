@@ -98,3 +98,5 @@ def format_dataset_char_level_sentences(texts, labels, metadata):
     meta_val = metadata[-nb_validation_samples:]
 
     return x_train, y_train, meta_train, x_val, y_val, meta_val, char_index
+
+

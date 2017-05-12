@@ -115,21 +115,23 @@ def display_dataset_statistics(texts):
     """
     Given a dataset, display statistics: Number of tweets, avg length of characters and tokens.
     :param texts: list of string texts
-    :param labels: list of classification labels
-    :param metadata: list of metadata dictionaries
-    :param pred_type: classification_type
     """
 
+
     # Number of tokens/words per tweet
-    tokens_all_texts = list(map(lambda tweet: tweet.split(" "), texts))
+    tokens_all_texts = list(map(lambda twt: twt.split(" "), texts))
     avg_token_len = reduce(lambda total_len, tweet_tokens: total_len + len(tweet_tokens), tokens_all_texts, 0) / float(len(
         tokens_all_texts))
 
     # Number of characters per tweet
-    char_length_all_texts = list(map(lambda tweet: len(tweet), texts))
+    char_length_all_texts = list(map(lambda twt: len(twt), texts))
     avg_char_len = reduce(lambda total_len, tweet_len: total_len + tweet_len, char_length_all_texts) / float(len(texts))
 
+    # Number of empty tweets
+    num_empty_tweets = reduce(lambda a, twt: a + 1 if len(twt) == 0 else a, texts, 0)
+
     print("Number of tweets: %i" % len(texts))
+    print("Number of empty tweets (given pre-processing; removal of stopwords etc...): %i" % num_empty_tweets)
     print("Average number of tokens/words per tweet: %f" % avg_token_len)
     print("Average number of characters per tweet: %f" % avg_char_len)
 
@@ -140,8 +142,8 @@ def display_dataset_statistics(texts):
     avg_sents_per_tweet = reduce(lambda total_len, sents: total_len + len(sents), txt_sents, 0) / float(len(texts))
 
     # Number of characters per sentence - len in chars
-    sent_len_tweets = [list(map(lambda s: len(s), tweet)) for tweet in txt_sents]
-    avg_sent_len_tweets = [reduce(lambda total_len, s_l: total_len + s_l, tweet, 0) / float(len(tweet)) for tweet in sent_len_tweets]
+    sent_len_tweets = [list(map(lambda s: len(s), tweet)) for tweet in txt_sents]  # Lists of sentence lengths
+    avg_sent_len_tweets = [reduce(lambda total_len, s_l: total_len + s_l, tweet, 0) / float(len(tweet)) for tweet in sent_len_tweets]  # len(tweet) here is number of sentences
     avg_char_per_sent = reduce(lambda total_len, avg_chars: total_len + avg_chars, avg_sent_len_tweets, 0) / float(len(texts))
 
     print("Average number of sentences per tweet: %f" % avg_sents_per_tweet)
@@ -161,6 +163,8 @@ def display_gender_distribution(metadata):
 
 if __name__ == '__main__':
     txts, labels, metadata, labels_index = prepare_dataset(GENDER)
-    # parser = Parser()
-    # txts = parser.replace_all(txts)
-    # display_dataset_statistics(txts)
+    parser = Parser()
+    txts = parser.replace_all(txts)  # Replace Internet terms and lowercase
+    # txts = parser.remove_stopwords(txts)
+    # txts = parser.lemmatize(txts)
+    display_dataset_statistics(txts)

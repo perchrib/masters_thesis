@@ -29,6 +29,7 @@ class Parser:
         modified_texts = [t.lower() for t in texts]  # Lower_case
         modified_texts = self.replace(modified_texts, url=URL_REPLACE, pic=PIC_REPLACE, mention=MENTION_REPLACE, hashtag=HASHTAG_REPLACE)
 
+        print("Replacing Internet terms and lowercasing - Done")
         return modified_texts
 
     def clean_html(self, content):
@@ -113,6 +114,7 @@ class Parser:
             new_text = " ".join(sustain_words)
             parsed_texts.append(new_text)
 
+        print("Removing stopwords - Done")
         return parsed_texts
 
     def lemmatize(self, texts):
@@ -125,9 +127,10 @@ class Parser:
         for t in texts:  # type: str
             terms = word_tokenize(t)
             pos_tags = pos_tag(terms)  # POS-tags needed to determine correct root form
-            lemmatized_terms = [self.lemmatizer.lemmatize(word=pos_tags[i][0], pos=get_wordnet_pos(pos_tags[i][1])) for i in range(len(terms))]
+            lemmatized_terms = [self.lemmatizer.lemmatize(word=pos_tags[i][0].decode('utf-8'), pos=get_wordnet_pos(pos_tags[i][1])) for i in range(len(terms))]
             lemmatized_texts.append(" ".join(lemmatized_terms))
 
+        print("Lemmmatization - Done")
         return lemmatized_texts
 
 
