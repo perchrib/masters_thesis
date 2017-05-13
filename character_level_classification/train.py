@@ -61,13 +61,18 @@ def train(model, model_info, data, save_model=False, extra_info=None, log_sess=T
 
     print("Training time: %s" % training_time)
 
+    # Compute prf for val set
+    prf_val = get_precision_recall_f_score(model, data['x_val'], data['y_val'], PREDICTION_TYPE)
+
     # Evaluate on test set, if supplied
     if 'x_test' in data:
         test_results = model.evaluate(data['x_test'], data['y_test'], batch_size=BATCH_SIZE)
-        prf = get_precision_recall_f_score(model, data['x_test'], data['y_test'], PREDICTION_TYPE)
+        prf_test = get_precision_recall_f_score(model, data['x_test'], data['y_test'], PREDICTION_TYPE)
+        num_test = len(data['x_test'])
     else:
         test_results = None
-
+        num_test = 0
+        prf_test = None
 
     if log_sess:
         log_session(log_dir=LOGS_DIR,
@@ -76,15 +81,16 @@ def train(model, model_info, data, save_model=False, extra_info=None, log_sess=T
                     training_time=training_time,
                     num_train=len(data['x_train']),
                     num_val=len(data['x_val']),
-                    num_test=len(data['x_test']),
+                    num_test=num_test,
                     optimizer=MODEL_OPTIMIZER,
                     batch_size=BATCH_SIZE,
                     max_epochs=NB_EPOCHS,
+                    prf_val=prf_val,
                     max_sequence_length=MAX_SEQUENCE_LENGTH,
                     test_results=test_results,
                     model_info=model_info,
                     extra_info=extra_info,
-                    prf_test=prf)
+                    prf_test=prf_test)
 
     if save_model:
         save_trained_model(model, MODEL_DIR, MODEL_OPTIMIZER)

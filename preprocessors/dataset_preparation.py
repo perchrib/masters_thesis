@@ -1,5 +1,8 @@
 from __future__ import print_function
 import os
+import sys
+# Append path to use modules outside pycharm environment, e.g. remote server
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 from functools import reduce
 from preprocessors.parser import Parser
 from nltk import sent_tokenize
@@ -24,6 +27,7 @@ def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
     labels_index = construct_labels_index(prediction_type)  # dictionary mapping label name to numeric id
     labels = []  # list of label ids
     metadata = []  # list of dictionaries with author information (age, gender)
+    foreign_tweets = 0
 
     print("------Parsing txt files..")
     for sub_folder_name in sorted(list(filter(lambda x: 'pan' in x, os.listdir(folder_path)))):
@@ -45,14 +49,19 @@ def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
                     gender_author = gender
                 if gender == gender_author:
                     for tweet in data_samples:
-                        # detect_languages_and_print(tweet)  # TODO: Remove or fix
+
+                        if detect_languages_and_print(tweet):  # TODO: Remove or fix
+                            print(author_data[1].upper(), tweet)
+                            foreign_tweets += 1
+
                         texts.append(tweet)
                         metadata.append({GENDER: author_data[1].upper(), AGE: author_data[2]})
                         labels.append(labels_index[metadata[-1][prediction_type]])
                         tweet_count += 1
         print("%i tweets in %s" % (tweet_count, sub_folder_name))
 
-    print('\nFound %s texts.' % len(texts))
+    print('\nFound %i texts.' % len(texts))
+    print('\nFound %i foreign tweets.' % foreign_tweets)
     return texts, labels, metadata, labels_index
 
 

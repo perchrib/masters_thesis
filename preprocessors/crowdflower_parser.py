@@ -4,7 +4,6 @@ import pandas as pd
 from helpers.global_constants import CROWDFLOWER_CSV_PATH, TEST_DATA_DIR, MALE, FEMALE
 from preprocessors.parser import Parser
 
-
 """
 Crowdflower Gender-Annotated Tweet Dataset Parser
 
@@ -61,21 +60,22 @@ def _write_tweets_to_file(class_name, file_name, tweets):
     ID_PLACEHOLDER = "_"
     SECONDARY_ATTR_PLACEHOLDER = "_"
 
-    # Number of tweets which are successfully parsed and pass quality control
-    num_accepted_tweets = 0
+    # Number of tweets which are not successfully parsed and pass quality control
+    num_declined_tweets = 0
 
     with open(os.path.join(TEST_DATA_DIR, file_name + '.txt'), 'wb') as dataset_file:
         dataset_file.write("%s:::%s:::%s" % (ID_PLACEHOLDER, class_name, SECONDARY_ATTR_PLACEHOLDER))
 
         for twt in tweets:
             twt = parser.clean_html(twt)  # Remove non-english characters and correct spacing
-            if len(twt) > 1:
+            if len(twt) > 1:  # Tweets must be more than one characters long
                 dataset_file.write("\n%s" % twt)
-                num_accepted_tweets += 1
+            else:
+                num_declined_tweets += 1
 
         print("\n%s" % class_name)
-        print("Number of tweets written to file: %i" % num_accepted_tweets)
-        print("Number of tweets declined: %i" % (len(tweets) - num_accepted_tweets))
+        print("Number of tweets written to file: %i" % (len(tweets) - num_declined_tweets))
+        print("Number of tweets declined: %i" % num_declined_tweets)
 
 
 if __name__ == '__main__':
