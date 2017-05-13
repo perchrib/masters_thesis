@@ -1,12 +1,15 @@
 from __future__ import print_function
 import os
+import sys
+# Append path to use modules outside pycharm environment, e.g. remote server
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 from functools import reduce
 from preprocessors.parser import Parser
 from nltk import sent_tokenize
 import numpy as np
 
 from preprocessors.language_detection import detect_languages_and_print
-from helpers.global_constants import TEXT_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT
+from helpers.global_constants import TEXT_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT, TEST_DATA_DIR
 from helpers.helper_functions import shuffle
 
 SEED = 1337
@@ -24,6 +27,7 @@ def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
     labels_index = construct_labels_index(prediction_type)  # dictionary mapping label name to numeric id
     labels = []  # list of label ids
     metadata = []  # list of dictionaries with author information (age, gender)
+    foreign_tweets = 0
 
     print("------Parsing txt files..")
     for sub_folder_name in sorted(list(filter(lambda x: 'pan' in x, os.listdir(folder_path)))):
@@ -45,14 +49,19 @@ def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
                     gender_author = gender
                 if gender == gender_author:
                     for tweet in data_samples:
-                        # detect_languages_and_print(tweet)  # TODO: Remove or fix
+
+                        if detect_languages_and_print(tweet):  # TODO: Remove or fix
+                            print(author_data[1].upper(), tweet)
+                            foreign_tweets += 1
+
                         texts.append(tweet)
                         metadata.append({GENDER: author_data[1].upper(), AGE: author_data[2]})
                         labels.append(labels_index[metadata[-1][prediction_type]])
                         tweet_count += 1
         print("%i tweets in %s" % (tweet_count, sub_folder_name))
 
-    print('\nFound %s texts.' % len(texts))
+    print('\nFound %i texts.' % len(texts))
+    print('\nFound %i foreign tweets.' % foreign_tweets)
     return texts, labels, metadata, labels_index
 
 
@@ -74,21 +83,16 @@ def split_dataset(data, labels, metadata, data_type_is_string=False):
 
     metadata = [metadata[i] for i in indices]
     nb_validation_samples = int(VALIDATION_SPLIT * data.shape[0])
-    nb_test_samples = int(TEST_SPLIT * data.shape[0])
 
-    x_train = data[:-nb_validation_samples-nb_test_samples]
-    y_train = labels[:-nb_validation_samples-nb_test_samples]
-    meta_train = metadata[:-nb_validation_samples-nb_test_samples]
+    x_train = data[:-nb_validation_samples]
+    y_train = labels[:-nb_validation_samples]
+    meta_train = metadata[:-nb_validation_samples]
 
-    x_val = data[-nb_validation_samples-nb_test_samples:-nb_test_samples]
-    y_val = labels[-nb_validation_samples-nb_test_samples:-nb_test_samples]
-    meta_val = metadata[-nb_validation_samples-nb_test_samples:-nb_test_samples]
+    x_val = data[-nb_validation_samples:]
+    y_val = labels[-nb_validation_samples:]
+    meta_val = metadata[-nb_validation_samples:]
 
-    x_test = data[-nb_test_samples:]
-    y_test = labels[-nb_test_samples:]
-    meta_test = data[-nb_test_samples:]
-
-    return x_train, y_train, meta_train, x_val, y_val, meta_val, x_test, y_test, meta_test
+    return x_train, y_train, meta_train, x_val, y_val, meta_val
 
 
 def construct_labels_index(prediction_type):

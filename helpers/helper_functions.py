@@ -94,9 +94,8 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=1, barLength
     sys.stdout.flush()
 
 
-def log_session(log_dir, model, history, training_time, num_train, num_val, num_test, optimizer, batch_size, max_epochs,
-                test_results, model_info=None, extra_info=None, max_sequence_length=None, prf=None):
-
+def log_session(log_dir, model, history, training_time, num_train, num_val, optimizer, batch_size, max_epochs, prf_val,
+                test_results=None, model_info=None, extra_info=None, num_test=0, max_sequence_length=None, prf_test=None):
 
     if not os.path.exists((os.path.join(log_dir, model.name))):
         os.makedirs((os.path.join(log_dir, model.name)))
@@ -132,14 +131,20 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, num_
         log_file.write("\n\n-----------Training statistics-----------\n")
         log_file.write(pd.DataFrame(history).__repr__())
 
-        # Write Test results
-        log_file.write("\n\n--------------Test results---------------\n")
-        log_file.write("%s: %f" % (model.metrics_names[0], round(test_results[0], 5)))  # loss
-        log_file.write(" %s: %f" % (model.metrics_names[1], round(test_results[1], 5)))  # accuracy
+        if prf_val:
+            log_file.write("\n\nValidation PRF")
+            prf_df = pd.DataFrame(data=prf_test, index=pd.Index(["Precision", "Recall", "F-score", "Support"]))
+            log_file.write(pd.DataFrame(prf_df).__repr__())
 
-        if prf:
-            log_file.write("\n")
-            prf_df = pd.DataFrame(data=prf, index=pd.Index(["Precision", "Recall", "F-score", "Support"]))
+        # Write Test results
+        if test_results:
+            log_file.write("\n\n--------------Test results---------------\n")
+            log_file.write("%s: %f" % (model.metrics_names[0], round(test_results[0], 5)))  # loss
+            log_file.write(" %s: %f" % (model.metrics_names[1], round(test_results[1], 5)))  # accuracy
+
+        if prf_test:
+            log_file.write("\n\nTest PRF")
+            prf_df = pd.DataFrame(data=prf_test, index=pd.Index(["Precision", "Recall", "F-score", "Support"]))
             log_file.write(pd.DataFrame(prf_df).__repr__())
 
         # Write model diagram
