@@ -38,10 +38,19 @@ def format_dataset_word_level(texts, labels, metadata):
     print('Shape of label tensor:', labels.shape)
 
     # split the data into a training set and a validation set
-    x_train, y_train, meta_train, x_val, y_val, meta_val, x_test, y_test, meta_test = split_dataset(data, labels,
-                                                                                                    metadata)
+    x_train, y_train, meta_train, x_val, y_val, meta_val = split_dataset(data, labels, metadata)
 
-    return x_train, y_train, meta_train, x_val, y_val, meta_val, x_test, y_test, meta_test, word_index
+    data = {
+        'x_train': x_train,
+        'y_train': y_train,
+        'meta_train': meta_train,
+        'x_val': x_val,
+        'y_val': y_val,
+        'meta_val': meta_val,
+        'word_index': word_index
+    }
+
+    return data
 
 
 def construct_embedding_matrix(word_index):

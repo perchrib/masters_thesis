@@ -1,9 +1,11 @@
 from __future__ import print_function
-from nltk.tokenize import TweetTokenizer
-from nltk import WordNetLemmatizer
+from nltk.tokenize import TweetTokenizer, word_tokenize
+from nltk import WordNetLemmatizer, pos_tag
 import re
-from nltk.corpus import stopwords
+
 import string
+from nltk.corpus import stopwords, wordnet
+
 
 
 URL_KEY = 'url'
@@ -30,6 +32,7 @@ class Parser:
         modified_texts = [t.lower() for t in texts]  # Lower_case
         modified_texts = self.replace(modified_texts, url=URL_REPLACE, pic=PIC_REPLACE, mention=MENTION_REPLACE, hashtag=HASHTAG_REPLACE)
 
+        print("Replacing Internet terms and lowercasing - Done")
         return modified_texts
 
     def clean_html(self, content):
@@ -79,6 +82,7 @@ class Parser:
 
             modified_texts.append(content)
 
+        modified_texts = [t.lower() for t in modified_texts]  # Lower_case
         return modified_texts
 
     def replace_urls(self, texts):
@@ -113,6 +117,7 @@ class Parser:
             new_text = " ".join(sustain_words)
             parsed_texts.append(new_text)
 
+        print("Removing stopwords - Done")
         return parsed_texts
 
     def lemmatize(self, texts):
@@ -123,10 +128,12 @@ class Parser:
         """
         lemmatized_texts = []
         for t in texts:  # type: str
-            terms = t.split()
-            lemmatized_terms = [self.lemmatizer.lemmatize(w) for w in terms]
+            terms = word_tokenize(t)
+            pos_tags = pos_tag(terms)  # POS-tags needed to determine correct root form
+            lemmatized_terms = [self.lemmatizer.lemmatize(word=pos_tags[i][0].decode('utf-8'), pos=get_wordnet_pos(pos_tags[i][1])) for i in range(len(terms))]
             lemmatized_texts.append(" ".join(lemmatized_terms))
 
+        print("Lemmmatization - Done")
         return lemmatized_texts
 
     def remove_punctuation(self, texts):
@@ -156,4 +163,20 @@ class Parser:
     def generate_word_vocabulary(self, texts):
         pass
 
+def get_wordnet_pos(treebank_tag):
+    """
+    Convert Penn Trebank Tag to WordNet Tag
+    :param treebank_tag: Tag in format of "NOUN", "VERB"
+    :return: Tag in format 's', 'v'; using Wordnet constants
+    """
+
+    # ADJ, ADJ_SAT, ADV, NOUN, VERB available as pos constants in wordnet
+    if treebank_tag.startswith('V'):
+        return wordnet.VERB
+    elif treebank_tag.startswith('J'):
+        return wordnet.ADJ
+    elif treebank_tag.startswith('RB'):
+        return wordnet.ADV
+    else:
+        return wordnet.NOUN  # Return Noun as default for all other pos
 

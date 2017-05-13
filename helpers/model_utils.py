@@ -4,10 +4,10 @@ import time
 import itertools
 import numpy as np
 
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, precision_recall_fscore_support
 from keras.callbacks import ModelCheckpoint
 from keras.models import load_model, save_model, Model
-from global_constants import GENDER
+from global_constants import GENDER, OVERALL_MACRO, OVERALL_MICRO
 
 import matplotlib.pyplot as plt
 
@@ -77,29 +77,22 @@ def load_and_predict(model_path, data, prediction_type, normalize):
     predictions = model.predict(data['x_test'])  # List of lists with confidence in each class, for each test sample
 
     # List of indices of highest value in each list in predictions. Corresponds to the prediction class
-    y_pred = np.asarray([np.argmax(preds) for preds in predictions])
-    y_test = np.asarray([np.argmax(categorical_labels) for categorical_labels in data['y_test']])
+    y_pred = get_argmax_classes(predictions)
+    y_true = get_argmax_classes(data['y_test'])
 
-    print("SHAPE pred", y_pred.shape)
-    print("SHAPE test", data['y_test'].shape)
     class_names = get_class_names(prediction_type)
 
-    create_and_plot_confusion_matrix(y_test=y_test, y_pred=y_pred, class_names=class_names, normalize=normalize)
+    create_and_plot_confusion_matrix(y_true=y_true, y_pred=y_pred, class_names=class_names, normalize=normalize)
 
 
-def create_and_plot_confusion_matrix(y_test, y_pred, class_names, normalize):
+def create_and_plot_confusion_matrix(y_true, y_pred, class_names, normalize):
     # Compute confusion matrix
-    cnf_matrix = confusion_matrix(y_test, y_pred)
+    cnf_matrix = confusion_matrix(y_true, y_pred)
     # np.set_printoptions(precision=2)
 
     # Plot non-normalized confusion matrix
     plt.figure()
     plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=normalize)
-
-    # # Plot normalized confusion matrix
-    # plt.figure()
-    # plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=True,
-    #                       title='Normalized confusion matrix')
 
     plt.show()
 
@@ -140,7 +133,38 @@ def get_class_names(prediction_type):
     if prediction_type == GENDER:
         return ["Male", "Female"]
 
-if __name__ == '__main__':
-    predictions = [[0.4, 0.6], [0.7, 0.3], [0.8, 0.2]]
-    y_pred = [np.argmax(x) for x in predictions]
-    create_and_plot_confusion_matrix([1, 1, 0], y_pred, ["Male", "Female"], normalize=False)
+
+def get_precision_recall_f_score(model, x_data, y_data, prediction_type):
+    classes = get_class_names(prediction_type)
+    predictions = model.predict(x_data)
+
+    # List of indices of highest value in each list in predictions. Corresponds to the prediction class
+    y_pred = get_argmax_classes(predictions)
+    y_true = get_argmax_classes(y_data)
+
+    # Calculate precision, recall, f-scores for all classes and
+    prf_scores = {OVERALL_MICRO: precision_recall_fscore_support(y_true=y_true, y_pred=y_pred, average='micro'),
+                  OVERALL_MACRO: precision_recall_fscore_support(y_true=y_true, y_pred=y_pred, average='macro')}
+
+    prf_each = precision_recall_fscore_support(y_true=y_true, y_pred=y_pred)
+
+    for i in range(len(classes)):
+        prf_scores[classes[i]] = tuple(metric[i] for metric in prf_each)
+
+    return prf_scores
+
+
+def get_argmax_classes(y_values):
+    """
+    Given list of multiclass predictions or categorical labels, return list of indicative class;
+    i.e., single values labels
+    :param y_values: list of list with multiclass confidence values/categorical labels
+    :return: list of single class values
+    """
+
+    return np.asarray([np.argmax(confidence) for confidence in y_values])
+
+# if __name__ == '__main__':
+#     preds = [[0.4, 0.6], [0.7, 0.3], [0.8, 0.2]]
+#     y_pred = [np.argmax(x) for x in preds]
+#     create_and_plot_confusion_matrix([1, 1, 0], y_pred, ["Male", "Female"], normalize=False)
