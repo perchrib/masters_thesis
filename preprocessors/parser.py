@@ -2,7 +2,10 @@ from __future__ import print_function
 from nltk.tokenize import TweetTokenizer, word_tokenize
 from nltk import WordNetLemmatizer, pos_tag
 import re
+
+import string
 from nltk.corpus import stopwords, wordnet
+
 
 
 URL_KEY = 'url'
@@ -133,7 +136,27 @@ class Parser:
         print("Lemmmatization - Done")
         return lemmatized_texts
 
+    def remove_punctuation(self, texts):
+        new_texts = []
+        for t in texts:
+            emoticons_in_t = re.findall('(?::|;|=)(?:-)?(?:\)|\(|D|P)|(?:<3)', t)
+            t = re.sub('(?::|;|=)(?:-)?(?:\)|\(|D|P)|(?:<3)', "EMO", t)
+            t = ' '.join(word.strip(string.punctuation) for word in t.split())
+            new_t = []
+            for word in t.split():
+                if word == "EMO":
+                    word = emoticons_in_t[0]
+                    del emoticons_in_t[0]
+                new_t.append(word)
+            new_texts.append(' '.join(new_t))
+        return new_texts
 
+    def remove_emoticons(self, texts):
+        new_texts = []
+        for t in texts:
+            t = re.sub('(?::|;|=)(?:-)?(?:\)|\(|D|P)|(?:<3)', "", t)
+            new_texts.append(t)
+        return new_texts
     def generate_character_vocabulary(self, texts):
         pass
 
@@ -156,3 +179,4 @@ def get_wordnet_pos(treebank_tag):
         return wordnet.ADV
     else:
         return wordnet.NOUN  # Return Noun as default for all other pos
+

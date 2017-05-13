@@ -7,6 +7,7 @@ import xml.etree.cElementTree as ET
 from preprocessors.parser import Parser
 from preprocessors.language_detection import detect_language
 from time import time
+from helpers.helper_functions import get_time_format
 
 __author__ = "Per Berg"
 
@@ -83,6 +84,7 @@ def get_parsed_data_from_xml_file(file, dir):
 
             if raw_data:
                 clean_text = DATA_PARSER.clean_html(raw_data)
+
                 # chars = [[c for c in word] for word in clean_text.split()]
                 # chars = sum(chars, [])
                 # for c in chars:
@@ -172,7 +174,7 @@ if "__main__" == __name__:
         total_tweets += tweets_stored
 
         dir_end_time = time() - dir_start_time
-        print("\nDone processing %s. Elapsed time: %f minutes" % (__dir__, dir_end_time))
+        print("\nDone processing %s. Elapsed time: %s" % (__dir__, get_time_format(dir_end_time)))
 
         if i == len(__dirs__)-1:
             print("\n\r", "#"*30)

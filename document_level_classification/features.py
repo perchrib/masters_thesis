@@ -7,6 +7,7 @@ sys.path.insert(0, "/Users/per/Documents/NTNU_Courses/5th_year/2-semester/master
 from text_mining.helpers import word_tokenize
 from text_mining.dataset_characteristics import most_common
 from collections import Counter
+from helpers.helper_functions import print_progress
 
 
 class TF_IDF():
