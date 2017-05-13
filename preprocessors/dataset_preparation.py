@@ -129,6 +129,9 @@ def display_dataset_statistics(texts):
 
     # Number of characters per tweet
     char_length_all_texts = list(map(lambda twt: len(twt), texts))
+    max_char_length = max(char_length_all_texts)
+    min_char_length = min(char_length_all_texts)
+    median_char_length = np.median(char_length_all_texts)
     avg_char_len = reduce(lambda total_len, tweet_len: total_len + tweet_len, char_length_all_texts) / float(len(texts))
 
     # Number of empty tweets
@@ -138,6 +141,10 @@ def display_dataset_statistics(texts):
     print("Number of empty tweets (given pre-processing; removal of stopwords etc...): %i" % num_empty_tweets)
     print("Average number of tokens/words per tweet: %f" % avg_token_len)
     print("Average number of characters per tweet: %f" % avg_char_len)
+    print("Median of number of characters in a tweet: %f" % median_char_length)
+    print("Max number of characters in a tweet: %f" % max_char_length)
+    print("Min number of characters in a tweet: %f" % min_char_length)
+
 
     # Split list of texts into lists of sentences
     txt_sents = list(map(lambda tweet: sent_tokenize(tweet), texts))
@@ -169,6 +176,8 @@ if __name__ == '__main__':
     txts, labels, metadata, labels_index = prepare_dataset(GENDER)
     parser = Parser()
     txts = parser.replace_all(txts)  # Replace Internet terms and lowercase
-    # txts = parser.remove_stopwords(txts)
-    # txts = parser.lemmatize(txts)
+    txts = parser.remove_stopwords(txts)
+    txts = parser.remove_emoticons(txts)
+    txts = parser.remove_punctuation(txts)
+    txts = parser.lemmatize(txts)
     display_dataset_statistics(txts)

@@ -7,6 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 from preprocessors.parser import Parser
 from preprocessors.dataset_preparation import prepare_dataset
 from helpers.global_constants import TEST_DATA_DIR, TRAIN_DATA_DIR
+from helpers.helper_functions import remove_texts_shorter_than_threshold
 
 from character_level_classification.dataset_formatting import format_dataset_char_level
 from character_level_classification.constants import PREDICTION_TYPE as c_PREDICTION_TYPE, MODEL_DIR as c_MODEL_DIR
@@ -32,12 +33,13 @@ from document_level_classification.dataset_formatting import format_dataset_doc_
 from char_word_combined.models import get_cw_model
 from char_word_combined.train import train as cw_train
 
+
 TRAIN = "train"
 TEST = "test"
 
 
 def word_main(operation, trained_model_path=None):
-    rem_stopwords = True
+    rem_stopwords = False
     lemmatize = True
     rem_punctuation = False
     rem_emoticons = False
@@ -74,6 +76,7 @@ def word_main(operation, trained_model_path=None):
                   "Remove emoticons %s" % rem_emoticons,
                   "All Internet terms are replaced with tags"]
 
+    print("Formatting dataset")
     data = format_dataset_word_level(train_texts, train_labels, train_metadata)
     data['x_test'], data['y_test'] = format_dataset_word_level(test_texts, test_labels, test_metadata, split=False)
 
@@ -84,25 +87,29 @@ def word_main(operation, trained_model_path=None):
         # ------- Insert models to train here -----------
         # Remember star before model getter
         # w_train(*get_word_model_2x512_256_lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=True)
-        w_train(*get_word_model_Conv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+
+        # w_train(*get_word_model_Conv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+
         # w_train(*get_word_model_3xConv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
         # w_train(*get_word_model_2x512_256_lstm_128_full(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+
         w_train(*get_word_model_3x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info,
-                save_model=False)
+                save_model=True)
+
         # w_train(*get_word_model_3x512_128lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
         # w_train(*get_word_model_4x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
 
     elif operation == TEST:
         # Evaluate model on test set
-        # load_and_evaluate(os.path.join(w_MODEL_DIR, trained_model_path), data=data)
-        load_and_predict(os.path.join(w_MODEL_DIR, trained_model_path), data=data, prediction_type=w_PREDICTION_TYPE,
-                         normalize=True)
+        load_and_evaluate(os.path.join(w_MODEL_DIR, trained_model_path), data=data)
+        # load_and_predict(os.path.join(w_MODEL_DIR, trained_model_path), data=data, prediction_type=w_PREDICTION_TYPE,
+        #                  normalize=True)
 
 
 def char_main(operation, trained_model_path=None):
 
-    rem_stopwords = True
-    lemmatize = True
+    rem_stopwords = False
+    lemmatize = False
     rem_punctuation = False
     rem_emoticons = False
 
@@ -138,11 +145,17 @@ def char_main(operation, trained_model_path=None):
                   "Remove emoticons %s" % rem_emoticons,
                   "All Internet terms are replaced with tags"]
 
+    print("Formatting dataset")
     data = format_dataset_char_level(train_texts, train_labels, train_metadata)
     data['x_test'], data['y_test'] = format_dataset_char_level(test_texts, test_labels, test_metadata, split=False)
 
     num_chars = len(data['char_index'])
     num_output_nodes = len(labels_index)
+    #
+    # Remove empty tweets after pre-processing
+    train_texts, train_labels, train_metadata = remove_texts_shorter_than_threshold(train_texts, train_labels, train_metadata)
+    test_texts, test_labels, test_metadata = remove_texts_shorter_than_threshold(test_texts, test_labels,
+                                                                                    test_metadata)
 
     if operation == TRAIN:
         # ------- Insert models to train here -----------
@@ -172,14 +185,10 @@ def char_main(operation, trained_model_path=None):
         #         extra_info=extra_info)
 
 
-
-        # Dummy model for fast train and save model --- DELETE
-        # c_train(*get_dummy_model(num_output_nodes, num_chars), data=data, save_model=True, log_sess=False)
-
     elif operation == TEST:
         # Evaluate model on test set
-        # load_and_evaluate(os.path.join(c_MODEL_DIR, trained_model_path), data=data)
-        load_and_predict(os.path.join(c_MODEL_DIR, trained_model_path), data=data, prediction_type=c_PREDICTION_TYPE, normalize=True)
+        load_and_evaluate(os.path.join(c_MODEL_DIR, trained_model_path), data=data)
+        # load_and_predict(os.path.join(c_MODEL_DIR, trained_model_path), data=data, prediction_type=c_PREDICTION_TYPE, normalize=True)
 
 
 def document_main():
@@ -257,7 +266,7 @@ if __name__ == '__main__':
     k_tf.set_session(k_tf.tf.Session(config=tf_config))
 
     # Train all models in character main
-    char_main(operation=TRAIN)
+    # char_main(operation=TRAIN)
 
     # Train all models in doc main
     """ DOCUMENT MODEL """
@@ -265,7 +274,7 @@ if __name__ == '__main__':
 
     # Train all models in word main
     """ WORD MODEL """
-    # word_main(operation=TRAIN)
+    word_main(operation=TRAIN)
 
     # Train char-word models in char word main
     # char_word_main()
