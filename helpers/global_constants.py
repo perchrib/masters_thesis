@@ -8,7 +8,7 @@ FEMALE = 'FEMALE'
 
 
 # Directories
-TEXT_DATA_DIR = '../data/txt/'
+TRAIN_DATA_DIR = '../data/txt_backup/'
 TEST_DATA_DIR = '../data/test/'
 
 CROWDFLOWER_CSV_PATH = '../data/csv/gender-classifier-DFE-791531.csv'

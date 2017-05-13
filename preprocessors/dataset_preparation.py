@@ -8,14 +8,14 @@ from preprocessors.parser import Parser
 from nltk import sent_tokenize
 import numpy as np
 
-from preprocessors.language_detection import detect_languages_and_print
-from helpers.global_constants import TEXT_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT, TEST_DATA_DIR
+from preprocessors.language_detection import detect_language
+from helpers.global_constants import TRAIN_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT, TEST_DATA_DIR
 from helpers.helper_functions import shuffle
 
 SEED = 1337
 
 
-def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
+def prepare_dataset(prediction_type, folder_path=TRAIN_DATA_DIR, gender=None):
     """
     --Used in both word_level and character_level--
     Iterate over dataset folder and create sequences of word indices
@@ -29,8 +29,8 @@ def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
     metadata = []  # list of dictionaries with author information (age, gender)
     foreign_tweets = 0
 
-    print("------Parsing txt files..")
-    for sub_folder_name in sorted(list(filter(lambda x: 'pan' in x, os.listdir(folder_path)))):
+    print("\n------Parsing %s files.." % folder_path)
+    for sub_folder_name in sorted(list(os.listdir(folder_path))):
         sub_folder_path = os.path.join(folder_path, sub_folder_name)
         tweet_count = 0
         for file_name in sorted(os.listdir(sub_folder_path)):
@@ -50,9 +50,9 @@ def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
                 if gender == gender_author:
                     for tweet in data_samples:
 
-                        if detect_languages_and_print(tweet):  # TODO: Remove or fix
-                            print(author_data[1].upper(), tweet)
-                            foreign_tweets += 1
+                        # if detect_languages_and_print(tweet):  # TODO: Remove or fix
+                        #     print(author_data[1].upper(), tweet)
+                        #     foreign_tweets += 1
 
                         texts.append(tweet)
                         metadata.append({GENDER: author_data[1].upper(), AGE: author_data[2]})

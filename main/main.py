@@ -6,6 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 
 from preprocessors.parser import Parser
 from preprocessors.dataset_preparation import prepare_dataset
+from helpers.global_constants import TEST_DATA_DIR, TRAIN_DATA_DIR
 
 from character_level_classification.dataset_formatting import format_dataset_char_level
 from character_level_classification.constants import PREDICTION_TYPE as c_PREDICTION_TYPE, MODEL_DIR as c_MODEL_DIR
@@ -36,23 +37,35 @@ TEST = "test"
 
 
 def word_main(operation, trained_model_path=None):
-    # Load dataset
-    texts, labels, metadata, labels_index = prepare_dataset(w_PREDICTION_TYPE)
-
-    rem_stopwords = False
-    lemmatize = False
+    rem_stopwords = True
+    lemmatize = True
     rem_punctuation = False
     rem_emoticons = False
 
+    # Load dataset
+    train_texts, train_labels, train_metadata, labels_index = prepare_dataset(w_PREDICTION_TYPE)
+    test_texts, test_labels, test_metadata, _ = prepare_dataset(w_PREDICTION_TYPE, folder_path=TEST_DATA_DIR)
+
     # Clean texts
     text_parser = Parser()
-    texts = text_parser.replace_all(texts)
+    train_texts = text_parser.replace_all(train_texts)  # Base filtering, i.e lowercase and tags
+    test_texts = text_parser.replace_all(test_texts)
 
     if rem_stopwords:
-        texts = text_parser.remove_stopwords(texts)
+        train_texts = text_parser.remove_stopwords(train_texts)
+        test_texts = text_parser.remove_stopwords(test_texts)
+
+    if rem_punctuation:
+        train_texts = text_parser.remove_punctuation(train_texts)
+        test_texts = text_parser.remove_punctuation(test_texts)
 
     if lemmatize:
-        texts = text_parser.lemmatize(texts)
+        train_texts = text_parser.lemmatize(train_texts)
+        test_texts = text_parser.lemmatize(test_texts)
+
+    if rem_emoticons:
+        train_texts = text_parser.remove_emoticons(train_texts)
+        test_texts = text_parser.remove_emoticons(test_texts)
 
     # Add extra info, e.g., about parsing here
     extra_info = ["Remove stopwords %s" % rem_stopwords,
@@ -61,7 +74,8 @@ def word_main(operation, trained_model_path=None):
                   "Remove emoticons %s" % rem_emoticons,
                   "All Internet terms are replaced with tags"]
 
-    data = format_dataset_word_level(texts, labels, metadata)
+    data = format_dataset_word_level(train_texts, train_labels, train_metadata)
+    data['x_test'], data['y_test'] = format_dataset_word_level(test_texts, test_labels, test_metadata, split=False)
 
     if operation == TRAIN:
         embedding_layer = get_embedding_layer(data['word_index'])
@@ -86,23 +100,36 @@ def word_main(operation, trained_model_path=None):
 
 
 def char_main(operation, trained_model_path=None):
-    # Load dataset
-    texts, labels, metadata, labels_index = prepare_dataset(c_PREDICTION_TYPE)
 
     rem_stopwords = True
     lemmatize = True
     rem_punctuation = False
     rem_emoticons = False
 
+    # Load dataset
+    train_texts, train_labels, train_metadata, labels_index = prepare_dataset(c_PREDICTION_TYPE)
+    test_texts, test_labels, test_metadata, _ = prepare_dataset(c_PREDICTION_TYPE, folder_path=TEST_DATA_DIR)
+
     # Clean texts
     text_parser = Parser()
-    texts = text_parser.replace_all(texts)  # Base filtering, i.e lowercase and tags
+    train_texts = text_parser.replace_all(train_texts)  # Base filtering, i.e lowercase and tags
+    test_texts = text_parser.replace_all(test_texts)
 
     if rem_stopwords:
-        texts = text_parser.remove_stopwords(texts)
+        train_texts = text_parser.remove_stopwords(train_texts)
+        test_texts = text_parser.remove_stopwords(test_texts)
+
+    if rem_punctuation:
+        train_texts = text_parser.remove_punctuation(train_texts)
+        test_texts = text_parser.remove_punctuation(test_texts)
 
     if lemmatize:
-        texts = text_parser.lemmatize(texts)
+        train_texts = text_parser.lemmatize(train_texts)
+        test_texts = text_parser.lemmatize(test_texts)
+
+    if rem_emoticons:
+        train_texts = text_parser.remove_emoticons(train_texts)
+        test_texts = text_parser.remove_emoticons(test_texts)
 
     # Add extra info, e.g., about parsing here
     extra_info = ["Remove stopwords %s" % rem_stopwords,
@@ -111,7 +138,8 @@ def char_main(operation, trained_model_path=None):
                   "Remove emoticons %s" % rem_emoticons,
                   "All Internet terms are replaced with tags"]
 
-    data = format_dataset_char_level(texts, labels, metadata)
+    data = format_dataset_char_level(train_texts, train_labels, train_metadata)
+    data['x_test'], data['y_test'] = format_dataset_char_level(test_texts, test_labels, test_metadata, split=False)
 
     num_chars = len(data['char_index'])
     num_output_nodes = len(labels_index)
@@ -229,7 +257,7 @@ if __name__ == '__main__':
     k_tf.set_session(k_tf.tf.Session(config=tf_config))
 
     # Train all models in character main
-    # char_main(operation=TRAIN)
+    char_main(operation=TRAIN)
 
     # Train all models in doc main
     """ DOCUMENT MODEL """
@@ -237,7 +265,7 @@ if __name__ == '__main__':
 
     # Train all models in word main
     """ WORD MODEL """
-    word_main(operation=TRAIN)
+    # word_main(operation=TRAIN)
 
     # Train char-word models in char word main
     # char_word_main()
