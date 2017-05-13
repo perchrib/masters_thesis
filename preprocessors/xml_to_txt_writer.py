@@ -1,11 +1,17 @@
-import xml.etree.cElementTree as ET
 import os
+import sys
+# Append path to use modules outside pycharm environment, e.g. remote server
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
+
+import xml.etree.cElementTree as ET
 from preprocessors.parser import Parser
+from preprocessors.language_detection import detect_language
+from time import time
 
 __author__ = "Per Berg"
 
 XML_DIR = "../data/xml/"
-TXT_DIR = "../data/txt/"
+TXT_DIR = "../data/train/"
 
 __dirs__ = [os.path.join(XML_DIR, "pan14-author-profiling-training-dataset-english-xml/"),
             os.path.join(XML_DIR, "pan15-author-profiling-training-dataset-english-xml/"),
@@ -22,7 +28,7 @@ data_loss = {}
 DATA_PARSER = Parser()
 TRUTH = {}
 characters = set()
-
+num_spanish_tweets = 0
 
 def get_all_files(dir):
     files = os.listdir(dir)  # type: List
@@ -82,9 +88,14 @@ def get_parsed_data_from_xml_file(file, dir):
                 # for c in chars:
                 #    characters.add(c)
 
-                if clean_text not in all_parsed_data: # Avoid duplicate tweets
-                    if clean_text:  # Avoid adding empty strings
-                        all_parsed_data.append(clean_text)
+                if clean_text not in all_parsed_data:  # Avoid duplicate tweets
+                    # Filter out non-english languages
+                    if not detect_language(clean_text):  # If not Spanish
+                        if clean_text:  # Avoid adding empty strings
+                            all_parsed_data.append(clean_text)
+                    else:
+                        global num_spanish_tweets
+                        num_spanish_tweets += 1
             else:
                 lost_data += 1
                 data_loss[file] = lost_data
@@ -143,8 +154,13 @@ if "__main__" == __name__:
     total_files_not_accessed = 0
     total_authors = 0
     total_tweets = 0
+
     for i in range(len(__dirs__)):
+        dir_start_time = time()
         __dir__ = __dirs__[i]
+
+        print("\nStart processing %s" % __dir__)
+
         save_dir = save_dirs[i]
         create_directory(save_dir)
 
@@ -155,6 +171,8 @@ if "__main__" == __name__:
         total_authors += written_files
         total_tweets += tweets_stored
 
+        dir_end_time = time() - dir_start_time
+        print("\nDone processing %s. Elapsed time: %f minutes" % (__dir__, dir_end_time))
 
         if i == len(__dirs__)-1:
             print("\n\r", "#"*30)
@@ -163,3 +181,5 @@ if "__main__" == __name__:
             print("\n\r", "#"*30)
             print("Total Files Not Accessed: ", total_files_not_accessed)
             print("Tweets Not Available: ", sum(data_loss.values()))
+            print("Number of Spanish tweets detected: %i" % num_spanish_tweets)
+

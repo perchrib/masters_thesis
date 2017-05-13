@@ -1,15 +1,19 @@
 from __future__ import print_function
 import os
+import sys
+# Append path to use modules outside pycharm environment, e.g. remote server
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 from functools import reduce
 from preprocessors.parser import Parser
 from nltk import sent_tokenize
 import numpy as np
 
-from helpers.global_constants import TEXT_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT
+from preprocessors.language_detection import detect_languages_and_print
+from helpers.global_constants import TEXT_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT, TEST_DATA_DIR
 from helpers.helper_functions import shuffle
 
-#SEED = 1337
-SEED = 1338
+SEED = 1337
+
 
 def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
     """
@@ -23,6 +27,7 @@ def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
     labels_index = construct_labels_index(prediction_type)  # dictionary mapping label name to numeric id
     labels = []  # list of label ids
     metadata = []  # list of dictionaries with author information (age, gender)
+    foreign_tweets = 0
 
     print("------Parsing txt files..")
     for sub_folder_name in sorted(list(filter(lambda x: 'pan' in x, os.listdir(folder_path)))):
@@ -44,13 +49,19 @@ def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
                     gender_author = gender
                 if gender == gender_author:
                     for tweet in data_samples:
+
+                        if detect_languages_and_print(tweet):  # TODO: Remove or fix
+                            print(author_data[1].upper(), tweet)
+                            foreign_tweets += 1
+
                         texts.append(tweet)
                         metadata.append({GENDER: author_data[1].upper(), AGE: author_data[2]})
                         labels.append(labels_index[metadata[-1][prediction_type]])
                         tweet_count += 1
         print("%i tweets in %s" % (tweet_count, sub_folder_name))
 
-    print('\nFound %s texts.' % len(texts))
+    print('\nFound %i texts.' % len(texts))
+    print('\nFound %i foreign tweets.' % foreign_tweets)
     return texts, labels, metadata, labels_index
 
 
@@ -64,9 +75,7 @@ def split_dataset(data, labels, metadata, data_type_is_string=False):
     # shuffle and split the data into a training set and a validation set
     if data_type_is_string:
         data, labels, indices = shuffle(data, labels)
-
     else:
-        np.random.seed(SEED)
         indices = np.arange(data.shape[0])
         np.random.shuffle(indices)
         data = data[indices]
@@ -74,22 +83,16 @@ def split_dataset(data, labels, metadata, data_type_is_string=False):
 
     metadata = [metadata[i] for i in indices]
     nb_validation_samples = int(VALIDATION_SPLIT * data.shape[0])
-    nb_test_samples = int(TEST_SPLIT * data.shape[0])
 
-    x_train = data[:-nb_validation_samples-nb_test_samples]
-    y_train = labels[:-nb_validation_samples-nb_test_samples]
-    meta_train = metadata[:-nb_validation_samples-nb_test_samples]
+    x_train = data[:-nb_validation_samples]
+    y_train = labels[:-nb_validation_samples]
+    meta_train = metadata[:-nb_validation_samples]
 
-    x_val = data[-nb_validation_samples-nb_test_samples:-nb_test_samples]
-    y_val = labels[-nb_validation_samples-nb_test_samples:-nb_test_samples]
-    meta_val = metadata[-nb_validation_samples-nb_test_samples:-nb_test_samples]
+    x_val = data[-nb_validation_samples:]
+    y_val = labels[-nb_validation_samples:]
+    meta_val = metadata[-nb_validation_samples:]
 
-    x_test = data[-nb_test_samples:]
-    y_test = labels[-nb_test_samples:]
-
-    meta_test = data[-nb_test_samples:]
-
-    return x_train, y_train, meta_train, x_val, y_val, meta_val, x_test, y_test, meta_test
+    return x_train, y_train, meta_train, x_val, y_val, meta_val
 
 
 def construct_labels_index(prediction_type):
@@ -116,21 +119,23 @@ def display_dataset_statistics(texts):
     """
     Given a dataset, display statistics: Number of tweets, avg length of characters and tokens.
     :param texts: list of string texts
-    :param labels: list of classification labels
-    :param metadata: list of metadata dictionaries
-    :param pred_type: classification_type
     """
 
+
     # Number of tokens/words per tweet
-    tokens_all_texts = list(map(lambda tweet: tweet.split(" "), texts))
+    tokens_all_texts = list(map(lambda twt: twt.split(" "), texts))
     avg_token_len = reduce(lambda total_len, tweet_tokens: total_len + len(tweet_tokens), tokens_all_texts, 0) / float(len(
         tokens_all_texts))
 
     # Number of characters per tweet
-    char_length_all_texts = list(map(lambda tweet: len(tweet), texts))
+    char_length_all_texts = list(map(lambda twt: len(twt), texts))
     avg_char_len = reduce(lambda total_len, tweet_len: total_len + tweet_len, char_length_all_texts) / float(len(texts))
 
+    # Number of empty tweets
+    num_empty_tweets = reduce(lambda a, twt: a + 1 if len(twt) == 0 else a, texts, 0)
+
     print("Number of tweets: %i" % len(texts))
+    print("Number of empty tweets (given pre-processing; removal of stopwords etc...): %i" % num_empty_tweets)
     print("Average number of tokens/words per tweet: %f" % avg_token_len)
     print("Average number of characters per tweet: %f" % avg_char_len)
 
@@ -141,8 +146,8 @@ def display_dataset_statistics(texts):
     avg_sents_per_tweet = reduce(lambda total_len, sents: total_len + len(sents), txt_sents, 0) / float(len(texts))
 
     # Number of characters per sentence - len in chars
-    sent_len_tweets = [list(map(lambda s: len(s), tweet)) for tweet in txt_sents]
-    avg_sent_len_tweets = [reduce(lambda total_len, s_l: total_len + s_l, tweet, 0) / float(len(tweet)) for tweet in sent_len_tweets]
+    sent_len_tweets = [list(map(lambda s: len(s), tweet)) for tweet in txt_sents]  # Lists of sentence lengths
+    avg_sent_len_tweets = [reduce(lambda total_len, s_l: total_len + s_l, tweet, 0) / float(len(tweet)) for tweet in sent_len_tweets]  # len(tweet) here is number of sentences
     avg_char_per_sent = reduce(lambda total_len, avg_chars: total_len + avg_chars, avg_sent_len_tweets, 0) / float(len(texts))
 
     print("Average number of sentences per tweet: %f" % avg_sents_per_tweet)
@@ -163,5 +168,7 @@ def display_gender_distribution(metadata):
 if __name__ == '__main__':
     txts, labels, metadata, labels_index = prepare_dataset(GENDER)
     parser = Parser()
-    txts = parser.replace_all(txts)
+    txts = parser.replace_all(txts)  # Replace Internet terms and lowercase
+    # txts = parser.remove_stopwords(txts)
+    # txts = parser.lemmatize(txts)
     display_dataset_statistics(txts)

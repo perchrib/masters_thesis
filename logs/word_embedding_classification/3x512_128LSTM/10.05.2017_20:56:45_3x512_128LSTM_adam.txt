@@ -1,0 +1,42 @@
+Training_log - 10/05/2017 20:56:45
+
+Model name: 3x512_128LSTM
+Elapsed training time: 104.279255899
+
+Training set size: 530222
+Validation set size: 66277
+Validation set fraction: 0.099999
+Test set fraction: 0.099999
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 50
+Max sequence length: 25
+
+-----------Training statistics-----------
+        acc      loss   val_acc  val_loss
+0  0.646754  0.615351  0.662749  0.594933
+1  0.685439  0.567169  0.688127  0.563217
+2  0.723616  0.514458  0.700379  0.552574
+3  0.766609  0.448420  0.712630  0.554843
+4  0.811002  0.375275  0.718892  0.600978
+5  0.849142  0.307501  0.723494  0.656322
+
+--------------Test results---------------
+loss: 0.662310 acc: 0.719440
+
+--------------Model Diagram---------------
+      InputLayer (None, 25)      
+       Embedding (None, 25, 200) 
+            LSTM (None, 25, 512) 
+            LSTM (None, 25, 512) 
+            LSTM (None, 25, 512) 
+            LSTM (None, 128)     
+           Dense (None, 2)       
+
+
+Extra information:
+=========================================
+ All Internet terms are replaced with tags
