@@ -55,6 +55,10 @@ def train(model, model_info, data, save_model=False, extra_info=None):
     if 'x_test' in data:
         # Evaluate on test set
         test_results = model.evaluate(data['x_test'], data['y_test'], batch_size=BATCH_SIZE)
+        num_test = len(data['x_test'])
+    else:
+        test_results = None
+        num_test = 0
 
     log_session(log_dir=LOGS_DIR,
                 model=model,
@@ -62,7 +66,7 @@ def train(model, model_info, data, save_model=False, extra_info=None):
                 training_time=training_time,
                 num_train=len(data['x_train']),
                 num_val=len(data['x_val']),
-                num_test=len(data['x_test']),
+                num_test=num_test,
                 optimizer=MODEL_OPTIMIZER,
                 batch_size=BATCH_SIZE,
                 max_epochs=NB_EPOCHS,

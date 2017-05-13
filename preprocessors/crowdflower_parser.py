@@ -3,9 +3,7 @@ import os
 import pandas as pd
 from helpers.global_constants import CROWDFLOWER_CSV_PATH, TEST_DATA_DIR, MALE, FEMALE
 from preprocessors.parser import Parser
-# pd.set_option('max_columns', 100)
-# pd.set_option('expand_frame_repr', False)
-# pd.set_option('max_rows', 1)
+
 
 """
 Crowdflower Gender-Annotated Tweet Dataset Parser
@@ -38,7 +36,6 @@ def parse_crowdflower(file_path=CROWDFLOWER_CSV_PATH, save_dir_path=TEST_DATA_DI
             if tweet not in female_tweets:
                 female_tweets.append(tweet)
             else:
-                print(tweet)
                 duplicates_females += 1
         else:
             continue  # Ignore classes non-gender classes; brand and unknown
@@ -64,18 +61,21 @@ def _write_tweets_to_file(class_name, file_name, tweets):
     ID_PLACEHOLDER = "_"
     SECONDARY_ATTR_PLACEHOLDER = "_"
 
+    # Number of tweets which are successfully parsed and pass quality control
+    num_accepted_tweets = 0
+
     with open(os.path.join(TEST_DATA_DIR, file_name + '.txt'), 'wb') as dataset_file:
         dataset_file.write("%s:::%s:::%s" % (ID_PLACEHOLDER, class_name, SECONDARY_ATTR_PLACEHOLDER))
 
         for twt in tweets:
-            twt = twt.replace('\n', ' ')  # Some tweets have newlines. Replace these with space instead
-            twt = parser.clean_html(twt)  # Remove non-english characters
-            dataset_file.write("\n%s" % twt)
+            twt = parser.clean_html(twt)  # Remove non-english characters and correct spacing
+            if len(twt) > 1:
+                dataset_file.write("\n%s" % twt)
+                num_accepted_tweets += 1
 
-
-
-    # pd.reset_option('display.max_rows')
-    # pd.reset_option('display.max_columns')
+        print("\n%s" % class_name)
+        print("Number of tweets written to file: %i" % num_accepted_tweets)
+        print("Number of tweets declined: %i" % (len(tweets) - num_accepted_tweets))
 
 
 if __name__ == '__main__':
