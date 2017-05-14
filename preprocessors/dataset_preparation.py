@@ -8,7 +8,7 @@ from preprocessors.parser import Parser
 from nltk import sent_tokenize
 import numpy as np
 
-from preprocessors.language_detection import detect_languages_and_print
+
 from helpers.global_constants import TEXT_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT, TEST_DATA_DIR
 from helpers.helper_functions import shuffle
 
@@ -50,9 +50,9 @@ def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
                 if gender == gender_author:
                     for tweet in data_samples:
 
-                        if detect_languages_and_print(tweet):  # TODO: Remove or fix
-                            print(author_data[1].upper(), tweet)
-                            foreign_tweets += 1
+                        # if detect_languages_and_print(tweet):  # TODO: Remove or fix
+                        #     print(author_data[1].upper(), tweet)
+                        #     foreign_tweets += 1
 
                         texts.append(tweet)
                         metadata.append({GENDER: author_data[1].upper(), AGE: author_data[2]})

@@ -10,6 +10,24 @@ from collections import Counter
 from helpers.helper_functions import print_progress
 
 
+class BOW():
+    def __init__(self, texts, ngram_range=(1, 1), vocabulary=None, max_features=None):
+        self.texts = texts
+        self.vocabulary = vocabulary
+        self.ngram_range = ngram_range
+        self.cv = CountVectorizer(vocabulary=self.vocabulary, max_features=max_features, ngram_range=self.ngram_range)
+        self.bag = self.cv.fit_transform(self.texts)
+
+    def get_count(self):
+        return self.cv
+
+    def get_bag(self):
+        return self.bag.toarray()
+
+    def fit_new_bag(self, texts):
+        return self.cv.transform(texts).toarray()
+
+
 class TF_IDF():
     def __init__(self, documents, labels, max_len_features, ngram_range=(1, 1)):
         # All tweets containing a list of strings ["hello #yolo", "yoyo @google"]
@@ -21,11 +39,21 @@ class TF_IDF():
         self.ngram_range = ngram_range
         self.train_vocabulary = self.n_frequent_ngram_token_dissimilarity_vocabulary() # self.train_unique_tokens.keys()
 
-        # contains the vocabulary, count word frequencies
-        self.train_counts = CountVectorizer(vocabulary=self.train_vocabulary, ngram_range=self.ngram_range)
+        """New"""
+        bow = BOW(self.train_docs, self.ngram_range, self.train_vocabulary)
+        self.train_counts = bow.get_count()
+        self.train_bow = bow.get_bag()
 
-        # Construct the bag of word model and transform documnets into sparse features vectors
-        self.train_bow = self.train_counts.fit_transform(self.train_docs)
+        """"""
+
+        """old"""
+        # contains the vocabulary, count word frequencies
+        #self.train_counts = CountVectorizer(vocabulary=self.train_vocabulary, ngram_range=self.ngram_range)
+
+        # Construct the bag of word model and transform documnents into sparse features vectors
+        #self.train_bow = self.train_counts.fit_transform(self.train_docs)
+        """"""
+
 
         self.tfidf_transformer = TfidfTransformer()
 

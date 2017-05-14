@@ -163,6 +163,9 @@ def document_main():
 
     texts, labels, metadata, labels_index = prepare_dataset(DOC_PREDICTION_TYPE)
 
+
+
+
     # Clean texts with parser
     parser = Parser()
     print("Remove Stopwords...")
@@ -174,7 +177,7 @@ def document_main():
     # Create format_dataset_tfidf
     print("Format Dataset to Document Level")
     data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], \
-    data['meta_val'], data['x_test'], data['y_test'], data['meta_test'] = format_dataset_doc_level(texts, labels, metadata, categorical=categorical)
+    data['meta_val'] = format_dataset_doc_level(texts, labels, metadata, categorical=categorical)
 
     input_size = data['x_train'].shape[1]
     output_size = data['y_train'].shape[1]
@@ -233,11 +236,11 @@ if __name__ == '__main__':
 
     # Train all models in doc main
     """ DOCUMENT MODEL """
-    # document_main()
+    document_main()
 
     # Train all models in word main
     """ WORD MODEL """
-    word_main(operation=TRAIN)
+    #word_main(operation=TRAIN)
 
     # Train char-word models in char word main
     # char_word_main()
