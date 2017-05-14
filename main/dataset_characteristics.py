@@ -1,5 +1,5 @@
 from __future__ import print_function, division
-from helpers.global_constants import TEXT_DATA_DIR
+from helpers.global_constants import TRAIN_DATA_DIR
 from text_mining.helpers import get_data, word_tokenize, seperate_authors_by_gender
 from text_mining.dataset_characteristics import Characteristics, equal_token_count, unequal_token_count, most_common, \
     lower, stopwords_counter, pos_tag_counter, least_common
@@ -123,7 +123,7 @@ def normalize(counts, scale):
 
 if __name__ == '__main__':
 
-    authors, female_texts, male_texts = get_data(TEXT_DATA_DIR)
+    authors, female_texts, male_texts = get_data(TRAIN_DATA_DIR)
     female_authors, male_authors = seperate_authors_by_gender(authors)
     print("Retrieved Data...")
     print("*"*20, "--Twitter--", "*"*20)

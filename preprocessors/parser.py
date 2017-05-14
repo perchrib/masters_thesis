@@ -130,7 +130,7 @@ class Parser:
         for t in texts:  # type: str
             terms = word_tokenize(t)
             pos_tags = pos_tag(terms)  # POS-tags needed to determine correct root form
-            lemmatized_terms = [self.lemmatizer.lemmatize(word=pos_tags[i][0].decode('utf-8'), pos=get_wordnet_pos(pos_tags[i][1])) for i in range(len(terms))]
+            lemmatized_terms = [self.lemmatizer.lemmatize(word=pos_tags[i][0], pos=get_wordnet_pos(pos_tags[i][1])).encode('utf-8') for i in range(len(terms))]
             lemmatized_texts.append(" ".join(lemmatized_terms))
 
         print("Lemmmatization - Done")

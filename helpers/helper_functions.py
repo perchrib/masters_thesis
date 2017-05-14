@@ -133,8 +133,8 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, opti
 
         if prf_val:
             log_file.write("\n\nValidation PRF")
-            prf_df = pd.DataFrame(data=prf_test, index=pd.Index(["Precision", "Recall", "F-score", "Support"]))
-            log_file.write(pd.DataFrame(prf_df).__repr__())
+            prf_val_df = pd.DataFrame(data=prf_val, index=pd.Index(["Precision", "Recall", "F-score", "Support"]))
+            log_file.write(pd.DataFrame(prf_val_df).__repr__())
 
         # Write Test results
         if test_results:
@@ -144,8 +144,8 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, opti
 
         if prf_test:
             log_file.write("\n\nTest PRF")
-            prf_df = pd.DataFrame(data=prf_test, index=pd.Index(["Precision", "Recall", "F-score", "Support"]))
-            log_file.write(pd.DataFrame(prf_df).__repr__())
+            prf_test_df = pd.DataFrame(data=prf_test, index=pd.Index(["Precision", "Recall", "F-score", "Support"]))
+            log_file.write(pd.DataFrame(prf_test_df).__repr__())
 
         # Write model diagram
         log_file.write("\n\n--------------Model Diagram---------------\n")
@@ -163,6 +163,34 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, opti
                 log_file.write("\n %s" % info)
 
     print("Done")
+
+
+def remove_texts_shorter_than_threshold(texts, labels, metadata, threshold=2):
+    """
+    Remove texts shorter than threshold from list of texts, labels and metadata
+    :param modified_texts:
+    :param modified_labels:
+    :param modified_metadata:
+    :param threshold:
+    :return:
+    """
+    removal_count = 0
+
+    modified_texts = []
+    modified_labels = []
+    modified_metadata = []
+
+    for i in range(len(texts)):
+        if len(texts[i]) >= threshold:
+            modified_texts.append(texts[i])
+            modified_labels.append(labels[i])
+            modified_metadata.append(metadata[i])
+
+            removal_count += 1
+
+    print("Removed %i tweets" % removal_count)
+
+    return modified_texts, modified_labels, modified_metadata
 
 
 def sum_col(array):

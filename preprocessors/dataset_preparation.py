@@ -8,14 +8,14 @@ from preprocessors.parser import Parser
 from nltk import sent_tokenize
 import numpy as np
 
-from preprocessors.language_detection import detect_languages_and_print
-from helpers.global_constants import TEXT_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT, TEST_DATA_DIR
+from preprocessors.language_detection import detect_language
+from helpers.global_constants import TRAIN_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT, TEST_DATA_DIR
 from helpers.helper_functions import shuffle
 
 SEED = 1337
 
 
-def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
+def prepare_dataset(prediction_type, folder_path=TRAIN_DATA_DIR, gender=None):
     """
     --Used in both word_level and character_level--
     Iterate over dataset folder and create sequences of word indices
@@ -29,8 +29,8 @@ def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
     metadata = []  # list of dictionaries with author information (age, gender)
     foreign_tweets = 0
 
-    print("------Parsing txt files..")
-    for sub_folder_name in sorted(list(filter(lambda x: 'pan' in x, os.listdir(folder_path)))):
+    print("\n------Parsing %s files.." % folder_path)
+    for sub_folder_name in sorted(list(os.listdir(folder_path))):
         sub_folder_path = os.path.join(folder_path, sub_folder_name)
         tweet_count = 0
         for file_name in sorted(os.listdir(sub_folder_path)):
@@ -50,9 +50,9 @@ def prepare_dataset(prediction_type, folder_path=TEXT_DATA_DIR, gender=None):
                 if gender == gender_author:
                     for tweet in data_samples:
 
-                        if detect_languages_and_print(tweet):  # TODO: Remove or fix
-                            print(author_data[1].upper(), tweet)
-                            foreign_tweets += 1
+                        # if detect_languages_and_print(tweet):  # TODO: Remove or fix
+                        #     print(author_data[1].upper(), tweet)
+                        #     foreign_tweets += 1
 
                         texts.append(tweet)
                         metadata.append({GENDER: author_data[1].upper(), AGE: author_data[2]})
@@ -129,6 +129,9 @@ def display_dataset_statistics(texts):
 
     # Number of characters per tweet
     char_length_all_texts = list(map(lambda twt: len(twt), texts))
+    max_char_length = max(char_length_all_texts)
+    min_char_length = min(char_length_all_texts)
+    median_char_length = np.median(char_length_all_texts)
     avg_char_len = reduce(lambda total_len, tweet_len: total_len + tweet_len, char_length_all_texts) / float(len(texts))
 
     # Number of empty tweets
@@ -138,6 +141,10 @@ def display_dataset_statistics(texts):
     print("Number of empty tweets (given pre-processing; removal of stopwords etc...): %i" % num_empty_tweets)
     print("Average number of tokens/words per tweet: %f" % avg_token_len)
     print("Average number of characters per tweet: %f" % avg_char_len)
+    print("Median of number of characters in a tweet: %f" % median_char_length)
+    print("Max number of characters in a tweet: %f" % max_char_length)
+    print("Min number of characters in a tweet: %f" % min_char_length)
+
 
     # Split list of texts into lists of sentences
     txt_sents = list(map(lambda tweet: sent_tokenize(tweet), texts))
@@ -166,9 +173,12 @@ def display_gender_distribution(metadata):
 
 
 if __name__ == '__main__':
-    txts, labels, metadata, labels_index = prepare_dataset(GENDER)
-    parser = Parser()
-    txts = parser.replace_all(txts)  # Replace Internet terms and lowercase
+    txts, labels, metadata, labels_index = prepare_dataset(GENDER, folder_path=TEST_DATA_DIR)
+    display_gender_distribution(metadata)
+    # parser = Parser()
+    # txts = parser.replace_all(txts)  # Replace Internet terms and lowercase
     # txts = parser.remove_stopwords(txts)
+    # txts = parser.remove_emoticons(txts)
+    # txts = parser.remove_punctuation(txts)
     # txts = parser.lemmatize(txts)
-    display_dataset_statistics(txts)
+    # display_dataset_statistics(txts)

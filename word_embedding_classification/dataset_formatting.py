@@ -13,7 +13,7 @@ from word_embedding_classification.constants import *
 np.random.seed(1337)
 
 
-def format_dataset_word_level(texts, labels, metadata):
+def format_dataset_word_level(texts, labels, metadata, split=True):
     """
     Format text samples and labels into tensors. Convert text samples into sequences of word indices.
     Split into training set and validation set
@@ -31,26 +31,32 @@ def format_dataset_word_level(texts, labels, metadata):
     word_index = tokenizer.word_index  # dictionary mapping words (str) to their rank/index (int)
     print('Found %s unique tokens / length of word index.' % len(word_index))
 
-    data = pad_sequences(sequences, maxlen=MAX_SEQUENCE_LENGTH)  # zero-pad sequences that are too short
+    formatted_data = pad_sequences(sequences, maxlen=MAX_SEQUENCE_LENGTH)  # zero-pad sequences that are too short
     labels = to_categorical(np.asarray(labels))  # convert to one-hot label vectors
 
-    print('Shape of data tensor:', data.shape)
+    print('Shape of data tensor:', formatted_data.shape)
     print('Shape of label tensor:', labels.shape)
 
-    # split the data into a training set and a validation set
-    x_train, y_train, meta_train, x_val, y_val, meta_val = split_dataset(data, labels, metadata)
+    # Training data
+    if split:
+        # split the data into a training set and a validation set
+        x_train, y_train, meta_train, x_val, y_val, meta_val = split_dataset(formatted_data, labels, metadata)
 
-    data = {
-        'x_train': x_train,
-        'y_train': y_train,
-        'meta_train': meta_train,
-        'x_val': x_val,
-        'y_val': y_val,
-        'meta_val': meta_val,
-        'word_index': word_index
-    }
+        all_data = {
+            'x_train': x_train,
+            'y_train': y_train,
+            'meta_train': meta_train,
+            'x_val': x_val,
+            'y_val': y_val,
+            'meta_val': meta_val,
+            'word_index': word_index
+        }
 
-    return data
+        return all_data
+
+    # Test data
+    else:
+        return formatted_data, labels
 
 
 def construct_embedding_matrix(word_index):
