@@ -1,4 +1,4 @@
-
+from __future__ import print_function
 import os
 import sys
 
@@ -10,8 +10,8 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 from word_embedding_classification.dataset_formatting import format_dataset_word_level, construct_embedding_matrix, \
     get_embedding_dim
 from word_embedding_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE, \
-    EMBEDDINGS_INDEX, MAX_SEQUENCE_LENGTH, LOGS_DIR, MODEL_DIR
-from helpers.model_utils import get_model_checkpoint, save_trained_model
+    EMBEDDINGS_INDEX, MAX_SEQUENCE_LENGTH, LOGS_DIR, MODEL_DIR, WORD_INDEX_DIR
+from helpers.model_utils import get_model_checkpoint, save_trained_model, save_term_index
 from word_embedding_classification.models import *
 from preprocessors.parser import Parser
 from preprocessors.dataset_preparation import prepare_dataset
@@ -31,7 +31,7 @@ def train(model, model_info, data, save_model=False, extra_info=None):
                   metrics=MODEL_METRICS)
 
     # Callbacks
-    early_stopping = EarlyStopping(monitor='val_loss', patience=2)
+    early_stopping = EarlyStopping(monitor='val_loss', patience=1)  # TODO: Patience is 1
     callbacks = [early_stopping]
 
     # if save_model:
@@ -61,6 +61,8 @@ def train(model, model_info, data, save_model=False, extra_info=None):
         test_results = model.evaluate(data['x_test'], data['y_test'], batch_size=BATCH_SIZE)
         prf_test = get_precision_recall_f_score(model, data['x_test'], data['y_test'], PREDICTION_TYPE)
         num_test = len(data['x_test'])
+
+        test_preds = model.predict(data['x_test'])
     else:
         test_results = None
         num_test = 0
@@ -83,8 +85,12 @@ def train(model, model_info, data, save_model=False, extra_info=None):
                 extra_info=extra_info,
                 prf_test=prf_test)
 
+    # for i in range(len(data['y_test'])):
+    #     print("True:", data['y_test'][i], "Pred:", test_preds[i])
+
     if save_model:
         save_trained_model(model, MODEL_DIR, MODEL_OPTIMIZER)
+        save_term_index(data['word_index'], model.name, WORD_INDEX_DIR)
 
 
 def get_embedding_layer(word_index):
@@ -92,6 +98,7 @@ def get_embedding_layer(word_index):
     return Embedding(len(word_index) + 1, get_embedding_dim(),
                      weights=[embedding_matrix],
                      input_length=MAX_SEQUENCE_LENGTH,
-                     trainable=False)  # Not trainable to prevent weights from being updated during training
-
+                     trainable=False,
+                     mask_zero=True)  # Ignore unknown words
+    # Not trainable to prevent weights from being updated during training
 

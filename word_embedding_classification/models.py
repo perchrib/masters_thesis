@@ -91,13 +91,16 @@ def get_word_model_3x512_256_lstm_128_full(embedding_layer, nb_output_nodes):
 def get_word_model_3x512lstm(embedding_layer, nb_output_nodes):
     model = Sequential(name="3x512_LSTM")
 
+    dropout=0.5
     model.add(embedding_layer)
     model.add(LSTM(512, return_sequences=True))
+    model.add(Dropout(0.3))
     model.add(LSTM(512, return_sequences=True))
+    model.add(Dropout(0.3))
     model.add(LSTM(512))
     model.add(Dense(nb_output_nodes, activation='softmax'))
 
-    model_info = []
+    model_info = ["Dropout %f" % dropout]
     return model, model_info
 
 

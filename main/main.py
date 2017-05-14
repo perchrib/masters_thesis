@@ -39,7 +39,7 @@ TEST = "test"
 
 
 def word_main(operation, trained_model_path=None):
-    rem_stopwords = False
+    rem_stopwords = True
     lemmatize = False
     rem_punctuation = False
     rem_emoticons = False
@@ -78,7 +78,7 @@ def word_main(operation, trained_model_path=None):
 
     print("Formatting dataset")
     data = format_dataset_word_level(train_texts, train_labels, train_metadata)
-    data['x_test'], data['y_test'] = format_dataset_word_level(test_texts, test_labels, test_metadata, split=False)
+    data['x_test'], data['y_test'] = format_dataset_word_level(test_texts, test_labels, test_metadata, trained_word_index=data['word_index'])
 
     if operation == TRAIN:
         embedding_layer = get_embedding_layer(data['word_index'])
@@ -108,7 +108,7 @@ def word_main(operation, trained_model_path=None):
 
 def char_main(operation, trained_model_path=None):
 
-    rem_stopwords = False
+    rem_stopwords = True
     lemmatize = False
     rem_punctuation = False
     rem_emoticons = False
@@ -147,8 +147,10 @@ def char_main(operation, trained_model_path=None):
 
     print("Formatting dataset")
     data = format_dataset_char_level(train_texts, train_labels, train_metadata)
-    data['x_test'], data['y_test'] = format_dataset_char_level(test_texts, test_labels, test_metadata, split=False)
+    data['x_test'], data['y_test'] = format_dataset_char_level(test_texts, test_labels, test_metadata, trained_char_index=data['char_index'])
 
+    # TODO: REmove
+    print(len(data['x_test']), data['x_test'][0])
     num_chars = len(data['char_index'])
     num_output_nodes = len(labels_index)
     #
@@ -266,7 +268,7 @@ if __name__ == '__main__':
     k_tf.set_session(k_tf.tf.Session(config=tf_config))
 
     # Train all models in character main
-    char_main(operation=TRAIN)
+    # char_main(operation=TRAIN)
 
     # Train all models in doc main
     """ DOCUMENT MODEL """
@@ -274,7 +276,7 @@ if __name__ == '__main__':
 
     # Train all models in word main
     """ WORD MODEL """
-    # word_main(operation=TRAIN)
+    word_main(operation=TRAIN)
 
     # Train char-word models in char word main
     # char_word_main()

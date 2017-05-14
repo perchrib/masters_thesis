@@ -50,9 +50,15 @@ def prepare_dataset(prediction_type, folder_path=TRAIN_DATA_DIR, gender=None):
                 if gender == gender_author:
                     for tweet in data_samples:
 
-                        # if detect_languages_and_print(tweet):  # TODO: Remove or fix
-                        #     print(author_data[1].upper(), tweet)
-                        #     foreign_tweets += 1
+                        # TODO: Remove
+                        # if author_data[1].upper() == 'MALE':
+                        #     tag = "running"
+                        #     tweet = tag.lower() + " " + tweet + " " + tag.lower()
+                        # elif author_data[1].upper() == 'FEMALE':
+                        #     tag = "queen"
+                        #     tweet = tag.lower() + " " + tweet + " " + tag.lower()
+                        # else:
+                        #     raise Exception("Not male or female")
 
                         texts.append(tweet)
                         metadata.append({GENDER: author_data[1].upper(), AGE: author_data[2]})
@@ -173,7 +179,7 @@ def display_gender_distribution(metadata):
 
 
 if __name__ == '__main__':
-    txts, labels, metadata, labels_index = prepare_dataset(GENDER, folder_path=TEST_DATA_DIR)
+    txts, labels, metadata, labels_index = prepare_dataset(GENDER)
     display_gender_distribution(metadata)
     # parser = Parser()
     # txts = parser.replace_all(txts)  # Replace Internet terms and lowercase

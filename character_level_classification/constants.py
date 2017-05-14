@@ -1,4 +1,4 @@
-
+import os
 # Prediction type
 GENDER = 'gender'
 AGE = 'age'
@@ -8,6 +8,7 @@ PREDICTION_TYPE = GENDER
 # Log directory
 LOGS_DIR = '../logs/character_level_classification'
 MODEL_DIR = '../models/character_level_classification'
+CHAR_INDEX_DIR = os.path.join(MODEL_DIR, 'char_index')
 
 # Text pre-processing
 MAX_SEQUENCE_LENGTH = 80
