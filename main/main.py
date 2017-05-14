@@ -40,7 +40,7 @@ TEST = "test"
 
 def word_main(operation, trained_model_path=None):
     rem_stopwords = False
-    lemmatize = True
+    lemmatize = False
     rem_punctuation = False
     rem_emoticons = False
 
@@ -178,8 +178,8 @@ def char_main(operation, trained_model_path=None):
         # c_train(*get_char_model_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False,
         #         extra_info=extra_info)
 
-        c_train(*get_char_model_512lstm(num_output_nodes, num_chars), data=data, save_model=False,
-                extra_info=extra_info)
+        # c_train(*get_char_model_512lstm(num_output_nodes, num_chars), data=data, save_model=False,
+        #         extra_info=extra_info)
 
         # c_train(*get_char_model_4x512lstm(num_output_nodes, num_chars), data=data, save_model=False,
         #         extra_info=extra_info)
@@ -266,7 +266,7 @@ if __name__ == '__main__':
     k_tf.set_session(k_tf.tf.Session(config=tf_config))
 
     # Train all models in character main
-    # char_main(operation=TRAIN)
+    char_main(operation=TRAIN)
 
     # Train all models in doc main
     """ DOCUMENT MODEL """
@@ -274,7 +274,7 @@ if __name__ == '__main__':
 
     # Train all models in word main
     """ WORD MODEL """
-    word_main(operation=TRAIN)
+    # word_main(operation=TRAIN)
 
     # Train char-word models in char word main
     # char_word_main()

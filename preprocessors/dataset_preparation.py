@@ -173,11 +173,12 @@ def display_gender_distribution(metadata):
 
 
 if __name__ == '__main__':
-    txts, labels, metadata, labels_index = prepare_dataset(GENDER)
-    parser = Parser()
-    txts = parser.replace_all(txts)  # Replace Internet terms and lowercase
-    txts = parser.remove_stopwords(txts)
-    txts = parser.remove_emoticons(txts)
-    txts = parser.remove_punctuation(txts)
-    txts = parser.lemmatize(txts)
-    display_dataset_statistics(txts)
+    txts, labels, metadata, labels_index = prepare_dataset(GENDER, folder_path=TEST_DATA_DIR)
+    display_gender_distribution(metadata)
+    # parser = Parser()
+    # txts = parser.replace_all(txts)  # Replace Internet terms and lowercase
+    # txts = parser.remove_stopwords(txts)
+    # txts = parser.remove_emoticons(txts)
+    # txts = parser.remove_punctuation(txts)
+    # txts = parser.lemmatize(txts)
+    # display_dataset_statistics(txts)
