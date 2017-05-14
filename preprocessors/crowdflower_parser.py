@@ -9,7 +9,9 @@ Crowdflower Gender-Annotated Tweet Dataset Parser
 
 """
 
-def parse_crowdflower(file_path=CROWDFLOWER_CSV_PATH, save_dir_path=TEST_DATA_DIR, save_to_file=False):
+CROWDFLOWER_SAVE_DIR = 'crowdflower/'
+
+def parse_crowdflower(file_path=CROWDFLOWER_CSV_PATH, save_dir_path=os.path.join(TEST_DATA_DIR, CROWDFLOWER_SAVE_DIR), save_to_file=False):
 
     if not os.path.exists(save_dir_path):
         os.makedirs(save_dir_path)
@@ -42,11 +44,11 @@ def parse_crowdflower(file_path=CROWDFLOWER_CSV_PATH, save_dir_path=TEST_DATA_DI
     print("Number of duplicate tweets in male set %i" % duplicates_males)
     print("Number of duplicate tweets in female set %i" % duplicates_females)
 
-    _write_tweets_to_file(MALE, 'male_tweets', male_tweets)
-    _write_tweets_to_file(FEMALE, 'female_tweets', female_tweets)
+    _write_tweets_to_file(MALE, 'male_tweets', male_tweets, save_dir_path)
+    _write_tweets_to_file(FEMALE, 'female_tweets', female_tweets, save_dir_path)
 
 
-def _write_tweets_to_file(class_name, file_name, tweets):
+def _write_tweets_to_file(class_name, file_name, tweets, save_dir_path):
     """
     Write list of tweets to file
     :param class_name: name of class. Use constant values specified in global constants. E.g. MALE
@@ -63,7 +65,7 @@ def _write_tweets_to_file(class_name, file_name, tweets):
     # Number of tweets which are not successfully parsed and pass quality control
     num_declined_tweets = 0
 
-    with open(os.path.join(TEST_DATA_DIR, file_name + '.txt'), 'wb') as dataset_file:
+    with open(os.path.join(save_dir_path, file_name + '.txt'), 'wb') as dataset_file:
         dataset_file.write("%s:::%s:::%s" % (ID_PLACEHOLDER, class_name, SECONDARY_ATTR_PLACEHOLDER))
 
         for twt in tweets:

@@ -14,7 +14,7 @@ def train(model, model_info, data, save_model=False, extra_info=None):
     
     :param model: Model object, the model that is going to be trained
     :param model_info: list of strings, information about parameters etc.
-    :param data: dictionary with validation, test and train set, ie {'x_train':[], 'y_trian:[], 'x_val':[], 'y_val':[]}
+    :param data: dictionary with validation, test and txt set, ie {'x_train':[], 'y_trian:[], 'x_val':[], 'y_val':[]}
     :param extra_info: 
     :return: 
     """
