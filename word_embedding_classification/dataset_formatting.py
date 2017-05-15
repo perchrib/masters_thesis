@@ -102,7 +102,8 @@ def construct_embedding_matrix(word_index):
         total_number_of_words += 1
 
     print("Total number of word occurrences: %i" % total_number_of_words)
-    print('Number of missing word occurrences / words with no embedding: %i' % number_of_missing_occurrences)
+    print('Number of missing word occurrences / unique words with no embedding: %i' % number_of_missing_occurrences)
+    print('Number of unique word embeddings: %i' % (total_number_of_words - number_of_missing_occurrences))
 
     return embedding_matrix
 

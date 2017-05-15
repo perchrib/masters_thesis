@@ -7,7 +7,6 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 from preprocessors.parser import Parser
 from preprocessors.dataset_preparation import prepare_dataset
 from helpers.global_constants import TEST_DATA_DIR, TRAIN_DATA_DIR
-from helpers.helper_functions import remove_texts_shorter_than_threshold
 
 from character_level_classification.dataset_formatting import format_dataset_char_level
 from character_level_classification.constants import PREDICTION_TYPE as c_PREDICTION_TYPE, MODEL_DIR as c_MODEL_DIR
@@ -50,8 +49,12 @@ def word_main(operation, trained_model_path=None):
 
     # Clean texts
     text_parser = Parser()
+    train_texts = text_parser.lowercase(train_texts)
     train_texts = text_parser.replace_all(train_texts)  # Base filtering, i.e lowercase and tags
+
+    test_texts = text_parser.lowercase(test_texts)
     test_texts = text_parser.replace_all(test_texts)
+
 
     if rem_stopwords:
         train_texts = text_parser.remove_stopwords(train_texts)
@@ -69,12 +72,16 @@ def word_main(operation, trained_model_path=None):
         train_texts = text_parser.remove_emoticons(train_texts)
         test_texts = text_parser.remove_emoticons(test_texts)
 
+    # Remove short texts from training
+    train_texts, train_labels, train_metadata, count_removed = text_parser.remove_texts_shorter_than_threshold(train_texts, train_labels, train_metadata)
+
     # Add extra info, e.g., about parsing here
     extra_info = ["Remove stopwords %s" % rem_stopwords,
                   "Lemmatize %s" % lemmatize,
                   "Remove punctuation %s" % rem_punctuation,
                   "Remove emoticons %s" % rem_emoticons,
-                  "All Internet terms are replaced with tags"]
+                  "All Internet terms are replaced with tags",
+                  "Removed %i tweet because they were shorter than threshold" % count_removed]
 
     print("Formatting dataset")
     data = format_dataset_word_level(train_texts, train_labels, train_metadata)
@@ -86,21 +93,22 @@ def word_main(operation, trained_model_path=None):
 
         # ------- Insert models to train here -----------
         # Remember star before model getter
-        # w_train(*get_word_model_2x512_256_lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=True)
+        # w_train(*get_word_model_2x512_256_lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
 
         # w_train(*get_word_model_Conv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
 
         # w_train(*get_word_model_3xConv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
         # w_train(*get_word_model_2x512_256_lstm_128_full(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
 
-        w_train(*get_word_model_3x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info,
-                save_model=True)
+        # w_train(*get_word_model_3x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+
+        w_train(*get_word_model_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
 
         # w_train(*get_word_model_3x512_128lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
         # w_train(*get_word_model_4x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
 
     elif operation == TEST:
-        # Evaluate model on test set
+        # Evaluate model on te  st set
         load_and_evaluate(os.path.join(w_MODEL_DIR, trained_model_path), data=data)
         # load_and_predict(os.path.join(w_MODEL_DIR, trained_model_path), data=data, prediction_type=w_PREDICTION_TYPE,
         #                  normalize=True)
@@ -108,7 +116,7 @@ def word_main(operation, trained_model_path=None):
 
 def char_main(operation, trained_model_path=None):
 
-    rem_stopwords = True
+    rem_stopwords = True  # Part of base
     lemmatize = False
     rem_punctuation = False
     rem_emoticons = False
@@ -119,7 +127,10 @@ def char_main(operation, trained_model_path=None):
 
     # Clean texts
     text_parser = Parser()
+    train_texts = text_parser.lowercase(train_texts)
     train_texts = text_parser.replace_all(train_texts)  # Base filtering, i.e lowercase and tags
+
+    test_texts = text_parser.lowercase(test_texts)
     test_texts = text_parser.replace_all(test_texts)
 
     if rem_stopwords:
@@ -138,12 +149,17 @@ def char_main(operation, trained_model_path=None):
         train_texts = text_parser.remove_emoticons(train_texts)
         test_texts = text_parser.remove_emoticons(test_texts)
 
+    # Remove short texts from training set
+    train_texts, train_labels, train_metadata, count_removed = text_parser.remove_texts_shorter_than_threshold(train_texts, train_labels, train_metadata)
+
+
     # Add extra info, e.g., about parsing here
     extra_info = ["Remove stopwords %s" % rem_stopwords,
                   "Lemmatize %s" % lemmatize,
                   "Remove punctuation %s" % rem_punctuation,
                   "Remove emoticons %s" % rem_emoticons,
-                  "All Internet terms are replaced with tags"]
+                  "All Internet terms are replaced with tags"
+                  "Removed %i tweets because they were shorter than threshold" % count_removed]
 
     print("Formatting dataset")
     data = format_dataset_char_level(train_texts, train_labels, train_metadata)
@@ -151,31 +167,20 @@ def char_main(operation, trained_model_path=None):
 
     # TODO: REmove
     print(len(data['x_test']), data['x_test'][0])
+
     num_chars = len(data['char_index'])
     num_output_nodes = len(labels_index)
-    #
-    # Remove empty tweets after pre-processing
-    train_texts, train_labels, train_metadata = remove_texts_shorter_than_threshold(train_texts, train_labels, train_metadata)
-    test_texts, test_labels, test_metadata = remove_texts_shorter_than_threshold(test_texts, test_labels,
-                                                                                    test_metadata)
 
     if operation == TRAIN:
         # ------- Insert models to train here -----------
         # Remember star before model getter
         # c_train(*get_char_model_3xConv_2xBiLSTM(num_output_nodes, num_chars), data=data)
         # c_train(*get_char_model_BiLSTM_full(num_output_nodes, num_chars), data=data)
-        #c_train(*get_char_model_3xConv(num_output_nodes), data=data)
         #c_train(*get_char_model_3xConv_LSTM(num_output_nodes, num_chars), data=data)
-        # c_train(*get_char_model_3xConv_4xBiLSTM(num_output_nodes, num_chars), data=data)
 
         # c_train(*get_char_model_2xConv_BiLSTM(num_output_nodes, num_chars), data=data)
 
         c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=True, extra_info=extra_info)
-        # c_train(*get_char_model_Conv_BiLSTM_2(num_output_nodes, num_chars), data=data, save_model=False)
-        # c_train(*get_char_model_Conv_BiLSTM_3(num_output_nodes, num_chars), data=data, save_model=True)
-        # c_train(*get_char_model_Conv_BiLSTM_mask(num_output_nodes, num_chars), data=data, save_model=False,
-        #         extra_info=extra_info)
-        # c_train(*get_char_model_Conv_BiLSTM_4(num_output_nodes, num_chars), data=data, save_model=False, extra_info=extra_info)
 
         # c_train(*get_char_model_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False,
         #         extra_info=extra_info)
@@ -183,8 +188,8 @@ def char_main(operation, trained_model_path=None):
         # c_train(*get_char_model_512lstm(num_output_nodes, num_chars), data=data, save_model=False,
         #         extra_info=extra_info)
 
-        # c_train(*get_char_model_4x512lstm(num_output_nodes, num_chars), data=data, save_model=False,
-        #         extra_info=extra_info)
+        c_train(*get_char_model_2x512lstm(num_output_nodes, num_chars), data=data, save_model=False,
+                extra_info=extra_info)
 
 
     elif operation == TEST:

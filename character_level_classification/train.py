@@ -39,7 +39,7 @@ def train(model, model_info, data, save_model=False, extra_info=None, log_sess=T
                   metrics=MODEL_METRICS)
 
     # Callbacks
-    early_stopping = EarlyStopping(monitor='val_loss', patience=3)  # TODO: CHange to 2
+    early_stopping = EarlyStopping(monitor='val_loss', patience=2)
     callbacks = [early_stopping]
 
     # if save_model:
@@ -50,7 +50,7 @@ def train(model, model_info, data, save_model=False, extra_info=None, log_sess=T
 
     print('\nCommence training %s model' % model.name)
     history = model.fit(data['x_train'], data['y_train'],
-                        validation_data=[data['x_test'], data['y_test']],  # TODO: Change to x_val
+                        validation_data=[data['x_val'], data['y_val']],
                         epochs=NB_EPOCHS,
                         batch_size=BATCH_SIZE,
                         shuffle=True,

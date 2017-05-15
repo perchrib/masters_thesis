@@ -165,34 +165,6 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, opti
     print("Done")
 
 
-def remove_texts_shorter_than_threshold(texts, labels, metadata, threshold=2):
-    """
-    Remove texts shorter than threshold from list of texts, labels and metadata
-    :param modified_texts:
-    :param modified_labels:
-    :param modified_metadata:
-    :param threshold:
-    :return:
-    """
-    removal_count = 0
-
-    modified_texts = []
-    modified_labels = []
-    modified_metadata = []
-
-    for i in range(len(texts)):
-        if len(texts[i]) >= threshold:
-            modified_texts.append(texts[i])
-            modified_labels.append(labels[i])
-            modified_metadata.append(metadata[i])
-
-            removal_count += 1
-
-    print("Removed %i tweets" % removal_count)
-
-    return modified_texts, modified_labels, modified_metadata
-
-
 def sum_col(array):
     sum_ = []
     row_dim = array.shape[0]

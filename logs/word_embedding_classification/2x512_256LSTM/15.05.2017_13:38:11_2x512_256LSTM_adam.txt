@@ -1,0 +1,66 @@
+Training_log - 15/05/2017 13:38:11
+
+Model name: 2x512_256LSTM
+Elapsed training time: 83.2463810484
+
+Training set size: 584630
+Validation set size: 64958
+Validation set fraction: 0.098082
+Test set fraction: 0.019167
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 50
+Max sequence length: 15
+
+-----------Training statistics-----------
+        acc      loss   val_acc  val_loss
+0  0.642553  0.618206  0.663706  0.592424
+1  0.675644  0.576674  0.683195  0.566876
+2  0.704784  0.537359  0.693494  0.557232
+3  0.735516  0.491937  0.705040  0.550344
+4  0.765019  0.445355  0.713892  0.546886
+5  0.790272  0.403526  0.716032  0.575442
+6  0.810786  0.368576  0.719665  0.588122
+
+Validation PRF
+                 Female          Male  Overall Macro  Overall Micro
+Precision      0.711268      0.725906       0.718587       0.719665
+Recall         0.658577      0.771808       0.715192       0.719665
+F-score        0.683909      0.748154       0.716031       0.719665
+Support    29913.000000  35045.000000            NaN            NaN
+
+--------------Test results---------------
+loss: 0.877130 acc: 0.580830
+
+Test PRF
+                Female         Male  Overall Macro  Overall Micro
+Precision     0.603380     0.560378       0.581879       0.580826
+Recall        0.554422     0.609143       0.581783       0.580826
+F-score       0.577866     0.583744       0.580805       0.580826
+Support    6569.000000  6125.000000            NaN            NaN
+
+--------------Model Diagram---------------
+      InputLayer (None, 15)      
+       Embedding (None, 15, 200) 
+            LSTM (None, 15, 512) 
+         Dropout (None, 15, 512) 
+            LSTM (None, 15, 512) 
+         Dropout (None, 15, 512) 
+            LSTM (None, 256)     
+           Dense (None, 2)       
+
+
+Model information:
+=========================================
+ Dropout: 0.5
+Extra information:
+=========================================
+ Remove stopwords True
+ Lemmatize False
+ Remove punctuation False
+ Remove emoticons False
+ All Internet terms are replaced with tags
+ Removed 33 tweet because they were shorter than threshold

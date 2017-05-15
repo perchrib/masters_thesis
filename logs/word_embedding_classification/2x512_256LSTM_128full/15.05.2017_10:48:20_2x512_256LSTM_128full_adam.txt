@@ -1,0 +1,59 @@
+Training_log - 15/05/2017 10:48:20
+
+Model name: 2x512_256LSTM_128full
+Elapsed training time: 21.7679795663
+
+Training set size: 589724
+Validation set size: 65524
+Validation set fraction: 0.098093
+Test set fraction: 0.019053
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 1
+Max sequence length: 25
+
+-----------Training statistics-----------
+        acc      loss  val_acc  val_loss
+0  0.639326  0.623743  0.65434  0.600061
+
+Validation PRF
+                 Female          Male  Overall Macro  Overall Micro
+Precision      0.673264      0.644921       0.659093        0.65434
+Recall         0.485544      0.798607       0.642076        0.65434
+F-score        0.564199      0.713583       0.638891        0.65434
+Support    30195.000000  35329.000000            NaN            NaN
+
+--------------Test results---------------
+loss: 0.661890 acc: 0.601480
+
+Test PRF
+                Female         Male  Overall Macro  Overall Micro
+Precision     0.648947     0.569953       0.609450       0.601477
+Recall        0.500532     0.709704       0.605118       0.601477
+F-score       0.565158     0.632197       0.598677       0.601477
+Support    6585.000000  6142.000000            NaN            NaN
+
+--------------Model Diagram---------------
+      InputLayer (None, 25)      
+       Embedding (None, 25, 200) 
+            LSTM (None, 25, 512) 
+         Dropout (None, 25, 512) 
+            LSTM (None, 25, 512) 
+         Dropout (None, 25, 512) 
+            LSTM (None, 256)     
+         Dropout (None, 256)     
+           Dense (None, 128)     
+         Dropout (None, 128)     
+           Dense (None, 2)       
+
+
+Extra information:
+=========================================
+ Remove stopwords True
+ Lemmatize False
+ Remove punctuation False
+ Remove emoticons False
+ All Internet terms are replaced with tags
