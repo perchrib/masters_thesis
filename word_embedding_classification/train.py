@@ -31,7 +31,7 @@ def train(model, model_info, data, save_model=False, extra_info=None):
                   metrics=MODEL_METRICS)
 
     # Callbacks
-    early_stopping = EarlyStopping(monitor='val_loss', patience=1)  # TODO: Patience is 1
+    early_stopping = EarlyStopping(monitor='val_loss', patience=2)  # TODO: Patience is 2
     callbacks = [early_stopping]
 
     # if save_model:

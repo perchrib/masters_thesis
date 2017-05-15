@@ -174,22 +174,21 @@ def char_main(operation, trained_model_path=None):
     if operation == TRAIN:
         # ------- Insert models to train here -----------
         # Remember star before model getter
-        # c_train(*get_char_model_3xConv_2xBiLSTM(num_output_nodes, num_chars), data=data)
-        # c_train(*get_char_model_BiLSTM_full(num_output_nodes, num_chars), data=data)
+        # c_train(*get_char_model_3xConv_2xBiLSTM(num_output_nodes, num_chars), data=data, extra_info=extra_info)
         #c_train(*get_char_model_3xConv_LSTM(num_output_nodes, num_chars), data=data)
 
-        # c_train(*get_char_model_2xConv_BiLSTM(num_output_nodes, num_chars), data=data)
+        # c_train(*get_char_model_2xConv_BiLSTM(num_output_nodes, num_chars), data=data, extra_info=extra_info)
 
-        c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=True, extra_info=extra_info)
+        # c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=True, extra_info=extra_info)
 
-        # c_train(*get_char_model_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False,
-        #         extra_info=extra_info)
+        c_train(*get_char_model_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False,
+                extra_info=extra_info)
 
         # c_train(*get_char_model_512lstm(num_output_nodes, num_chars), data=data, save_model=False,
         #         extra_info=extra_info)
 
-        c_train(*get_char_model_2x512lstm(num_output_nodes, num_chars), data=data, save_model=False,
-                extra_info=extra_info)
+        # c_train(*get_char_model_2x512lstm(num_output_nodes, num_chars), data=data, save_model=False,
+        #         extra_info=extra_info)
 
 
     elif operation == TEST:
