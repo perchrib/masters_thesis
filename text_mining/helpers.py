@@ -6,6 +6,10 @@ def flatten(list):
     return [item for sublist in list for item in sublist]
 
 def word_tokenize(texts):
+    """
+    :param texts: list of texts 
+    :return: list of all words in the whole text
+    """
     return flatten(map(lambda x: x.split(), texts))
 
 

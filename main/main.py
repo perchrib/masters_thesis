@@ -250,7 +250,8 @@ def char_word_main():
 
     # Clean texts
     text_parser = Parser()
-    texts = text_parser.replace_all(texts)
+    texts = text_parser.lowercase(texts)
+    texts = text_parser.replace_all_twitter_syntax_tokens(texts)
     texts = text_parser.remove_stopwords(texts)
     # texts = text_parser.replace_urls(texts)
 
