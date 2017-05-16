@@ -193,7 +193,7 @@ def get_word_model_Conv_BiLSTM(embedding_layer, nb_output_nodes):
 
     model_info = ["Kernel_size: %i" % kernel_size, "Filters: %i" % filters, "Pool length: %i" % pool_length,
                   "LSTM dropout: %f, LSTM recurrent dropout %f" % (lstm_drop, lstm_drop_rec),
-                  "Conv dropout: %f" % conv_dropout, "Dense dropout: %f" % dense_drop, "No dense layer before softmax"]  # TODO: Update last info
+                  "Conv dropout: %f" % conv_dropout, "Dense dropout: %f" % dense_drop, "No dense layer before softmax"] # TODO: Update last info
     return model, model_info
 
 
