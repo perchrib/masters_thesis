@@ -43,6 +43,9 @@ class Visualizer():
         
         """
         rotation = 90
+        alpha = 1
+        if 'pos' in self.title.lower() or 'stopwords' in self.title.lower():
+            alpha = 0.7
         if "emoticons" in self.title.lower() or "emoticons" in self.xlabel.lower():
             rotation = 270
         common_tokens = sorted(tc1.keys())
@@ -51,7 +54,7 @@ class Visualizer():
         tc2_freq = [tc2[token] for token in common_tokens]
 
         plt.plot(tc1_freq, label=tc1_label)
-        plt.plot(tc2_freq, label=tc2_label, alpha=0.7)
+        plt.plot(tc2_freq, label=tc2_label, alpha=alpha)
 
         plt.xticks(range(len(common_tokens)), common_tokens, rotation=rotation, fontsize=font_size)
         plt.legend(loc='best', frameon=False)
@@ -109,19 +112,27 @@ class Visualizer():
         :param x_labels: list of labels name that will be plottet in the x axis 
         :param y_labels: list of labels values that will be the histogram value in the plot
         """
+
         if len(x_labels) != len(y_labels):
             raise TypeError("Not Same Length")
         x = np.arange(len(x_labels))
-
-        plt.bar(x, height=y_labels, color=color)
+        if "sentiment" in self.title.lower():
+            color = ["C0", "C0", "C1", "C1", "C1"]
+            plt.bar(x[:2], height=y_labels[:2], color=color[:2], label="male")
+            plt.bar(x[2:], height=y_labels[2:], color=color[2:], label="female")
+        else:
+            plt.bar(x, height=y_labels, color=color)
+        plt.legend(loc='best', frameon=False)
         plt.xticks(x, x_labels)
         plt.grid(False)
+
         plt.tight_layout()
 
     def plot_boxplot(self, distribution=None, distributions=None, xlabel=None):
         colors = ["C0", "C1", "C2"]
         #ax = self.figure.add_subplot(111)
         #plt.set_xticklabels(xlabel)
+
         if distributions:
             bp = plt.boxplot(distributions, patch_artist=True)
         else:
@@ -138,14 +149,6 @@ class Visualizer():
             flier.set(marker='x', color='C3', alpha=0.5)
 
         plt.xticks(range(1, len(xlabel) + 1), xlabel)
-
-
-
-
-
-
-
-
 
 
     def subplot_checker(self):

@@ -2,6 +2,9 @@
 # Prediction type
 GENDER = 'gender'
 AGE = 'age'
+C_BAG_OF_WORDS = 'bow'
+C_TF_IDF = 'tfidf'
+
 PREDICTION_TYPE = GENDER
 
 
@@ -9,23 +12,40 @@ PREDICTION_TYPE = GENDER
 LOGS_DIR = '../logs/document_level_classification'
 MODEL_DIR = '../models/document_level_classification'
 
-# Text pre-processing
-MAX_FEATURE_LENGTH = 10000
-N_GRAM = (1, 1)
-DIM_REDUCTION = True
+# Autoencoder
+DIM_REDUCTION = False
 DIM_REDUCTION_SIZE = 50
 
+if not DIM_REDUCTION:
+    DIM_REDUCTION_SIZE = None
 
+#############################################
+# Model (TUNING PARAMETERS HERE!)
+MODEL_TYPE = "base" # set TYPE = "" when not using "base"
+LAYERS = [512]
+# Regularization
+DROPOUT = 0
+L1 = 0
+L2 = 0
 
-# Model
-MODEL_OPTIMIZER = 'adam'
+# Text pre-processing
+FEATURE_MODEL = C_BAG_OF_WORDS
+MAX_FEATURE_LENGTH = 10000
+N_GRAM = (1, 1)
 
+###############################################
 # Standard!
+MODEL_OPTIMIZER = 'adam'
 MODEL_LOSS = 'categorical_crossentropy'
+ACTIVATION = 'relu'
+OUTPUT_ACTIVATION = 'softmax'
+CATEGORICAL = True
 
 # For Logistic Regression
 Log_Reg = False
-#MODEL_LOSS = 'binary_crossentropy'
+if Log_Reg:
+    CATEGORICAL = False
+    MODEL_LOSS = 'binary_crossentropy'
 
 MODEL_METRICS = ['accuracy']
 NB_EPOCHS = 50

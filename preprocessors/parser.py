@@ -27,7 +27,7 @@ class Parser:
     def lowercase(self, texts):
         return [t.lower() for t in texts]  # Lower_case
 
-    def replace_all(self, texts):
+    def replace_all_twitter_syntax_tokens(self, texts):
         # Raise error if texts not lists
         if type(texts) is not list:
             raise Exception("Parser must be passed a list of texts")
@@ -140,16 +140,21 @@ class Parser:
     def remove_punctuation(self, texts):
         new_texts = []
         for t in texts:
+            EMOTICON_ID = "EMO1231298736"
+            #print("Before: ", t)
             emoticons_in_t = re.findall('(?::|;|=)(?:-)?(?:\)|\(|D|P)|(?:<3)', t)
-            t = re.sub('(?::|;|=)(?:-)?(?:\)|\(|D|P)|(?:<3)', "EMO", t)
+            t = re.sub('(?::|;|=)(?:-)?(?:\)|\(|D|P)|(?:<3)', EMOTICON_ID, t)
             t = ' '.join(word.strip(string.punctuation) for word in t.split())
             new_t = []
+            #print("AFTER: ", t)
             for word in t.split():
-                if word == "EMO":
+                if word == EMOTICON_ID:
                     word = emoticons_in_t[0]
                     del emoticons_in_t[0]
                 new_t.append(word)
             new_texts.append(' '.join(new_t))
+
+        print("Removing punctuations - Done")
         return new_texts
 
     def remove_emoticons(self, texts):
@@ -158,7 +163,6 @@ class Parser:
             t = re.sub('(?::|;|=)(?:-)?(?:\)|\(|D|P)|(?:<3)', "", t)
             new_texts.append(t)
         return new_texts
-
 
     def remove_texts_shorter_than_threshold(self, texts, labels, metadata, threshold=2):
         """
@@ -187,7 +191,6 @@ class Parser:
         print("Removed %i empty tweets" % removal_count)
 
         return modified_texts, modified_labels, modified_metadata, removal_count
-
 
     def generate_character_vocabulary(self, texts):
         pass

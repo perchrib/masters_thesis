@@ -7,10 +7,30 @@ sys.path.insert(0, "/Users/per/Documents/NTNU_Courses/5th_year/2-semester/master
 from text_mining.helpers import word_tokenize
 from text_mining.dataset_characteristics import most_common
 from collections import Counter
-from helpers.helper_functions import print_progress
 
 
-class TF_IDF():
+class BOW():
+    def __init__(self, documents, ngram_range=(1, 1), vocabulary=None, max_features=None):
+        self.documents = documents
+        self.vocabulary = vocabulary
+        self.ngram_range = ngram_range
+        self.cv = CountVectorizer(vocabulary=self.vocabulary, max_features=max_features, ngram_range=self.ngram_range)
+        self.bag = self.cv.fit_transform(self.documents)
+
+    def get_count(self):
+        return self.cv
+
+    def get_bag(self):
+        return self.bag.toarray()
+
+    def fit_to_training_data(self):
+        return self.get_bag()
+
+    def fit_to_new_data(self, texts):
+        return self.cv.transform(texts).toarray()
+
+
+class TF_IDF:
     def __init__(self, documents, labels, max_len_features, ngram_range=(1, 1)):
         # All tweets containing a list of strings ["hello #yolo", "yoyo @google"]
         self.labels = labels
@@ -21,14 +41,23 @@ class TF_IDF():
         self.ngram_range = ngram_range
         self.train_vocabulary = self.n_frequent_ngram_token_dissimilarity_vocabulary() # self.train_unique_tokens.keys()
 
-        # contains the vocabulary, count word frequencies
-        self.train_counts = CountVectorizer(vocabulary=self.train_vocabulary, ngram_range=self.ngram_range)
+        """New"""
+        bow = BOW(self.train_docs, self.ngram_range, self.train_vocabulary)
+        self.train_counts = bow.get_count()
+        self.train_bow = bow.get_bag()
 
-        # Construct the bag of word model and transform documnets into sparse features vectors
-        self.train_bow = self.train_counts.fit_transform(self.train_docs)
+        """"""
+
+        """old"""
+        # contains the vocabulary, count word frequencies
+        #self.train_counts = CountVectorizer(vocabulary=self.train_vocabulary, ngram_range=self.ngram_range)
+
+        # Construct the bag of word model and transform documnents into sparse features vectors
+        #self.train_bow = self.train_counts.fit_transform(self.train_docs)
+        """"""
+
 
         self.tfidf_transformer = TfidfTransformer()
-
 
     def fit_to_training_data(self):
         tfidf_features = self.tfidf_transformer.fit_transform(self.train_bow)
@@ -38,6 +67,9 @@ class TF_IDF():
         new_cv = self.train_counts.transform(np.asarray(new_texts))
         new_tfidf_features = self.tfidf_transformer.transform(new_cv)
         return new_tfidf_features.toarray()
+
+    def get_count(self):
+        self.train_counts
 
     def n_frequent_words_in_texts(self):
         """
@@ -72,7 +104,6 @@ class TF_IDF():
         #    print key, " : ", different_value_vocabulary_counts[key]
 
         return different_value_vocabulary_counts.keys()
-
 
 
     def get_ngram_occurrences_counter(self, texts, ngram_range, max_features, type):
