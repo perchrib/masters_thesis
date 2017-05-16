@@ -205,9 +205,9 @@ def get_word_model_BiLSTM(embedding_layer, nb_output_nodes):
     lstm_drop_rec = 0.2
     merge_drop = 0.2
 
-    forward = LSTM(512, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu')(
+    forward = LSTM(200, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu')(
         embedding)
-    backward = LSTM(512, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu',
+    backward = LSTM(200, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu',
                     go_backwards=True)(embedding)
 
     encoding = merge([forward, backward], mode='concat', concat_axis=-1)

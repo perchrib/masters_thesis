@@ -162,6 +162,8 @@ class Parser:
         for t in texts:
             t = re.sub('(?::|;|=)(?:-)?(?:\)|\(|D|P)|(?:<3)', "", t)
             new_texts.append(t)
+
+        print("Removing emoticons - Done")
         return new_texts
 
     def remove_texts_shorter_than_threshold(self, texts, labels, metadata, threshold=2):

@@ -1,0 +1,63 @@
+Training_log - 16/05/2017 16:20:22
+
+Model name: base_512
+Elapsed training time: 0h:06m:38s
+
+Training set size: 589724
+Validation set size: 65524
+Validation set fraction: 0.098093
+Test set fraction: 0.019053
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 50
+Max sequence length: 10000
+
+-----------Training statistics-----------
+        acc      loss   val_acc  val_loss
+0  0.659797  0.594025  0.680178  0.572158
+1  0.745605  0.491616  0.710503  0.549884
+2  0.844086  0.325436  0.724269  0.603728
+3  0.904254  0.205102  0.730755  0.738930
+4  0.928209  0.152343  0.733838  0.861283
+
+Validation PRF
+                 Female          Male  Overall Macro  Overall Micro
+Precision      0.735029      0.732996       0.734012       0.733838
+Recall         0.660540      0.796484       0.728512       0.733838
+F-score        0.695796      0.763423       0.729610       0.733838
+Support    30195.000000  35329.000000            NaN            NaN
+
+--------------Test results---------------
+loss: 1.658270 acc: 0.570360
+
+Test PRF
+                Female         Male  Overall Macro  Overall Micro
+Precision     0.591843     0.550707       0.571275       0.570362
+Recall        0.546545     0.595897       0.571221       0.570362
+F-score       0.568293     0.572412       0.570352       0.570362
+Support    6585.000000  6142.000000            NaN            NaN
+
+--------------Model Diagram---------------
+    InputLayer (None, 10000) 
+         Dense (None, 512)   
+         Dense (None, 2)     
+
+
+Model information:
+=========================================
+ 
+--- Regularisation ---
+
+ 	-Dropout: None
+ 	-L1: None
+ 	-L2: None
+ 
+--- Feature Info ---
+
+ 	-Embedding: bow
+ 	-Ngram: (1, 1)
+ 	-Autoencoder: False
+ 	-Reduction size: None
