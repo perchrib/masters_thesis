@@ -24,8 +24,9 @@ import keras.backend.tensorflow_backend as k_tf
 from helpers.model_utils import load_and_evaluate, load_and_predict
 
 from document_level_classification.constants import PREDICTION_TYPE as DOC_PREDICTION_TYPE
-from document_level_classification.models import get_2048_1024_512, get_4096_2048_1024_512, get_1024_512, \
-    get_logistic_regression, get_512_256_128
+from document_level_classification.models import get_ann_model
+    #get_2048_1024_512, get_4096_2048_1024_512, get_1024_512, \
+    #get_logistic_regression, get_512_256_128
 from document_level_classification.train import train as document_trainer
 from document_level_classification.dataset_formatting import format_dataset_doc_level
 
@@ -210,8 +211,8 @@ def document_main():
     texts = parser.remove_stopwords(texts)
     texts_test = parser.remove_stopwords(texts_test)
     print("Parsing Twitter Specific Syntax...")
-    texts = parser.replace_all(texts)
-    texts_test = parser.replace_all(texts_test)
+    texts = parser.replace_all_twitter_syntax_tokens(texts)
+    texts_test = parser.replace_all_twitter_syntax_tokens(texts_test)
     data = {}
     # Create format_dataset_tfidf
 
@@ -236,7 +237,7 @@ def document_main():
     # document_trainer(*get_2048_1024_512(input_size, output_size), data=data)
     # document_trainer(*get_4096_2048_1024_512(input_size, output_size), data=data)
     # document_trainer(*get_1024_512(input_size, output_size), data=data)
-    document_trainer(*get_512_256_128(input_size, output_size), data=data)
+    document_trainer(*get_ann_model(input_size, output_size), data=data)
 
     # Logistic Regression
     # output_size = data['y_train'].shape[1]

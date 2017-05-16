@@ -12,22 +12,33 @@ PREDICTION_TYPE = GENDER
 LOGS_DIR = '../logs/document_level_classification'
 MODEL_DIR = '../models/document_level_classification'
 
+# Autoencoder
+DIM_REDUCTION = False
+DIM_REDUCTION_SIZE = 50
+
+if not DIM_REDUCTION:
+    DIM_REDUCTION_SIZE = None
+
+#############################################
+# Model (TUNING PARAMETERS HERE!)
+MODEL_TYPE = "base" # set TYPE = "" when not using "base"
+LAYERS = [512]
+# Regularization
+DROPOUT = 0
+L1 = 0
+L2 = 0
+
 # Text pre-processing
 FEATURE_MODEL = C_BAG_OF_WORDS
 MAX_FEATURE_LENGTH = 10000
 N_GRAM = (1, 1)
 
-# Autoencoder
-DIM_REDUCTION = False
-DIM_REDUCTION_SIZE = 50
-
-
-
-# Model
-MODEL_OPTIMIZER = 'adam'
-
+###############################################
 # Standard!
+MODEL_OPTIMIZER = 'adam'
 MODEL_LOSS = 'categorical_crossentropy'
+ACTIVATION = 'relu'
+OUTPUT_ACTIVATION = 'softmax'
 CATEGORICAL = True
 
 # For Logistic Regression
