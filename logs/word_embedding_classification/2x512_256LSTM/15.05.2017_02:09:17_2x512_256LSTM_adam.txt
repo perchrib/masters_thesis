@@ -1,0 +1,64 @@
+Training_log - 15/05/2017 02:09:17
+
+Model name: 2x512_256LSTM
+Elapsed training time: 200.59723775
+
+Training set size: 589724
+Validation set size: 65524
+Validation set fraction: 0.098093
+Test set fraction: 0.019053
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 50
+Max sequence length: 25
+
+-----------Training statistics-----------
+        acc      loss   val_acc  val_loss
+0  0.642813  0.618012  0.653150  0.600575
+1  0.675126  0.577089  0.676332  0.572877
+2  0.704818  0.538790  0.690632  0.559975
+3  0.735559  0.494324  0.700461  0.553563
+4  0.764561  0.448479  0.708275  0.562025
+5  0.789149  0.407058  0.712289  0.574235
+
+Validation PRF
+                 Female          Male  Overall Macro  Overall Micro
+Precision      0.700541      0.721209       0.710875       0.712289
+Recall         0.656135      0.760282       0.708209       0.712289
+F-score        0.677611      0.740230       0.708921       0.712289
+Support    30195.000000  35329.000000            NaN            NaN
+
+--------------Test results---------------
+loss: 0.832000 acc: 0.589060
+
+Test PRF
+                Female         Male  Overall Macro  Overall Micro
+Precision     0.605055     0.572635       0.588845       0.589063
+Recall        0.592559     0.585314       0.588937       0.589063
+F-score       0.598742     0.578905       0.588823       0.589063
+Support    6585.000000  6142.000000            NaN            NaN
+
+--------------Model Diagram---------------
+      InputLayer (None, 25)      
+       Embedding (None, 25, 200) 
+            LSTM (None, 25, 512) 
+         Dropout (None, 25, 512) 
+            LSTM (None, 25, 512) 
+         Dropout (None, 25, 512) 
+            LSTM (None, 256)     
+           Dense (None, 2)       
+
+
+Model information:
+=========================================
+ Dropout: 0.5
+Extra information:
+=========================================
+ Remove stopwords True
+ Lemmatize False
+ Remove punctuation False
+ Remove emoticons False
+ All Internet terms are replaced with tags

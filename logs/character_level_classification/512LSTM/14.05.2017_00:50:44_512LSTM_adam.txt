@@ -1,0 +1,56 @@
+Training_log - 14/05/2017 00:50:44
+
+Model name: 512LSTM
+Elapsed training time: 1h:00m:24s
+
+Training set size: 589724
+Validation set size: 65524
+Validation set fraction: 0.097922
+Test set fraction: 0.020773
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 50
+Max sequence length: 80
+
+-----------Training statistics-----------
+        acc      loss   val_acc  val_loss
+0  0.537604  0.690598  0.539344  0.689678
+1  0.532653  0.691973  0.539497  0.689956
+2  0.529444  0.692477  0.539176  0.690061
+3  0.529031  0.692589  0.539176  0.689887
+
+Validation PRF                Female         Male  Overall Macro  Overall Micro
+Precision     1.000000     0.492122       0.746061       0.492158
+Recall        0.000142     1.000000       0.500071       0.492158
+F-score       0.000283     0.659627       0.329955       0.492158
+Support    7060.000000  6840.000000            NaN            NaN
+
+--------------Test results---------------
+loss: 0.698350 acc: 0.492160
+
+Test PRF                Female         Male  Overall Macro  Overall Micro
+Precision     1.000000     0.492122       0.746061       0.492158
+Recall        0.000142     1.000000       0.500071       0.492158
+F-score       0.000283     0.659627       0.329955       0.492158
+Support    7060.000000  6840.000000            NaN            NaN
+
+--------------Model Diagram---------------
+     InputLayer (None, 80)     
+         Lambda (None, 80, 70) 
+           LSTM (None, 512)    
+          Dense (None, 2)      
+
+
+Model information:
+=========================================
+ No dropout
+Extra information:
+=========================================
+ Remove stopwords False
+ Lemmatize True
+ Remove punctuation False
+ Remove emoticons False
+ All Internet terms are replaced with tags

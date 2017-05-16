@@ -8,18 +8,20 @@ from sklearn.metrics import confusion_matrix, precision_recall_fscore_support
 from keras.callbacks import ModelCheckpoint
 from keras.models import load_model, save_model, Model
 from global_constants import GENDER, OVERALL_MACRO, OVERALL_MICRO
+from helper_functions import save_pickle
 
 import matplotlib.pyplot as plt
 
 
 def get_model_checkpoint(model_name, model_dir, model_optimizer):
-    if not os.path.exists(model_dir, model_name):
-        os.makedirs(os.path.join(model_dir, model_name))
+    dir_path = os.path.join(model_dir, model_name)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
 
     model_file_name = time.strftime(
         "%d.%m.%Y_%H:%M:%S") + "_" + model_name + "_" + model_optimizer + "_{epoch:02d}_{val_acc:.4f}.h5"
 
-    checkpoint = ModelCheckpoint(os.path.join(model_dir, model_name, model_file_name), save_best_only=True)
+    checkpoint = ModelCheckpoint(os.path.join(dir_path, model_file_name), save_best_only=True)
 
     return checkpoint
 
@@ -35,9 +37,9 @@ def save_trained_model(model, model_dir, model_optimizer):
     """
 
     print("Saving trained model")
-
-    if not os.path.exists(os.path.join(model_dir, model.name)):
-        os.makedirs(os.path.join(model_dir, model.name))
+    dir_path = os.path.join(model_dir, model.name)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
 
     # _{epoch:02d}_{val_acc:.4f}
     model_file_name = time.strftime(
@@ -45,6 +47,18 @@ def save_trained_model(model, model_dir, model_optimizer):
 
     model.save(os.path.join(model_dir, model.name, model_file_name))
     print("Model saved")
+
+
+def save_term_index(term_index, model_name, index_dir):
+    print("Saving term index")
+
+    if not os.path.exists(os.path.join(index_dir, model_name)):
+        os.makedirs(os.path.join(index_dir, model_name))
+
+    index_file_name = time.strftime("%d.%m.%Y_%H:%M:%S") + "_" + model_name
+    save_pickle(os.path.join(index_dir, index_file_name), term_index)
+
+    print("Term index saved")
 
 
 def load_and_evaluate(model_path, data):

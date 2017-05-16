@@ -100,7 +100,7 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, opti
     if not os.path.exists((os.path.join(log_dir, model.name))):
         os.makedirs((os.path.join(log_dir, model.name)))
 
-    file_name = time.strftime("%d.%m.%Y_%H:%M:%S") + "_" + model.name + "_" + optimizer + ".txt"
+    file_name = time.strftime("%d.%m.%Y_%H:%M:%S") + "_" + model.name + ".txt"
 
     print("Writing log file - %s..." % file_name)
 
@@ -163,34 +163,6 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, opti
                 log_file.write("\n %s" % info)
 
     print("Done")
-
-
-def remove_texts_shorter_than_threshold(texts, labels, metadata, threshold=2):
-    """
-    Remove texts shorter than threshold from list of texts, labels and metadata
-    :param modified_texts:
-    :param modified_labels:
-    :param modified_metadata:
-    :param threshold:
-    :return:
-    """
-    removal_count = 0
-
-    modified_texts = []
-    modified_labels = []
-    modified_metadata = []
-
-    for i in range(len(texts)):
-        if len(texts[i]) >= threshold:
-            modified_texts.append(texts[i])
-            modified_labels.append(labels[i])
-            modified_metadata.append(metadata[i])
-
-            removal_count += 1
-
-    print("Removed %i tweets" % removal_count)
-
-    return modified_texts, modified_labels, modified_metadata
 
 
 def sum_col(array):

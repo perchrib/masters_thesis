@@ -11,23 +11,26 @@ from character_level_classification.constants import *
 from helpers.global_constants import VALIDATION_SPLIT
 
 
-def format_dataset_char_level(texts, labels, metadata, split=True):
+def format_dataset_char_level(texts, labels, metadata, trained_char_index=None):
     """
     Format dataset into char indices for one hot encodings.
     Split into training set, validation set and test set.
     :param texts: list of tweets
     :param labels: list of tweet labels
     :param metadata: list of dictionaries containing age and gender for each tweet
-    :param split: whether or not to split training data. Should be false for test data
+    :param trained_char_index: whether or not to split training data. Should be false for test data
     :return:
     """
 
-    print('\n-------Creating character set...')
-    all_text = ''.join(texts)
+    if not trained_char_index:
+        print('\n-------Creating character set...')
+        all_text = ''.join(texts)
 
-    chars = set(all_text)
-    print('Total Chars: %i' % len(chars))
-    char_index = dict((char, i) for i, char in enumerate(chars))
+        chars = set(all_text)
+        print('Total Chars: %i' % len(chars))
+        char_index = dict((char, i) for i, char in enumerate(chars))
+    else:
+        char_index = trained_char_index
 
     # Matrix of -1 because char_index can be both 0 and -1
     formatted_data = np.ones((len(texts), MAX_SEQUENCE_LENGTH), dtype=np.int64) * -1
@@ -40,11 +43,11 @@ def format_dataset_char_level(texts, labels, metadata, split=True):
     for i, tweet in enumerate(texts):
         for j, char in enumerate(tweet):
             if j < MAX_SEQUENCE_LENGTH:
-                formatted_data[i, j] = char_index[char]
-                # data[i, MAX_SEQUENCE_LENGTH-1-j] = char_index[char]  # Input reversed
+                if char in char_index:
+                    formatted_data[i, j] = char_index[char]
 
     # Training data
-    if split:
+    if not trained_char_index:
         # split the data into a training set and a validation set
         x_train, y_train, meta_train, x_val, y_val, meta_val = split_dataset(formatted_data, labels, metadata)
 
@@ -63,31 +66,6 @@ def format_dataset_char_level(texts, labels, metadata, split=True):
     # Test data
     else:
         return formatted_data, labels
-
-
-def _create_index_sequences_and_categorical_labels(texts, labels, char_index):
-    # Matrix of -1 because char_index can be both 0 and -1
-    data = np.ones((len(texts), MAX_SEQUENCE_LENGTH), dtype=np.int64) * -1
-
-    labels = to_categorical(np.asarray(labels))  # convert to one-hot label vectors
-
-    print('Shape of data tensor:', data.shape)
-    print('Shape of label tensor:', labels.shape)
-
-    for i, tweet in enumerate(texts):
-        for j, char in enumerate(tweet):
-            if j < MAX_SEQUENCE_LENGTH:
-                data[i, j] = char_index[char]
-                # data[i, MAX_SEQUENCE_LENGTH-1-j] = char_index[char]  # Input reversed
-
-    return data, labels
-
-    # # split the data into a training set and a validation set
-    # x_train, y_train, meta_train, x_val, y_val, meta_val, x_test, y_test, meta_test = split_dataset_val_test(data,
-    #                                                                                                          labels,
-    #                                                                                                          metadata)
-    #
-    # return x_train, y_train, meta_train, x_val, y_val, meta_val, x_test, y_test, meta_test, char_index
 
 
 

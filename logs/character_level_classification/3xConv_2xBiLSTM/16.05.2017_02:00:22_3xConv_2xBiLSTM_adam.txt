@@ -1,0 +1,75 @@
+Training_log - 16/05/2017 02:00:22
+
+Model name: 3xConv_2xBiLSTM
+Elapsed training time: 0h:45m:23s
+
+Training set size: 586620
+Validation set size: 65179
+Validation set fraction: 0.098083
+Test set fraction: 0.019152
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 50
+Max sequence length: 100
+
+-----------Training statistics-----------
+        acc      loss   val_acc  val_loss
+0  0.539535  0.690162  0.540726  0.689846
+1  0.539586  0.690051  0.540726  0.689893
+2  0.539559  0.690041  0.540726  0.689828
+3  0.539598  0.690040  0.540726  0.689861
+4  0.539552  0.690051  0.540726  0.689852
+5  0.539564  0.690041  0.540726  0.689887
+
+Validation PRF
+            Female          Male  Overall Macro  Overall Micro
+Precision      0.0      0.540726       0.270363       0.540726
+Recall         0.0      1.000000       0.500000       0.540726
+F-score        0.0      0.701911       0.350955       0.540726
+Support    29935.0  35244.000000            NaN            NaN
+
+--------------Test results---------------
+loss: 0.698090 acc: 0.482600
+
+Test PRF
+           Female         Male  Overall Macro  Overall Micro
+Precision     0.0     0.482596       0.241298       0.482596
+Recall        0.0     1.000000       0.500000       0.482596
+F-score       0.0     0.651015       0.325507       0.482596
+Support    6585.0  6142.000000            NaN            NaN
+
+--------------Model Diagram---------------
+      InputLayer (None, 100)           InputLayer (None, 100)     
+          Lambda (None, 100, 77)           Lambda (None, 100, 77) 
+          Conv1D (None, 96, 256)           Conv1D (None, 96, 256) 
+         Dropout (None, 96, 256)          Dropout (None, 96, 256) 
+    MaxPooling1D (None, 48, 256)     MaxPooling1D (None, 48, 256) 
+          Conv1D (None, 46, 256)           Conv1D (None, 46, 256) 
+         Dropout (None, 46, 256)          Dropout (None, 46, 256) 
+    MaxPooling1D (None, 23, 256)     MaxPooling1D (None, 23, 256) 
+          Conv1D (None, 21, 256)           Conv1D (None, 21, 256) 
+         Dropout (None, 21, 256)          Dropout (None, 21, 256) 
+    MaxPooling1D (None, 10, 256)     MaxPooling1D (None, 10, 256) 
+            LSTM (None, 256)                 LSTM (None, 256)     
+                 \______________________________/                 
+                                |                                 
+                           Merge (None, 512)                      
+                         Dropout (None, 512)                      
+                           Dense (None, 128)                      
+                         Dropout (None, 128)                      
+                           Dense (None, 2)                        
+
+
+Model information:
+=========================================
+ LSTM dropout = 0.2, 0.2
+Extra information:
+=========================================
+ Remove stopwords True
+ Lemmatize False
+ Remove punctuation False
+ Remove emoticons False
+ All Internet terms are replaced with tagsRemoved 3449 tweets because they were shorter than threshold
