@@ -23,9 +23,8 @@ import keras.backend.tensorflow_backend as k_tf
 from helpers.model_utils import load_and_evaluate, load_and_predict
 
 from document_level_classification.constants import PREDICTION_TYPE as DOC_PREDICTION_TYPE
-from document_level_classification.models import get_ann_model
-    #get_2048_1024_512, get_4096_2048_1024_512, get_1024_512, \
-    #get_logistic_regression, get_512_256_128
+from document_level_classification.models import get_ann_model, get_logistic_regression
+
 from document_level_classification.train import train as document_trainer
 from document_level_classification.dataset_formatting import format_dataset_doc_level
 
@@ -195,17 +194,14 @@ def char_main(operation, trained_model_path=None):
 
 def document_main():
     # Load dataset
-    from document_level_classification.constants import Log_Reg
-    categorical = True
-    if Log_Reg:
-        categorical = False
+    from document_level_classification.constants import Log_Reg, TEST_DATA_DIR
 
     # Train and Validation
     texts, labels, metadata, labels_index = prepare_dataset(DOC_PREDICTION_TYPE)
 
     # This is the Test datset from Kaggle
     texts_test, labels_test, metadata_test, labels_index_test = prepare_dataset(DOC_PREDICTION_TYPE,
-                                                                                folder_path="../data/test/")
+                                                                                folder_path=TEST_DATA_DIR)
 
     # Clean texts with parser
     parser = Parser()
@@ -236,15 +232,12 @@ def document_main():
     input_size = data['x_train'].shape[1]
     output_size = data['y_train'].shape[1]
 
-    # document_trainer(*get_2048_1024_512(input_size, output_size), data=data)
-    # document_trainer(*get_4096_2048_1024_512(input_size, output_size), data=data)
-    # document_trainer(*get_1024_512(input_size, output_size), data=data)
-    document_trainer(*get_ann_model(input_size, output_size), data=data)
+    if not Log_Reg:
+        document_trainer(*get_ann_model(input_size, output_size), data=data)
 
     # Logistic Regression
-    # output_size = data['y_train'].shape[1]
-    # print("Output Size Log_Reg: ", output_size)
-    # document_trainer(*get_logistic_regression(input_size, output_size), data=data)
+    if Log_Reg:
+        document_trainer(*get_logistic_regression(input_size, output_size), data=data)
 
 
 def char_word_main():
@@ -298,7 +291,7 @@ if __name__ == '__main__':
 
     # Train all models in word main
     """ WORD MODEL """
-    word_main(operation=TRAIN)
+    #word_main(operation=TRAIN)
 
     # Train char-word models in char word main
     # char_word_main()

@@ -1,4 +1,4 @@
-
+from helpers.global_constants import TEST_DATA_DIR
 # Prediction type
 GENDER = 'gender'
 AGE = 'age'
@@ -11,6 +11,7 @@ PREDICTION_TYPE = GENDER
 # Log directory
 LOGS_DIR = '../logs/document_level_classification'
 MODEL_DIR = '../models/document_level_classification'
+TEST_DATA_DIR = TEST_DATA_DIR
 
 # Autoencoder
 DIM_REDUCTION = False
@@ -22,7 +23,7 @@ if not DIM_REDUCTION:
 #############################################
 # Model (TUNING PARAMETERS HERE!)
 MODEL_TYPE = "base" # set TYPE = "" when not using "base"
-LAYERS = [512]
+LAYERS = [1]
 # Regularization
 DROPOUT = 0
 L1 = 0
@@ -32,6 +33,7 @@ L2 = 0
 FEATURE_MODEL = C_BAG_OF_WORDS
 MAX_FEATURE_LENGTH = 10000
 N_GRAM = (1, 1)
+
 
 ###############################################
 # Standard!
