@@ -24,13 +24,16 @@ class Parser:
         self.tknzr = TweetTokenizer()
         self.lemmatizer = WordNetLemmatizer()
 
-    def replace_all(self, texts):
+    def lowercase(self, texts):
+        modified_texts = [t.lower() for t in texts]  # Lower_case
+        return modified_texts
+
+    def replace_all_twitter_syntax_tokens(self, texts):
         # Raise error if texts not lists
         if type(texts) is not list:
             raise Exception("Parser must be passed a list of texts")
 
-        modified_texts = [t.lower() for t in texts]  # Lower_case
-        modified_texts = self.replace(modified_texts, url=URL_REPLACE, pic=PIC_REPLACE, mention=MENTION_REPLACE, hashtag=HASHTAG_REPLACE)
+        modified_texts = self.replace(texts, url=URL_REPLACE, pic=PIC_REPLACE, mention=MENTION_REPLACE, hashtag=HASHTAG_REPLACE)
 
         print("Replacing Internet terms and lowercasing - Done")
         return modified_texts
@@ -82,7 +85,6 @@ class Parser:
 
             modified_texts.append(content)
 
-        modified_texts = [t.lower() for t in modified_texts]  # Lower_case
         return modified_texts
 
     def replace_urls(self, texts):
@@ -139,16 +141,21 @@ class Parser:
     def remove_punctuation(self, texts):
         new_texts = []
         for t in texts:
+            EMOTICON_ID = "EMO1231298736"
+            #print("Before: ", t)
             emoticons_in_t = re.findall('(?::|;|=)(?:-)?(?:\)|\(|D|P)|(?:<3)', t)
-            t = re.sub('(?::|;|=)(?:-)?(?:\)|\(|D|P)|(?:<3)', "EMO", t)
+            t = re.sub('(?::|;|=)(?:-)?(?:\)|\(|D|P)|(?:<3)', EMOTICON_ID, t)
             t = ' '.join(word.strip(string.punctuation) for word in t.split())
             new_t = []
+            #print("AFTER: ", t)
             for word in t.split():
-                if word == "EMO":
+                if word == EMOTICON_ID:
                     word = emoticons_in_t[0]
                     del emoticons_in_t[0]
                 new_t.append(word)
             new_texts.append(' '.join(new_t))
+
+        print("Removing punctuations - Done")
         return new_texts
 
     def remove_emoticons(self, texts):
@@ -157,6 +164,7 @@ class Parser:
             t = re.sub('(?::|;|=)(?:-)?(?:\)|\(|D|P)|(?:<3)', "", t)
             new_texts.append(t)
         return new_texts
+
     def generate_character_vocabulary(self, texts):
         pass
 

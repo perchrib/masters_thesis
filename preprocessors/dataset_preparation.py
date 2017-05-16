@@ -30,7 +30,7 @@ def prepare_dataset(prediction_type, folder_path=TRAIN_DATA_DIR, gender=None):
     foreign_tweets = 0
 
     print("\n------Parsing %s files.." % folder_path)
-    for sub_folder_name in sorted(list(os.listdir(folder_path))):
+    for sub_folder_name in sorted(filter(lambda x: ".DS" not in x, list(os.listdir(folder_path)))):
         sub_folder_path = os.path.join(folder_path, sub_folder_name)
         tweet_count = 0
         for file_name in sorted(os.listdir(sub_folder_path)):

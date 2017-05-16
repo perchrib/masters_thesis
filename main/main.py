@@ -15,7 +15,6 @@ from character_level_classification.train import train as c_train
 from character_level_classification.models import *
 from character_level_classification.model_sent import get_char_model_3xConv_Bi_lstm_sent
 
-
 from word_embedding_classification.dataset_formatting import format_dataset_word_level
 from word_embedding_classification.constants import PREDICTION_TYPE as w_PREDICTION_TYPE, MODEL_DIR as w_MODEL_DIR
 from word_embedding_classification.train import train as w_train, get_embedding_layer
@@ -25,16 +24,16 @@ import keras.backend.tensorflow_backend as k_tf
 from helpers.model_utils import load_and_evaluate, load_and_predict
 
 from document_level_classification.constants import PREDICTION_TYPE as DOC_PREDICTION_TYPE
-from document_level_classification.models import get_2048_1024_512, get_4096_2048_1024_512, get_1024_512,\
-    get_logistic_regression, get_512_256_128
+from document_level_classification.models import get_ann_model
+    #get_2048_1024_512, get_4096_2048_1024_512, get_1024_512, \
+    #get_logistic_regression, get_512_256_128
 from document_level_classification.train import train as document_trainer
 from document_level_classification.dataset_formatting import format_dataset_doc_level
 
 from char_word_combined.models import get_cw_model
 from char_word_combined.train import train as cw_train
 
-
-TRAIN = "train"
+TRAIN = "txt"
 TEST = "test"
 
 
@@ -84,7 +83,7 @@ def word_main(operation, trained_model_path=None):
         embedding_layer = get_embedding_layer(data['word_index'])
         num_output_nodes = len(labels_index)
 
-        # ------- Insert models to train here -----------
+        # ------- Insert models to txt here -----------
         # Remember star before model getter
         # w_train(*get_word_model_2x512_256_lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=True)
 
@@ -107,7 +106,6 @@ def word_main(operation, trained_model_path=None):
 
 
 def char_main(operation, trained_model_path=None):
-
     rem_stopwords = False
     lemmatize = False
     rem_punctuation = False
@@ -153,22 +151,24 @@ def char_main(operation, trained_model_path=None):
     num_output_nodes = len(labels_index)
     #
     # Remove empty tweets after pre-processing
-    train_texts, train_labels, train_metadata = remove_texts_shorter_than_threshold(train_texts, train_labels, train_metadata)
+    train_texts, train_labels, train_metadata = remove_texts_shorter_than_threshold(train_texts, train_labels,
+                                                                                    train_metadata)
     test_texts, test_labels, test_metadata = remove_texts_shorter_than_threshold(test_texts, test_labels,
-                                                                                    test_metadata)
+                                                                                 test_metadata)
 
     if operation == TRAIN:
-        # ------- Insert models to train here -----------
+        # ------- Insert models to txt here -----------
         # Remember star before model getter
         # c_train(*get_char_model_3xConv_2xBiLSTM(num_output_nodes, num_chars), data=data)
         # c_train(*get_char_model_BiLSTM_full(num_output_nodes, num_chars), data=data)
-        #c_train(*get_char_model_3xConv(num_output_nodes), data=data)
-        #c_train(*get_char_model_3xConv_LSTM(num_output_nodes, num_chars), data=data)
+        # c_train(*get_char_model_3xConv(num_output_nodes), data=data)
+        # c_train(*get_char_model_3xConv_LSTM(num_output_nodes, num_chars), data=data)
         # c_train(*get_char_model_3xConv_4xBiLSTM(num_output_nodes, num_chars), data=data)
 
         # c_train(*get_char_model_2xConv_BiLSTM(num_output_nodes, num_chars), data=data)
 
-        c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=True, extra_info=extra_info)
+        c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=True,
+                extra_info=extra_info)
         # c_train(*get_char_model_Conv_BiLSTM_2(num_output_nodes, num_chars), data=data, save_model=False)
         # c_train(*get_char_model_Conv_BiLSTM_3(num_output_nodes, num_chars), data=data, save_model=True)
         # c_train(*get_char_model_Conv_BiLSTM_mask(num_output_nodes, num_chars), data=data, save_model=False,
@@ -198,20 +198,38 @@ def document_main():
     if Log_Reg:
         categorical = False
 
+    # Train and Validation
     texts, labels, metadata, labels_index = prepare_dataset(DOC_PREDICTION_TYPE)
+
+    # This is the Test datset from Kaggle
+    texts_test, labels_test, metadata_test, labels_index_test = prepare_dataset(DOC_PREDICTION_TYPE,
+                                                                                folder_path="../data/test/")
 
     # Clean texts with parser
     parser = Parser()
     print("Remove Stopwords...")
     texts = parser.remove_stopwords(texts)
+    texts_test = parser.remove_stopwords(texts_test)
     print("Parsing Twitter Specific Syntax...")
-    texts = parser.replace_all(texts)
-
+    texts = parser.replace_all_twitter_syntax_tokens(texts)
+    texts_test = parser.replace_all_twitter_syntax_tokens(texts_test)
     data = {}
     # Create format_dataset_tfidf
+
     print("Format Dataset to Document Level")
-    data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], \
-    data['meta_val'], data['x_test'], data['y_test'], data['meta_test'] = format_dataset_doc_level(texts, labels, metadata, categorical=categorical)
+    data['x_train'], data['y_train'], data['meta_train'], \
+    data['x_val'], data['y_val'], data['meta_val'], \
+    feature_model, reduction_model = format_dataset_doc_level(texts,
+                                                              labels,
+                                                              metadata,
+                                                              is_test=False)
+
+    data['x_test'], data['y_test'], data['meta_test'] = format_dataset_doc_level(texts_test,
+                                                                                 labels_test,
+                                                                                 metadata_test,
+                                                                                 is_test=True,
+                                                                                 feature_model=feature_model,
+                                                                                 reduction_model=reduction_model)
 
     input_size = data['x_train'].shape[1]
     output_size = data['y_train'].shape[1]
@@ -219,7 +237,7 @@ def document_main():
     # document_trainer(*get_2048_1024_512(input_size, output_size), data=data)
     # document_trainer(*get_4096_2048_1024_512(input_size, output_size), data=data)
     # document_trainer(*get_1024_512(input_size, output_size), data=data)
-    document_trainer(*get_512_256_128(input_size, output_size), data=data)
+    document_trainer(*get_ann_model(input_size, output_size), data=data)
 
     # Logistic Regression
     # output_size = data['y_train'].shape[1]
@@ -233,18 +251,22 @@ def char_word_main():
 
     # Clean texts
     text_parser = Parser()
-    texts = text_parser.replace_all(texts)
+    texts = text_parser.lowercase(texts)
+    texts = text_parser.replace_all_twitter_syntax_tokens(texts)
     texts = text_parser.remove_stopwords(texts)
     # texts = text_parser.replace_urls(texts)
 
     # Format for character model
     c_data = {}
-    c_data['x_train'], c_data['y_train'], c_data['meta_train'], c_data['x_val'], c_data['y_val'], c_data['meta_val'], c_data[
-        'x_test'], c_data['y_test'], c_data['meta_test'], c_data['char_index'] = format_dataset_char_level(texts, labels,
-                                                                                                     metadata)
+    c_data['x_train'], c_data['y_train'], c_data['meta_train'], c_data['x_val'], c_data['y_val'], c_data['meta_val'], \
+    c_data[
+        'x_test'], c_data['y_test'], c_data['meta_test'], c_data['char_index'] = format_dataset_char_level(texts,
+                                                                                                           labels,
+                                                                                                           metadata)
     # Format for word model
     w_data = {}
-    w_data['x_train'], w_data['y_train'], w_data['meta_train'], w_data['x_val'], w_data['y_val'], w_data['meta_val'], w_data[
+    w_data['x_train'], w_data['y_train'], w_data['meta_train'], w_data['x_val'], w_data['y_val'], w_data['meta_val'], \
+    w_data[
         'x_test'], w_data['y_test'], w_data['meta_test'], w_data[
         'word_index'] = format_dataset_word_level(texts, labels,
                                                   metadata)
@@ -255,22 +277,22 @@ def char_word_main():
 
     extra_info = []
 
-    cw_train(*get_cw_model(embedding_layer, num_output_nodes, num_chars), c_data=c_data, w_data=w_data, save_model=True, extra_info=extra_info)
+    cw_train(*get_cw_model(embedding_layer, num_output_nodes, num_chars), c_data=c_data, w_data=w_data, save_model=True,
+             extra_info=extra_info)
 
 
 if __name__ == '__main__':
-
     # For more conservative memory usage
     tf_config = k_tf.tf.ConfigProto()
     tf_config.gpu_options.allow_growth = True
     k_tf.set_session(k_tf.tf.Session(config=tf_config))
 
     # Train all models in character main
-    char_main(operation=TRAIN)
+    # char_main(operation=TRAIN)
 
     # Train all models in doc main
     """ DOCUMENT MODEL """
-    # document_main()
+    document_main()
 
     # Train all models in word main
     """ WORD MODEL """
@@ -285,4 +307,3 @@ if __name__ == '__main__':
 
     # char_main(operation=TEST, trained_model_path="Conv_BiLSTM/27.04.2017_21:07:34_Conv_BiLSTM_adam_31_0.70.h5")
     # word_main(operation=TEST, trained_model_path="Conv_BiLSTM/28.04.2017_18:59:55_Conv_BiLSTM_adam_{epoch:02d}_{val_acc:.4f}.h5")
-

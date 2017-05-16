@@ -6,11 +6,14 @@ from preprocessors.parser import Parser
 from nltk.corpus import stopwords
 import nltk
 from nltk.tag import map_tag
+from nltk.sentiment.vader import SentimentIntensityAnalyzer as SIA
+
 
 class Characteristics():
     """
     :param texts, a list of texts, each text is an element in the list
     """
+
     def __init__(self, texts):
         self.tokens = word_tokenize(texts)
         self.token_count = Counter(self.tokens)
@@ -52,6 +55,7 @@ def most_common(counter, n_freq):
     most_common_counter = Counter({k: v for k, v in counter.iteritems() if k in common_tokens})
     return most_common_counter
 
+
 def emoticon_counter(tokens):
     """
     :param tokens: list of tokens 
@@ -59,6 +63,7 @@ def emoticon_counter(tokens):
     """
     emoticons = re.findall('(?::|;|=)(?:-)?(?:\)|\(|D|P)|(?:<3)', " ".join(tokens))
     return Counter(emoticons)
+
 
 def tag_counter(tokens, tag):
     """
@@ -68,6 +73,7 @@ def tag_counter(tokens, tag):
     """
     tags = [t for t in tokens if t.startswith(tag) and len(t) > 1]
     return Counter(tags)
+
 
 def twitter_syntax_token_counter(texts, emoticon_count=None):
     parser = Parser()
@@ -89,10 +95,10 @@ def twitter_syntax_token_counter(texts, emoticon_count=None):
 def clean_text(texts):
     parser = Parser()
     clean_texts = parser.remove_stopwords(texts)
-    clean_texts = parser.replace_all(clean_texts)
+    clean_texts = parser.lowercase(clean_texts)
+    clean_texts = parser.replace_all_twitter_syntax_tokens(clean_texts)
     clean_tokens = word_tokenize(clean_texts)
     return clean_tokens
-
 
 
 def length_of_texts_counter(texts):
@@ -101,7 +107,6 @@ def length_of_texts_counter(texts):
     length_of_texts_chars = [len(text) for text in parsed_texts]
     length_of_texts_words = [len(text.split()) for text in parsed_texts]
     return Counter(length_of_texts_chars), Counter(length_of_texts_words)
-
 
 
 def unequal_token_count(dist_1, dist_2, n_frequent_tokens=None):
@@ -158,6 +163,52 @@ def pos_tag_counter(tokens, simple_pos_tags=True):
         ordinary_tags = [(word, tag) for word, tag in postags]
         pos_tag_counts = Counter([tag for word, tag in ordinary_tags])
     return pos_tag_counts
+
+
+def sentiment_tweet_counter(texts):
+    analyzer = SIA()
+    sentiment_counts = []
+    for t in texts:
+        result = analyzer.polarity_scores(t)
+        if is_equals(result):
+            sentiment_counts.append('neu')
+        else:
+            result['compound'] = -1
+            sentiment_counts.append(max(result, key=result.get))
+    return Counter(sentiment_counts)
+
+
+def is_equals(results):
+    del results['compound']
+    if 0 in set(results.values()):
+        return True
+    return False
+
+
+def sentiment_word_counter(texts):
+    pos_word_count = []
+    neg_word_count = []
+    neu_word_count = []
+    all_words = word_tokenize(texts)
+    analyzer = SIA()
+    for w in all_words:
+        if len(w) < 2:
+            continue
+        result = analyzer.polarity_scores(w)
+        result['compound'] = -1
+        sentiment_result = max(result, key=result.get)
+
+        if sentiment_result == "pos":
+            pos_word_count.append(w)
+        elif sentiment_result == "neg":
+            neg_word_count.append(w)
+        elif sentiment_result == "neu":
+            neu_word_count.append(w)
+    return Counter(pos_word_count), Counter(neg_word_count), Counter(neu_word_count)
+
+
+
+
 
 
 

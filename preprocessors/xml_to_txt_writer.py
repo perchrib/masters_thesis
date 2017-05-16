@@ -12,7 +12,7 @@ from helpers.helper_functions import get_time_format
 __author__ = "Per Berg"
 
 XML_DIR = "../data/xml/"
-TXT_DIR = "../data/train/"
+TXT_DIR = "../data/txt/"
 
 __dirs__ = [os.path.join(XML_DIR, "pan14-author-profiling-training-dataset-english-xml/"),
             os.path.join(XML_DIR, "pan15-author-profiling-training-dataset-english-xml/"),

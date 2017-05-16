@@ -132,7 +132,7 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, opti
         log_file.write(pd.DataFrame(history).__repr__())
 
         if prf_val:
-            log_file.write("\n\nValidation PRF")
+            log_file.write("\n\nValidation PRF\n")
             prf_val_df = pd.DataFrame(data=prf_val, index=pd.Index(["Precision", "Recall", "F-score", "Support"]))
             log_file.write(pd.DataFrame(prf_val_df).__repr__())
 
@@ -143,7 +143,7 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, opti
             log_file.write(" %s: %f" % (model.metrics_names[1], round(test_results[1], 5)))  # accuracy
 
         if prf_test:
-            log_file.write("\n\nTest PRF")
+            log_file.write("\n\nTest PRF\n")
             prf_test_df = pd.DataFrame(data=prf_test, index=pd.Index(["Precision", "Recall", "F-score", "Support"]))
             log_file.write(pd.DataFrame(prf_test_df).__repr__())
 
