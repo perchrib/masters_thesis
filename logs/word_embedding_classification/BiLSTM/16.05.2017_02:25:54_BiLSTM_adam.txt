@@ -1,0 +1,70 @@
+Training_log - 16/05/2017 02:25:54
+
+Model name: BiLSTM
+Elapsed training time: 60.0718405843
+
+Training set size: 586620
+Validation set size: 65179
+Validation set fraction: 0.098083
+Test set fraction: 0.019152
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 50
+Max sequence length: 15
+
+-----------Training statistics-----------
+        acc      loss   val_acc  val_loss
+0  0.607086  0.699381  0.619970  0.657435
+1  0.610579  0.664109  0.619908  0.658592
+2  0.611975  0.663452  0.620936  0.654543
+3  0.613680  0.662307  0.624005  0.654807
+4  0.615501  0.661285  0.625416  0.654395
+5  0.616362  0.660373  0.626091  0.650129
+6  0.617146  0.660095  0.625017  0.651951
+7  0.618414  0.659734  0.626107  0.655526
+8  0.619041  0.659532  0.627671  0.655492
+
+Validation PRF
+                 Female          Male  Overall Macro  Overall Micro
+Precision      0.613082      0.636783       0.624932       0.627671
+Recall         0.513179      0.724918       0.619048       0.627671
+F-score        0.558699      0.677998       0.618349       0.627671
+Support    29935.000000  35244.000000            NaN            NaN
+
+--------------Test results---------------
+loss: 0.679340 acc: 0.604540
+
+Test PRF
+                Female         Male  Overall Macro  Overall Micro
+Precision     0.638919     0.577650       0.608284       0.604542
+Recall        0.541989     0.671605       0.606797       0.604542
+F-score       0.586476     0.621095       0.603785       0.604542
+Support    6585.000000  6142.000000            NaN            NaN
+
+--------------Model Diagram---------------
+      InputLayer (None, 15)            InputLayer (None, 15)      
+       Embedding (None, 15, 200)        Embedding (None, 15, 200) 
+            LSTM (None, 256)                 LSTM (None, 256)     
+                 \______________________________/                 
+                                |                                 
+                           Merge (None, 512)                      
+                         Dropout (None, 512)                      
+                           Dense (None, 2)                        
+
+
+Model information:
+=========================================
+ LSTM dropout: 0.200000, LSTM recurrent dropout 0.200000
+ Merge dropout 0.200000
+ L2 Regularizer used
+Extra information:
+=========================================
+ Remove stopwords True
+ Lemmatize False
+ Remove punctuation False
+ Remove emoticons False
+ All Internet terms are replaced with tags
+ Removed 3449 tweet because they were shorter than threshold

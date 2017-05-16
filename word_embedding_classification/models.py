@@ -164,13 +164,13 @@ def get_word_model_Conv_BiLSTM(embedding_layer, nb_output_nodes):
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
     embedding = embedding_layer(tweet_input)
 
-    kernel_size = 4  # TODO: Change kernel size
+    kernel_size = 4  # TODO: Kernel size is 4
     filters = 1024
     pool_length = 2
     conv_dropout = 0.5
     lstm_drop = 0.2
     lstm_drop_rec = 0.2
-    dense_drop = 0.2
+    dense_drop = 0.3
 
     embedding = Conv1D(filters=filters,
                        kernel_size=kernel_size,
@@ -180,14 +180,13 @@ def get_word_model_Conv_BiLSTM(embedding_layer, nb_output_nodes):
     embedding = Dropout(conv_dropout)(embedding)
     embedding = MaxPooling1D(pool_length=pool_length)(embedding)
 
-    forward = LSTM(256, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu')(
+    # TODO: num neurons is 150
+    forward = LSTM(150, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu')(
         embedding)
-    backward = LSTM(256, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu',
+    backward = LSTM(150, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu',
                     go_backwards=True)(embedding)
 
     output = merge([forward, backward], mode='concat', concat_axis=-1)
-    # output = Dropout(dense_drop)(output)
-    # output = Dense(128, activation='relu')(output)  # TODO: Remove or keep?
     output = Dropout(dense_drop)(output)
     output = Dense(nb_output_nodes, activation='softmax')(output)
     model = Model(input=tweet_input, output=output, name='Conv_BiLSTM')

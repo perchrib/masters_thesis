@@ -165,9 +165,6 @@ def char_main(operation, trained_model_path=None):
     data = format_dataset_char_level(train_texts, train_labels, train_metadata)
     data['x_test'], data['y_test'] = format_dataset_char_level(test_texts, test_labels, test_metadata, trained_char_index=data['char_index'])
 
-    # TODO: REmove
-    print(len(data['x_test']), data['x_test'][0])
-
     num_chars = len(data['char_index'])
     num_output_nodes = len(labels_index)
 
@@ -181,14 +178,14 @@ def char_main(operation, trained_model_path=None):
 
         # c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=True, extra_info=extra_info)
 
-        c_train(*get_char_model_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False,
-                extra_info=extra_info)
+        # c_train(*get_char_model_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False,
+        #         extra_info=extra_info)
 
         # c_train(*get_char_model_512lstm(num_output_nodes, num_chars), data=data, save_model=False,
         #         extra_info=extra_info)
 
-        # c_train(*get_char_model_2x512lstm(num_output_nodes, num_chars), data=data, save_model=False,
-        #         extra_info=extra_info)
+        c_train(*get_char_model_2x512lstm(num_output_nodes, num_chars), data=data, save_model=False,
+                extra_info=extra_info)
 
 
     elif operation == TEST:

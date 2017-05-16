@@ -100,7 +100,7 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, opti
     if not os.path.exists((os.path.join(log_dir, model.name))):
         os.makedirs((os.path.join(log_dir, model.name)))
 
-    file_name = time.strftime("%d.%m.%Y_%H:%M:%S") + "_" + model.name + "_" + optimizer + ".txt"
+    file_name = time.strftime("%d.%m.%Y_%H:%M:%S") + "_" + model.name + ".txt"
 
     print("Writing log file - %s..." % file_name)
 

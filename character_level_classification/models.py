@@ -228,7 +228,7 @@ def get_char_model_Conv_BiLSTM(num_output_nodes, char_num, params=None):
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
     embedding = get_one_hot_layer(tweet_input, char_num)
 
-    kernel_size = 5
+    kernel_size = 4
     filters = 1024
     pool_length = 2
     conv_dropout = 0.5
@@ -252,7 +252,7 @@ def get_char_model_Conv_BiLSTM(num_output_nodes, char_num, params=None):
 
     output = merge([forward, backward], mode='concat', concat_axis=-1)
     output = Dropout(dense_drop1)(output)
-    output = Dense(128, activation='relu')(output)
+    # output = Dense(128, activation='relu')(output)
     output = Dropout(dense_drop2)(output)
     output = Dense(num_output_nodes, activation='softmax')(output)
     model = Model(input=tweet_input, output=output, name='Conv_BiLSTM')

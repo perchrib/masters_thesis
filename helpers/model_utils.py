@@ -14,13 +14,14 @@ import matplotlib.pyplot as plt
 
 
 def get_model_checkpoint(model_name, model_dir, model_optimizer):
-    if not os.path.exists(model_dir, model_name):
-        os.makedirs(os.path.join(model_dir, model_name))
+    dir_path = os.path.join(model_dir, model_name)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
 
     model_file_name = time.strftime(
         "%d.%m.%Y_%H:%M:%S") + "_" + model_name + "_" + model_optimizer + "_{epoch:02d}_{val_acc:.4f}.h5"
 
-    checkpoint = ModelCheckpoint(os.path.join(model_dir, model_name, model_file_name), save_best_only=True)
+    checkpoint = ModelCheckpoint(os.path.join(dir_path, model_file_name), save_best_only=True)
 
     return checkpoint
 
@@ -36,9 +37,9 @@ def save_trained_model(model, model_dir, model_optimizer):
     """
 
     print("Saving trained model")
-
-    if not os.path.exists(os.path.join(model_dir, model.name)):
-        os.makedirs(os.path.join(model_dir, model.name))
+    dir_path = os.path.join(model_dir, model.name)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
 
     # _{epoch:02d}_{val_acc:.4f}
     model_file_name = time.strftime(
