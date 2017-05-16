@@ -9,7 +9,7 @@ from nltk import sent_tokenize
 import numpy as np
 
 from preprocessors.language_detection import detect_language
-from helpers.global_constants import TRAIN_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT, TEST_DATA_DIR
+from helpers.global_constants import TRAIN_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT, TEST_DATA_DIR, TRAIN, TEST, REM_STOPWORDS, REM_EMOTICONS, REM_PUNCTUATION, LEMMATIZE
 from helpers.helper_functions import shuffle
 
 SEED = 1337
@@ -163,6 +163,57 @@ def display_dataset_statistics(texts):
     # print("Average number of characters per sentences: %f" % avg_char_per_sent)
 
 
+def filter_dataset(texts, labels, metadata, filters, train_or_test):
+    """
+    Filter dataset based on what's specified in filters dict
+    :param texts:
+    :param labels:
+    :param metadata:
+    :param filters: dict of values specifying what should be removed
+    :param train_or_test: Values= TRAIN or TEST. If TEST, short tweets are not removed
+    :return:
+    """
+
+
+    modified_texts = texts
+    modified_labels = labels
+    modified_metadata = metadata
+    count_removed = 0  # Stays zero unless removed for training set
+
+    # Clean texts
+    text_parser = Parser()
+    # Base filtering, which stays constant. No experiments with these
+    modified_texts = text_parser.lowercase(modified_texts)
+    modified_texts = text_parser.replace_all_twitter_syntax_tokens(modified_texts)
+
+    if filters[REM_STOPWORDS]:
+        modified_texts = text_parser.remove_stopwords(modified_texts)
+
+    if filters[REM_PUNCTUATION]:
+        modified_texts = text_parser.remove_punctuation(modified_texts)
+
+    if filters[LEMMATIZE]:
+        modified_texts = text_parser.lemmatize(modified_texts)
+
+    if filters[REM_EMOTICONS]:
+        modified_texts = text_parser.remove_emoticons(modified_texts)
+
+    # Remove short texts from training
+    if train_or_test == TRAIN:
+        modified_texts, modified_labels, modified_metadata, count_removed = text_parser.remove_texts_shorter_than_threshold(
+            modified_texts, modified_labels, modified_metadata)
+
+    # Extra parsing info for use in log
+    extra_info = ["Remove stopwords %s" % filters[REM_STOPWORDS],
+                  "Lemmatize %s" % filters[LEMMATIZE],
+                  "Remove punctuation %s" % filters[REM_PUNCTUATION],
+                  "Remove emoticons %s" % filters[REM_EMOTICONS],
+                  "All Internet terms are replaced with tags",
+                  "Removed %i tweet because they were shorter than threshold" % count_removed]
+
+    return modified_texts, modified_labels, modified_metadata, extra_info
+
+
 def display_gender_distribution(metadata):
 
     num_total = len(metadata)
@@ -178,7 +229,7 @@ if __name__ == '__main__':
     txts, labels, metadata, labels_index = prepare_dataset(GENDER)
     display_gender_distribution(metadata)
     parser = Parser()
-    txts = parser.replace_all(txts)  # Replace Internet terms and lowercase
+    txts = parser.replace_all_twitter_syntax_tokens(txts)  # Replace Internet terms and lowercase
     # txts = parser.remove_stopwords(txts)
     txts, labels, metadata = parser.remove_texts_shorter_than_threshold(txts, labels, metadata)
     # txts = parser.remove_emoticons(txts)

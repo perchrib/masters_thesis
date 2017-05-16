@@ -1,4 +1,5 @@
 import os
+from helpers.global_constants import REM_STOPWORDS, LEMMATIZE, REM_EMOTICONS, REM_PUNCTUATION
 # Prediction type
 GENDER = 'gender'
 AGE = 'age'
@@ -18,6 +19,13 @@ MAX_SEQUENCE_LENGTH = 100
 MAX_SENTENCE_LENGTH = 2  # Max number of sentences to consider when
 MAX_CHAR_SENT_LENGTH = 52
 
+# Filtering constants
+FILTERS = {
+    REM_STOPWORDS: True,
+    LEMMATIZE: False,
+    REM_PUNCTUATION: False,
+    REM_EMOTICONS: False
+}
 
 # Model
 MODEL_OPTIMIZER = 'adam'

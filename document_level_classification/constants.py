@@ -1,4 +1,4 @@
-
+from helpers.global_constants import REM_STOPWORDS, LEMMATIZE, REM_EMOTICONS, REM_PUNCTUATION
 # Prediction type
 GENDER = 'gender'
 AGE = 'age'
@@ -50,3 +50,12 @@ if Log_Reg:
 MODEL_METRICS = ['accuracy']
 NB_EPOCHS = 50
 BATCH_SIZE = 128
+
+
+# Filtering constants
+FILTERS = {
+    REM_STOPWORDS: True,
+    LEMMATIZE: False,
+    REM_PUNCTUATION: False,
+    REM_EMOTICONS: False
+}
