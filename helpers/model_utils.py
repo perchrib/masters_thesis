@@ -178,7 +178,41 @@ def get_argmax_classes(y_values):
 
     return np.asarray([np.argmax(confidence) for confidence in y_values])
 
-# if __name__ == '__main__':
-#     preds = [[0.4, 0.6], [0.7, 0.3], [0.8, 0.2]]
-#     y_pred = [np.argmax(x) for x in preds]
-#     create_and_plot_confusion_matrix([1, 1, 0], y_pred, ["Male", "Female"], normalize=False)
+
+def plot_models(log_path_list, metric):
+    """
+    
+    :param log_path_list: 
+    :param metric: 
+    :return: 
+    """
+
+    model_names = []
+
+    for path in log_path_list:
+        with open(path) as log_file:
+            eof = False  # End of file
+            while not eof:
+                line = log_file.readline()
+                if line == "":
+                    eof = True
+
+                # Model Name
+                elif line.startswith("Model name"):
+                    model_names.append(line.split(":")[1].strip())
+                    print(model_names)
+
+                elif "Training statistics" in line:
+                    log_file.readline()
+                    line = log_file.readline().split()
+                    line.pop()
+                    print(line)
+
+
+if __name__ == '__main__':
+    # preds = [[0.4, 0.6], [0.7, 0.3], [0.8, 0.2]]
+    # y_pred = [np.argmax(x) for x in preds]
+    # create_and_plot_confusion_matrix([1, 1, 0], y_pred, ["Male", "Female"], normalize=False)
+
+    paths = ['/Users/zlash/Dropbox/NTNU/Master/master/logs/character_level_classification/Conv_BiLSTM/18.05.2017_17:47:45_Conv_BiLSTM.txt']
+    plot_models(paths, 'val_loss')

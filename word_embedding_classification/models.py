@@ -218,7 +218,7 @@ def get_word_model_BiLSTM(embedding_layer, nb_output_nodes):
     model = Model(input=tweet_input, output=output, name='BiLSTM')
 
     model_info = ["LSTM dropout: %f, LSTM recurrent dropout %f" % (lstm_drop, lstm_drop_rec),
-                  "Merge dropout %f" % merge_drop, "No merge drop"]  # TODO: merge drop
+                  "Merge dropout %f" % merge_drop]  # TODO: merge drop
     return model, model_info
 
 
@@ -237,9 +237,9 @@ def get_word_model_2xBiLSTM(embedding_layer, nb_output_nodes):
                     go_backwards=True)(embedding)
 
     forward = LSTM(250, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu')(
-        embedding)
+        forward)
     backward = LSTM(250, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu',
-                    go_backwards=True)(embedding)
+                    go_backwards=True)(backward)
 
     encoding = merge([forward, backward], mode='concat', concat_axis=-1)
     encoding = Dropout(merge_drop)(encoding)

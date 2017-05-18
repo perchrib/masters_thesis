@@ -74,9 +74,9 @@ def word_main(operation, trained_model_path=None, manual_filters=None):
 
         # w_train(*get_word_model_3x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
 
-        # w_train(*get_word_model_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
-        w_train(*get_word_model_2xBiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info,
-                save_model=False)
+        w_train(*get_word_model_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+        # w_train(*get_word_model_2xBiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info,
+        #         save_model=False)
 
         # w_train(*get_word_model_3x512_128lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
         # w_train(*get_word_model_4x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
@@ -126,7 +126,9 @@ def char_main(operation, trained_model_path=None, manual_filters=None):
 
         # c_train(*get_char_model_2xConv_BiLSTM(num_output_nodes, num_chars), data=data, extra_info=extra_info)
 
-        c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False, extra_info=extra_info)
+        # c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False, extra_info=extra_info)
+
+        c_train(*get_char_model_Conv_2xBiLSTM(num_output_nodes, num_chars), data=data, save_model=False, extra_info=extra_info)
 
         # c_train(*get_char_model_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False,
         #         extra_info=extra_info)
@@ -303,12 +305,10 @@ if __name__ == '__main__':
     # Single word
     word_main(operation=TRAIN)
 
-    # Train char-word models in char word main
-    # char_word_main()
+
 
 
     # Load model and run test data on model
-
 
     # char_main(operation=TEST, trained_model_path="Conv_BiLSTM/27.04.2017_21:07:34_Conv_BiLSTM_adam_31_0.70.h5")
     # word_main(operation=TEST, trained_model_path="Conv_BiLSTM/28.04.2017_18:59:55_Conv_BiLSTM_adam_{epoch:02d}_{val_acc:.4f}.h5")

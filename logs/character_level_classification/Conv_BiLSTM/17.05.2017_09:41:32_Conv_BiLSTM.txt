@@ -101,7 +101,6 @@ Model information:
  Conv dropout: 0.500000
  Dense drop1 0.500000
  Dense drop2 0.200000
- No dense layer before softmax
 Extra information:
 =========================================
  Remove stopwords True

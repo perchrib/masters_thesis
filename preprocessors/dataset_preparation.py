@@ -9,7 +9,7 @@ from nltk import sent_tokenize
 import numpy as np
 
 from preprocessors.language_detection import detect_language
-from helpers.global_constants import TRAIN_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT, TEST_DATA_DIR, TRAIN, TEST, REM_STOPWORDS, REM_EMOTICONS, REM_PUNCTUATION, LEMMATIZE
+from helpers.global_constants import TRAIN_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT, TEST_DATA_DIR, TRAIN, TEST, REM_STOPWORDS, REM_EMOTICONS, REM_PUNCTUATION, LEMMATIZE, REM_INTERNET_TERMS
 from helpers.helper_functions import shuffle
 
 SEED = 1337
@@ -180,9 +180,14 @@ def filter_dataset(texts, labels, metadata, filters, train_or_test):
 
     # Clean texts
     text_parser = Parser()
+
     # Base filtering, which stays constant. No experiments with these
     modified_texts = text_parser.lowercase(modified_texts)
-    modified_texts = text_parser.replace_all_twitter_syntax_tokens(modified_texts)
+
+    if REM_INTERNET_TERMS in filters and REM_INTERNET_TERMS:  # Either remove Internet specific tokens or replace with tags
+        modified_texts = text_parser.remove_all_twitter_syntax_tokens(modified_texts)
+    else:
+        modified_texts = text_parser.replace_all_twitter_syntax_tokens(modified_texts)
 
     if filters[REM_STOPWORDS]:
         modified_texts = text_parser.remove_stopwords(modified_texts)

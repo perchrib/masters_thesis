@@ -37,6 +37,16 @@ class Parser:
         print("Replacing Internet terms and lowercasing - Done")
         return modified_texts
 
+    def remove_all_twitter_syntax_tokens(self, texts):
+        # Raise error if texts not lists
+        if type(texts) is not list:
+            raise Exception("Parser must be passed a list of texts")
+
+        modified_texts = self.replace(texts, url="", pic="", mention="", hashtag="")
+
+        print("Removing Internet terms and lowercasing - Done")
+        return modified_texts
+
     def clean_html(self, content):
         """
         Strips the input string from html code
@@ -86,8 +96,6 @@ class Parser:
 
         return modified_texts
 
-    def replace_urls(self, texts):
-        return self.replace(texts, url='U')
 
     def do_join(self, content):
         """
