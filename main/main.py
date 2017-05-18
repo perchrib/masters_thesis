@@ -74,7 +74,9 @@ def word_main(operation, trained_model_path=None, manual_filters=None):
 
         # w_train(*get_word_model_3x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
 
-        w_train(*get_word_model_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+        # w_train(*get_word_model_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+        w_train(*get_word_model_2xBiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info,
+                save_model=False)
 
         # w_train(*get_word_model_3x512_128lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
         # w_train(*get_word_model_4x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
@@ -279,8 +281,9 @@ if __name__ == '__main__':
          REM_PUNCTUATION: False}
     ]
 
-    for f in filter_list:
-        char_main(operation=TRAIN, manual_filters=f)
+    # Char ablation
+    # for f in filter_list:
+    #     char_main(operation=TRAIN, manual_filters=f)
 
     # Single char
     # char_main(operation=TRAIN)
@@ -292,12 +295,13 @@ if __name__ == '__main__':
 
     # Train all models in word main
     """ WORD MODEL """
+    # Word ablation
     # for f in filter_list:
     #     word_main(operation=TRAIN, manual_filters=f)
 
 
     # Single word
-    # word_main(operation=TRAIN)
+    word_main(operation=TRAIN)
 
     # Train char-word models in char word main
     # char_word_main()

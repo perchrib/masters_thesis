@@ -51,7 +51,7 @@ def train(model, model_info, data, save_model=False, extra_info=None):
                         verbose=1).history
 
     training_time = get_time_format(time() - start_time)
-    print('Training time: %i' % training_time)
+    print('Training time: %s' % training_time)
 
     # Compute prf for val set
     prf_val = get_precision_recall_f_score(model, data['x_val'], data['y_val'], PREDICTION_TYPE)

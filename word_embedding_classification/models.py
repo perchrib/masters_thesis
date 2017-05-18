@@ -205,20 +205,49 @@ def get_word_model_BiLSTM(embedding_layer, nb_output_nodes):
 
     lstm_drop = 0.5
     lstm_drop_rec = 0.2
-    merge_drop = 0.2
+    merge_drop = 0.5
 
-    forward = LSTM(200, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu')(
+    forward = LSTM(250, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu')(
         embedding)
-    backward = LSTM(200, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu',
+    backward = LSTM(250, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu',
                     go_backwards=True)(embedding)
 
     encoding = merge([forward, backward], mode='concat', concat_axis=-1)
-    # encoding = Dropout(merge_drop)(encoding)
+    encoding = Dropout(merge_drop)(encoding)
     output = Dense(nb_output_nodes, activation='softmax')(encoding)
     model = Model(input=tweet_input, output=output, name='BiLSTM')
 
     model_info = ["LSTM dropout: %f, LSTM recurrent dropout %f" % (lstm_drop, lstm_drop_rec),
                   "Merge dropout %f" % merge_drop, "No merge drop"]  # TODO: merge drop
+    return model, model_info
+
+
+
+def get_word_model_2xBiLSTM(embedding_layer, nb_output_nodes):
+    tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
+    embedding = embedding_layer(tweet_input)
+
+    lstm_drop = 0.5
+    lstm_drop_rec = 0.2
+    merge_drop = 0.5
+
+    forward = LSTM(250, return_sequences=True, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu')(
+        embedding)
+    backward = LSTM(250, return_sequences=True, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu',
+                    go_backwards=True)(embedding)
+
+    forward = LSTM(250, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu')(
+        embedding)
+    backward = LSTM(250, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu',
+                    go_backwards=True)(embedding)
+
+    encoding = merge([forward, backward], mode='concat', concat_axis=-1)
+    encoding = Dropout(merge_drop)(encoding)
+    output = Dense(nb_output_nodes, activation='softmax')(encoding)
+    model = Model(input=tweet_input, output=output, name='2xBiLSTM')
+
+    model_info = ["LSTM dropout: %f, LSTM recurrent dropout %f" % (lstm_drop, lstm_drop_rec),
+                  "Merge dropout %f" % merge_drop, "No merge drop"]
     return model, model_info
 
 

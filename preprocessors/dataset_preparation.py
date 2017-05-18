@@ -27,7 +27,6 @@ def prepare_dataset(prediction_type, folder_path=TRAIN_DATA_DIR, gender=None):
     labels_index = construct_labels_index(prediction_type)  # dictionary mapping label name to numeric id
     labels = []  # list of label ids
     metadata = []  # list of dictionaries with author information (age, gender)
-    foreign_tweets = 0
 
     print("\n------Parsing %s files.." % folder_path)
     for sub_folder_name in sorted(filter(lambda x: ".DS" not in x, list(os.listdir(folder_path)))):
@@ -56,7 +55,6 @@ def prepare_dataset(prediction_type, folder_path=TRAIN_DATA_DIR, gender=None):
         print("%i tweets in %s" % (tweet_count, sub_folder_name))
 
     print('\nFound %i texts.' % len(texts))
-    print('\nFound %i foreign tweets.' % foreign_tweets)
     return texts, labels, metadata, labels_index
 
 
