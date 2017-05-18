@@ -4,6 +4,7 @@ from keras.regularizers import l2, l1, l1_l2
 
 from word_embedding_classification.constants import PREDICTION_TYPE, MAX_SEQUENCE_LENGTH
 
+
 def get_word_model_3xsimple_lstm(embedding_layer, nb_output_nodes):
     model = Sequential(name="3xSimpleLSTM")
 
@@ -193,7 +194,8 @@ def get_word_model_Conv_BiLSTM(embedding_layer, nb_output_nodes):
 
     model_info = ["Kernel_size: %i" % kernel_size, "Filters: %i" % filters, "Pool length: %i" % pool_length,
                   "LSTM dropout: %f, LSTM recurrent dropout %f" % (lstm_drop, lstm_drop_rec),
-                  "Conv dropout: %f" % conv_dropout, "Dense dropout: %f" % dense_drop, "No dense layer before softmax"] # TODO: Update last info
+                  "Conv dropout: %f" % conv_dropout, "Dense dropout: %f" % dense_drop,
+                  "No dense layer before softmax"]  # TODO: Update last info
     return model, model_info
 
 
@@ -201,7 +203,7 @@ def get_word_model_BiLSTM(embedding_layer, nb_output_nodes):
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
     embedding = embedding_layer(tweet_input)
 
-    lstm_drop = 0.2
+    lstm_drop = 0.5
     lstm_drop_rec = 0.2
     merge_drop = 0.2
 
@@ -211,12 +213,14 @@ def get_word_model_BiLSTM(embedding_layer, nb_output_nodes):
                     go_backwards=True)(embedding)
 
     encoding = merge([forward, backward], mode='concat', concat_axis=-1)
-    encoding = Dropout(merge_drop)(encoding)
+    # encoding = Dropout(merge_drop)(encoding)
     output = Dense(nb_output_nodes, activation='softmax')(encoding)
     model = Model(input=tweet_input, output=output, name='BiLSTM')
 
-    model_info = ["LSTM dropout: %f, LSTM recurrent dropout %f" % (lstm_drop, lstm_drop_rec), "Merge dropout %f" % merge_drop]
+    model_info = ["LSTM dropout: %f, LSTM recurrent dropout %f" % (lstm_drop, lstm_drop_rec),
+                  "Merge dropout %f" % merge_drop, "No merge drop"]  # TODO: merge drop
     return model, model_info
+
 
 def get_word_model_3xConv_BiLSTM(embedding_layer, nb_output_nodes):
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')

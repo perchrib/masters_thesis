@@ -46,7 +46,7 @@ def word_main(operation, trained_model_path=None, manual_filters=None):
         filter_dataset(texts=train_texts,
                        labels=train_labels,
                        metadata=train_metadata,
-                       filters=w_FILTERS,
+                       filters=filters,
                        train_or_test=TRAIN)
     test_texts, test_labels, test_metadata, _ = \
         filter_dataset(texts=test_texts,
@@ -124,7 +124,7 @@ def char_main(operation, trained_model_path=None, manual_filters=None):
 
         # c_train(*get_char_model_2xConv_BiLSTM(num_output_nodes, num_chars), data=data, extra_info=extra_info)
 
-        c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=True, extra_info=extra_info)
+        c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False, extra_info=extra_info)
 
         # c_train(*get_char_model_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False,
         #         extra_info=extra_info)
@@ -240,7 +240,7 @@ if __name__ == '__main__':
 
     # Train all models in character main
 
-    ##ABLATION SETUP
+    #ABLATION SETUP
     filter_list = [
         # Lemmatize
         {REM_STOPWORDS: True,
@@ -270,11 +270,20 @@ if __name__ == '__main__':
         {REM_STOPWORDS: False,
          LEMMATIZE: False,
          REM_EMOTICONS: False,
+         REM_PUNCTUATION: False},
+
+        # Base
+        {REM_STOPWORDS: True,
+         LEMMATIZE: False,
+         REM_EMOTICONS: False,
          REM_PUNCTUATION: False}
     ]
 
     for f in filter_list:
         char_main(operation=TRAIN, manual_filters=f)
+
+    # Single char
+    # char_main(operation=TRAIN)
 
 
     # Train all models in doc main
@@ -285,6 +294,10 @@ if __name__ == '__main__':
     """ WORD MODEL """
     # for f in filter_list:
     #     word_main(operation=TRAIN, manual_filters=f)
+
+
+    # Single word
+    # word_main(operation=TRAIN)
 
     # Train char-word models in char word main
     # char_word_main()

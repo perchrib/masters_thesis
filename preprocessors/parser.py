@@ -128,10 +128,21 @@ class Parser:
         :return: lemmatized texts
         """
         lemmatized_texts = []
+        count = 0
         for t in texts:  # type: str
+            count += 1
             terms = word_tokenize(t)
             pos_tags = pos_tag(terms)  # POS-tags needed to determine correct root form
-            lemmatized_terms = [self.lemmatizer.lemmatize(word=pos_tags[i][0], pos=get_wordnet_pos(pos_tags[i][1])).encode('utf-8') for i in range(len(terms))]
+            lemmatized_terms = []
+            for i in range(len(terms)):
+                try:
+                    l_term = self.lemmatizer.lemmatize(word=pos_tags[i][0], pos=get_wordnet_pos(pos_tags[i][1])).encode('utf-8')
+                    lemmatized_terms.append(l_term)
+                except Exception:  # TODO: Investigate if lemmatization works properly
+                    # UnicodeDecodeError
+                    continue
+
+            # [self.lemmatizer.lemmatize(word=pos_tags[i][0], pos=get_wordnet_pos(pos_tags[i][1])).encode('utf-8') for i in range(len(terms))]
             lemmatized_texts.append(" ".join(lemmatized_terms))
 
         print("Lemmmatization - Done")

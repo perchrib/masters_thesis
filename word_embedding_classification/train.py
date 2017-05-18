@@ -17,8 +17,8 @@ from preprocessors.parser import Parser
 from preprocessors.dataset_preparation import prepare_dataset
 from keras.layers import Embedding
 from keras.callbacks import EarlyStopping
-from time import time, strftime
-from helpers.helper_functions import log_session
+from time import time
+from helpers.helper_functions import log_session, get_time_format
 from helpers.model_utils import get_precision_recall_f_score
 
 np.random.seed(1337)
@@ -50,7 +50,7 @@ def train(model, model_info, data, save_model=False, extra_info=None):
                         callbacks=callbacks,
                         verbose=1).history
 
-    training_time = (time() - start_time) / 60
+    training_time = get_time_format(time() - start_time)
     print('Training time: %i' % training_time)
 
     # Compute prf for val set
