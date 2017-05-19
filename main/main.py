@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 
 from preprocessors.parser import Parser
 from preprocessors.dataset_preparation import prepare_dataset, filter_dataset
-from helpers.global_constants import TEST_DATA_DIR, TRAIN_DATA_DIR, TEST, TRAIN
+from helpers.global_constants import TEST_DATA_DIR, TRAIN_DATA_DIR, TEST, TRAIN, REM_PUNCTUATION, REM_STOPWORDS, REM_EMOTICONS, LEMMATIZE
 
 from character_level_classification.dataset_formatting import format_dataset_char_level
 from character_level_classification.constants import PREDICTION_TYPE as c_PREDICTION_TYPE, MODEL_DIR as c_MODEL_DIR, FILTERS as c_FILTERS
@@ -33,17 +33,20 @@ from char_word_combined.models import get_cw_model
 from char_word_combined.train import train as cw_train
 
 
-def word_main(operation, trained_model_path=None):
+def word_main(operation, trained_model_path=None, manual_filters=None):
+    print("""WORD MODEL""")
     # Load datasets
     train_texts, train_labels, train_metadata, labels_index = prepare_dataset(w_PREDICTION_TYPE)
     test_texts, test_labels, test_metadata, _ = prepare_dataset(w_PREDICTION_TYPE, folder_path=TEST_DATA_DIR)
+
+    filters = w_FILTERS if manual_filters is None else manual_filters
 
     # Filter datasets
     train_texts, train_labels, train_metadata, extra_info = \
         filter_dataset(texts=train_texts,
                        labels=train_labels,
                        metadata=train_metadata,
-                       filters=w_FILTERS,
+                       filters=filters,
                        train_or_test=TRAIN)
     test_texts, test_labels, test_metadata, _ = \
         filter_dataset(texts=test_texts,
@@ -72,6 +75,8 @@ def word_main(operation, trained_model_path=None):
         # w_train(*get_word_model_3x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
 
         w_train(*get_word_model_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+        # w_train(*get_word_model_2xBiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info,
+        #         save_model=False)
 
         # w_train(*get_word_model_3x512_128lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
         # w_train(*get_word_model_4x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
@@ -83,17 +88,20 @@ def word_main(operation, trained_model_path=None):
         #                  normalize=True)
 
 
-def char_main(operation, trained_model_path=None):
+def char_main(operation, trained_model_path=None, manual_filters=None):
+    print("""CHAR MODEL""")
     # Load dataset
     train_texts, train_labels, train_metadata, labels_index = prepare_dataset(c_PREDICTION_TYPE)
     test_texts, test_labels, test_metadata, _ = prepare_dataset(c_PREDICTION_TYPE, folder_path=TEST_DATA_DIR)
+
+    filters = c_FILTERS if manual_filters is None else manual_filters
 
     # Filter datasets
     train_texts, train_labels, train_metadata, extra_info = \
         filter_dataset(texts=train_texts,
                        labels=train_labels,
                        metadata=train_metadata,
-                       filters=c_FILTERS,
+                       filters=filters,
                        train_or_test=TRAIN)
     test_texts, test_labels, test_metadata, _ = \
         filter_dataset(texts=test_texts,
@@ -118,7 +126,9 @@ def char_main(operation, trained_model_path=None):
 
         # c_train(*get_char_model_2xConv_BiLSTM(num_output_nodes, num_chars), data=data, extra_info=extra_info)
 
-        # c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=True, extra_info=extra_info)
+        # c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False, extra_info=extra_info)
+
+        c_train(*get_char_model_Conv_2xBiLSTM(num_output_nodes, num_chars), data=data, save_model=False, extra_info=extra_info)
 
         # c_train(*get_char_model_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False,
         #         extra_info=extra_info)
@@ -126,8 +136,8 @@ def char_main(operation, trained_model_path=None):
         # c_train(*get_char_model_512lstm(num_output_nodes, num_chars), data=data, save_model=False,
         #         extra_info=extra_info)
 
-        c_train(*get_char_model_2x512lstm(num_output_nodes, num_chars), data=data, save_model=False,
-                extra_info=extra_info)
+        # c_train(*get_char_model_2x512lstm(num_output_nodes, num_chars), data=data, save_model=False,
+        #         extra_info=extra_info)
 
 
     elif operation == TEST:
@@ -233,22 +243,70 @@ if __name__ == '__main__':
     k_tf.set_session(k_tf.tf.Session(config=tf_config))
 
     # Train all models in character main
-    char_main(operation=TRAIN)
+
+    #ABLATION SETUP
+    filter_list = [
+        # Lemmatize
+        {REM_STOPWORDS: True,
+         LEMMATIZE: True,
+         REM_EMOTICONS: False,
+         REM_PUNCTUATION: False},
+
+        # Emoticons
+        {REM_STOPWORDS: True,
+         LEMMATIZE: False,
+         REM_EMOTICONS: True,
+         REM_PUNCTUATION: False},
+
+        # Punctuation
+        {REM_STOPWORDS: True,
+         LEMMATIZE: False,
+         REM_EMOTICONS: False,
+         REM_PUNCTUATION: True},
+
+        # All true
+        {REM_STOPWORDS: True,
+         LEMMATIZE: True,
+         REM_EMOTICONS: True,
+         REM_PUNCTUATION: True},
+
+        # Do not remove stopwords
+        {REM_STOPWORDS: False,
+         LEMMATIZE: False,
+         REM_EMOTICONS: False,
+         REM_PUNCTUATION: False},
+
+        # Base
+        {REM_STOPWORDS: True,
+         LEMMATIZE: False,
+         REM_EMOTICONS: False,
+         REM_PUNCTUATION: False}
+    ]
+
+    # Char ablation
+    # for f in filter_list:
+    #     char_main(operation=TRAIN, manual_filters=f)
+
+    # Single char
+    # char_main(operation=TRAIN)
+
 
     # Train all models in doc main
     """ DOCUMENT MODEL """
-    document_main()
+    # document_main()
 
     # Train all models in word main
     """ WORD MODEL """
-    # word_main(operation=TRAIN)
+    # Word ablation
+    # for f in filter_list:
+    #     word_main(operation=TRAIN, manual_filters=f)
 
-    # Train char-word models in char word main
-    # char_word_main()
+
+    # Single word
+    word_main(operation=TRAIN)
 
 
     # Load model and run test data on model
-
 
     # char_main(operation=TEST, trained_model_path="Conv_BiLSTM/27.04.2017_21:07:34_Conv_BiLSTM_adam_31_0.70.h5")
     # word_main(operation=TEST, trained_model_path="Conv_BiLSTM/28.04.2017_18:59:55_Conv_BiLSTM_adam_{epoch:02d}_{val_acc:.4f}.h5")

@@ -224,17 +224,18 @@ def get_char_model_3xConv_LSTM(num_output_nodes, char_num):
     return model, model_info
 
 
-def get_char_model_Conv_BiLSTM(num_output_nodes, char_num, params=None):
+def get_char_model_Conv_BiLSTM(num_output_nodes, char_num):
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
     embedding = get_one_hot_layer(tweet_input, char_num)
 
-    kernel_size = 4
-    filters = 1024
+    kernel_size = 5
+    filters = 1024  # TODO: NUmber of filters
     pool_length = 2
     conv_dropout = 0.5
     lstm_drop = 0.2
     lstm_drop_rec = 0.2
     dense_drop1 = 0.5
+
     dense_drop2 = 0.2
 
     embedding = Conv1D(filters=filters,
@@ -245,25 +246,71 @@ def get_char_model_Conv_BiLSTM(num_output_nodes, char_num, params=None):
     embedding = Dropout(conv_dropout)(embedding)
     embedding = MaxPooling1D(pool_length=pool_length)(embedding)
 
-    # TODO: 150 neurons each
-    forward = LSTM(150, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu')(
+
+    forward = LSTM(256, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu')(
         embedding)
-    backward = LSTM(150, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu',
+    backward = LSTM(256, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu',
                     go_backwards=True)(embedding)
 
     output = merge([forward, backward], mode='concat', concat_axis=-1)
     output = Dropout(dense_drop1)(output)
-    # output = Dense(128, activation='relu')(output)
+    output = Dense(200, activation='relu')(output)
     # output = Dropout(dense_drop2)(output)
     output = Dense(num_output_nodes, activation='softmax')(output)
     model = Model(input=tweet_input, output=output, name='Conv_BiLSTM')
 
     model_info = ["Kernel_size: %i" % kernel_size, "Filters: %i" % filters, "Pool length: %i" % pool_length,
                   "LSTM dropout: %f, LSTM recurrent dropout %f" % (lstm_drop, lstm_drop_rec),
-                  "Conv dropout: %f" % conv_dropout, "Dense drop1 %f" % dense_drop1, "Dense drop2 %f" % dense_drop2, "No dense layer before softmax"]
+                  "Conv dropout: %f" % conv_dropout, "Dense drop1 %f" % dense_drop1, "Dense drop2 %f" % dense_drop2]
 
     return model, model_info
 
+
+def get_char_model_Conv_2xBiLSTM(num_output_nodes, char_num):
+    tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
+    embedding = get_one_hot_layer(tweet_input, char_num)
+
+    kernel_size = 5
+    filters = 1024  # TODO: NUmber of filters
+    pool_length = 2
+    conv_dropout = 0.5
+    lstm_drop = 0.2
+    lstm_drop_rec = 0.2
+    dense_drop1 = 0.5
+
+    dense_drop2 = 0.2
+
+    embedding = Conv1D(filters=filters,
+                       kernel_size=kernel_size,
+                       activation='relu',
+                       kernel_initializer='glorot_uniform')(embedding)
+
+    embedding = Dropout(conv_dropout)(embedding)
+    embedding = MaxPooling1D(pool_length=pool_length)(embedding)
+
+
+    forward = LSTM(256, return_sequences=True, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu')(
+        embedding)
+    backward = LSTM(256, return_sequences=True, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu',
+                    go_backwards=True)(embedding)
+
+    forward = LSTM(256, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu')(
+        forward)
+    backward = LSTM(256, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu',
+                    go_backwards=True)(backward)
+
+    output = merge([forward, backward], mode='concat', concat_axis=-1)
+    output = Dropout(dense_drop1)(output)
+    output = Dense(200, activation='relu')(output)
+    # output = Dropout(dense_drop2)(output)
+    output = Dense(num_output_nodes, activation='softmax')(output)
+    model = Model(input=tweet_input, output=output, name='Conv_2xBiLSTM')
+
+    model_info = ["Kernel_size: %i" % kernel_size, "Filters: %i" % filters, "Pool length: %i" % pool_length,
+                  "LSTM dropout: %f, LSTM recurrent dropout %f" % (lstm_drop, lstm_drop_rec),
+                  "Conv dropout: %f" % conv_dropout, "Dense drop1 %f" % dense_drop1, "Dense drop2 %f" % dense_drop2]
+
+    return model, model_info
 
 def get_one_hot_layer(input_layer, nb_chars):
     """
@@ -281,11 +328,3 @@ def one_hot(indices, num_classes):
     import tensorflow as tf
     return tf.one_hot(indices, depth=num_classes, axis=-1)
 
-## To be removed
-# def one_hot_back(x):
-#     return tf.to_float(tf.one_hot(x, nb_chars, on_value=1, off_value=0, axis=-1))
-#     # return tf.to_float(tf.one_hot(x, chars, on_value=1, off_value=0))
-#
-#
-# def one_hot_out(in_shape):
-#     return in_shape[0], in_shape[1], nb_chars

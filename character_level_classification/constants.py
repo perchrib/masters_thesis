@@ -1,5 +1,5 @@
 import os
-from helpers.global_constants import REM_STOPWORDS, LEMMATIZE, REM_EMOTICONS, REM_PUNCTUATION
+from helpers.global_constants import REM_STOPWORDS, LEMMATIZE, REM_EMOTICONS, REM_PUNCTUATION, REM_INTERNET_TERMS
 # Prediction type
 GENDER = 'gender'
 AGE = 'age'

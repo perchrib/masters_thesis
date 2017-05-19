@@ -37,6 +37,16 @@ class Parser:
         print("Replacing Internet terms and lowercasing - Done")
         return modified_texts
 
+    def remove_all_twitter_syntax_tokens(self, texts):
+        # Raise error if texts not lists
+        if type(texts) is not list:
+            raise Exception("Parser must be passed a list of texts")
+
+        modified_texts = self.replace(texts, url="", pic="", mention="", hashtag="")
+
+        print("Removing Internet terms and lowercasing - Done")
+        return modified_texts
+
     def clean_html(self, content):
         """
         Strips the input string from html code
@@ -86,8 +96,6 @@ class Parser:
 
         return modified_texts
 
-    def replace_urls(self, texts):
-        return self.replace(texts, url='U')
 
     def do_join(self, content):
         """
@@ -128,10 +136,21 @@ class Parser:
         :return: lemmatized texts
         """
         lemmatized_texts = []
+        count = 0
         for t in texts:  # type: str
+            count += 1
             terms = word_tokenize(t)
             pos_tags = pos_tag(terms)  # POS-tags needed to determine correct root form
-            lemmatized_terms = [self.lemmatizer.lemmatize(word=pos_tags[i][0], pos=get_wordnet_pos(pos_tags[i][1])).encode('utf-8') for i in range(len(terms))]
+            lemmatized_terms = []
+            for i in range(len(terms)):
+                try:
+                    l_term = self.lemmatizer.lemmatize(word=pos_tags[i][0], pos=get_wordnet_pos(pos_tags[i][1])).encode('utf-8')
+                    lemmatized_terms.append(l_term)
+                except Exception:  # TODO: Investigate if lemmatization works properly
+                    # UnicodeDecodeError
+                    continue
+
+            # [self.lemmatizer.lemmatize(word=pos_tags[i][0], pos=get_wordnet_pos(pos_tags[i][1])).encode('utf-8') for i in range(len(terms))]
             lemmatized_texts.append(" ".join(lemmatized_terms))
 
         print("Lemmmatization - Done")
@@ -162,6 +181,8 @@ class Parser:
         for t in texts:
             t = re.sub('(?::|;|=)(?:-)?(?:\)|\(|D|P)|(?:<3)', "", t)
             new_texts.append(t)
+
+        print("Removing emoticons - Done")
         return new_texts
 
     def remove_texts_shorter_than_threshold(self, texts, labels, metadata, threshold=2):

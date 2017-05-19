@@ -9,7 +9,7 @@ from nltk import sent_tokenize
 import numpy as np
 
 from preprocessors.language_detection import detect_language
-from helpers.global_constants import TRAIN_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT, TEST_DATA_DIR, TRAIN, TEST, REM_STOPWORDS, REM_EMOTICONS, REM_PUNCTUATION, LEMMATIZE
+from helpers.global_constants import TRAIN_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT, TEST_DATA_DIR, TRAIN, TEST, REM_STOPWORDS, REM_EMOTICONS, REM_PUNCTUATION, LEMMATIZE, REM_INTERNET_TERMS
 from helpers.helper_functions import shuffle
 
 SEED = 1337
@@ -27,7 +27,6 @@ def prepare_dataset(prediction_type, folder_path=TRAIN_DATA_DIR, gender=None):
     labels_index = construct_labels_index(prediction_type)  # dictionary mapping label name to numeric id
     labels = []  # list of label ids
     metadata = []  # list of dictionaries with author information (age, gender)
-    foreign_tweets = 0
 
     print("\n------Parsing %s files.." % folder_path)
     for sub_folder_name in sorted(filter(lambda x: ".DS" not in x, list(os.listdir(folder_path)))):
@@ -56,7 +55,6 @@ def prepare_dataset(prediction_type, folder_path=TRAIN_DATA_DIR, gender=None):
         print("%i tweets in %s" % (tweet_count, sub_folder_name))
 
     print('\nFound %i texts.' % len(texts))
-    print('\nFound %i foreign tweets.' % foreign_tweets)
     return texts, labels, metadata, labels_index
 
 
@@ -182,9 +180,14 @@ def filter_dataset(texts, labels, metadata, filters, train_or_test):
 
     # Clean texts
     text_parser = Parser()
+
     # Base filtering, which stays constant. No experiments with these
     modified_texts = text_parser.lowercase(modified_texts)
-    modified_texts = text_parser.replace_all_twitter_syntax_tokens(modified_texts)
+
+    if REM_INTERNET_TERMS in filters and REM_INTERNET_TERMS:  # Either remove Internet specific tokens or replace with tags
+        modified_texts = text_parser.remove_all_twitter_syntax_tokens(modified_texts)
+    else:
+        modified_texts = text_parser.replace_all_twitter_syntax_tokens(modified_texts)
 
     if filters[REM_STOPWORDS]:
         modified_texts = text_parser.remove_stopwords(modified_texts)
