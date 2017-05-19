@@ -15,6 +15,10 @@ TRAIN_LOSS = "Training Loss"
 VAL_ACC = "Validation Accuracy"
 VAL_LOSS = "Validation Loss"
 
+CHAR = "char"
+DOC = "doc"
+WORD = "word"
+
 
 # Directories
 TRAIN_DATA_DIR = '../data/train/'

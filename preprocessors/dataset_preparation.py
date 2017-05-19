@@ -178,6 +178,12 @@ def filter_dataset(texts, labels, metadata, filters, train_or_test):
     modified_metadata = metadata
     count_removed = 0  # Stays zero unless removed for training set
 
+    # Extra parsing info for use in log
+    extra_info = ["Remove stopwords %s" % filters[REM_STOPWORDS],
+                  "Lemmatize %s" % filters[LEMMATIZE],
+                  "Remove punctuation %s" % filters[REM_PUNCTUATION],
+                  "Remove emoticons %s" % filters[REM_EMOTICONS]]
+
     # Clean texts
     text_parser = Parser()
 
@@ -186,8 +192,10 @@ def filter_dataset(texts, labels, metadata, filters, train_or_test):
 
     if REM_INTERNET_TERMS in filters and REM_INTERNET_TERMS:  # Either remove Internet specific tokens or replace with tags
         modified_texts = text_parser.remove_all_twitter_syntax_tokens(modified_texts)
+        extra_info.append("Internet terms have been REMOVED")
     else:
         modified_texts = text_parser.replace_all_twitter_syntax_tokens(modified_texts)
+        extra_info.append("Internet terms have been replaced with placeholders")
 
     if filters[REM_STOPWORDS]:
         modified_texts = text_parser.remove_stopwords(modified_texts)
@@ -207,12 +215,7 @@ def filter_dataset(texts, labels, metadata, filters, train_or_test):
             modified_texts, modified_labels, modified_metadata)
 
     # Extra parsing info for use in log
-    extra_info = ["Remove stopwords %s" % filters[REM_STOPWORDS],
-                  "Lemmatize %s" % filters[LEMMATIZE],
-                  "Remove punctuation %s" % filters[REM_PUNCTUATION],
-                  "Remove emoticons %s" % filters[REM_EMOTICONS],
-                  "All Internet terms are replaced with tags",
-                  "Removed %i tweet because they were shorter than threshold" % count_removed]
+    extra_info.append("Removed %i tweet because they were shorter than threshold" % count_removed)
 
     return modified_texts, modified_labels, modified_metadata, extra_info
 

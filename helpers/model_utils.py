@@ -275,4 +275,4 @@ if __name__ == '__main__':
     #
     paths = ['../logs/character_level_classification/Conv_BiLSTM/18.05.2017_17:47:45_Conv_BiLSTM.txt',
              '../logs/character_level_classification/BiLSTM/16.05.2017_14:27:27_BiLSTM_adam.txt']
-    plot_models(paths, TRAIN_LOSS)
+    plot_models(paths, VAL_LOSS)

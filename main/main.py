@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 
 from preprocessors.parser import Parser
 from preprocessors.dataset_preparation import prepare_dataset, filter_dataset
-from helpers.global_constants import TEST_DATA_DIR, TRAIN_DATA_DIR, TEST, TRAIN, REM_PUNCTUATION, REM_STOPWORDS, REM_EMOTICONS, LEMMATIZE
+from helpers.global_constants import TEST_DATA_DIR, TRAIN_DATA_DIR, TEST, TRAIN, REM_PUNCTUATION, REM_STOPWORDS, REM_EMOTICONS, LEMMATIZE, REM_INTERNET_TERMS, CHAR, DOC, WORD
 
 from character_level_classification.dataset_formatting import format_dataset_char_level
 from character_level_classification.constants import PREDICTION_TYPE as c_PREDICTION_TYPE, MODEL_DIR as c_MODEL_DIR, FILTERS as c_FILTERS
@@ -242,8 +242,6 @@ if __name__ == '__main__':
     tf_config.gpu_options.allow_growth = True
     k_tf.set_session(k_tf.tf.Session(config=tf_config))
 
-    # Train all models in character main
-
     #ABLATION SETUP
     filter_list = [
         # Lemmatize
@@ -280,30 +278,40 @@ if __name__ == '__main__':
         {REM_STOPWORDS: True,
          LEMMATIZE: False,
          REM_EMOTICONS: False,
-         REM_PUNCTUATION: False}
+         REM_PUNCTUATION: False},
+
+        # Remove Internet terms instead of replacing
+        {REM_STOPWORDS: True,
+         LEMMATIZE: False,
+         REM_EMOTICONS: False,
+         REM_PUNCTUATION: False,
+         REM_INTERNET_TERMS: False}
     ]
 
-    # Char ablation
-    # for f in filter_list:
-    #     char_main(operation=TRAIN, manual_filters=f)
+    if sys.argv[0] == DOC:
+        # Train all models in doc main
+        """ DOCUMENT MODEL """
+        document_main()
 
-    # Single char
-    # char_main(operation=TRAIN)
+    elif sys.argv[1] == CHAR:
+        # Train all models in character main
+        """CHAR MODEL"""
+        # Char ablation
+        # for f in filter_list:
+        #     char_main(operation=TRAIN, manual_filters=f)
 
+        # Single char
+        char_main(operation=TRAIN)
 
-    # Train all models in doc main
-    """ DOCUMENT MODEL """
-    # document_main()
+    elif sys.argv[1] == WORD:
+        # Train all models in word main
+        """ WORD MODEL """
+        # Word ablation
+        for f in filter_list:
+            word_main(operation=TRAIN, manual_filters=f)
 
-    # Train all models in word main
-    """ WORD MODEL """
-    # Word ablation
-    # for f in filter_list:
-    #     word_main(operation=TRAIN, manual_filters=f)
-
-
-    # Single word
-    word_main(operation=TRAIN)
+        # Single word
+        # word_main(operation=TRAIN)
 
 
     # Load model and run test data on model
