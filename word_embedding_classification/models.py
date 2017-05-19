@@ -247,7 +247,7 @@ def get_word_model_2xBiLSTM(embedding_layer, nb_output_nodes):
     model = Model(input=tweet_input, output=output, name='2xBiLSTM')
 
     model_info = ["LSTM dropout: %f, LSTM recurrent dropout %f" % (lstm_drop, lstm_drop_rec),
-                  "Merge dropout %f" % merge_drop, "No merge drop"]
+                  "Merge dropout %f" % merge_drop]
     return model, model_info
 
 

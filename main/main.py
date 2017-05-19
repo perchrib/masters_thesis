@@ -306,8 +306,6 @@ if __name__ == '__main__':
     word_main(operation=TRAIN)
 
 
-
-
     # Load model and run test data on model
 
     # char_main(operation=TEST, trained_model_path="Conv_BiLSTM/27.04.2017_21:07:34_Conv_BiLSTM_adam_31_0.70.h5")

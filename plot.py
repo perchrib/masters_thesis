@@ -45,6 +45,7 @@ def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
 if __name__ == '__main__':
+    # plt.style.use("seaborn-darkgrid")
     # plot_svm_mockup()
-    # plot_xor()
-    plot_sigmoid_mockup()
+    plot_xor()
+    # plot_sigmoid_mockup()

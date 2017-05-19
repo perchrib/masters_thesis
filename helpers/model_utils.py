@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.metrics import confusion_matrix, precision_recall_fscore_support
 from keras.callbacks import ModelCheckpoint
 from keras.models import load_model, save_model, Model
-from global_constants import GENDER, OVERALL_MACRO, OVERALL_MICRO
+from global_constants import GENDER, OVERALL_MACRO, OVERALL_MICRO, TRAIN_ACC, TRAIN_LOSS, VAL_ACC, VAL_LOSS
 from helper_functions import save_pickle
 
 import matplotlib.pyplot as plt
@@ -179,15 +179,45 @@ def get_argmax_classes(y_values):
     return np.asarray([np.argmax(confidence) for confidence in y_values])
 
 
-def plot_models(log_path_list, metric):
+def plot_models(log_path_list, graph_metric):
     """
-    
-    :param log_path_list: 
-    :param metric: 
+    Given a list of log file paths, plot the training histories for the specified graph_metric
+    :param log_path_list: List of log file paths
+    :param graph_metric: Which metric to plot from provided logs. Allowed values are TRAIN_ACC; TRAIN_LOSS; VAL_ACC and VAL_LOSS
     :return: 
     """
 
+    # Get statistics for all models in log_path_list
+    # List of lists (for each models) with corresponding history of values
+    model_names, statistics = _get_log_statistics(log_path_list)
+
+    print("Specified models for plotting: %s" % model_names)
+    # Plot correct metric
+    plt.style.use("seaborn-darkgrid")
+
+    for i in range(len(statistics[graph_metric])):
+        plt.plot(statistics[graph_metric][i], label=model_names[i])
+
+    plt.ylabel(graph_metric)
+    plt.xlabel("Epochs")
+    plt.legend()
+    plt.show()
+    print("")
+
+
+def _get_log_statistics(log_path_list):
+    """
+    Read log files and mine training statistics
+    :param log_path_list: list of log file paths
+    :return: list of model names and dictionary with training statistics
+    """
+
     model_names = []
+    # List of lists (for each models) with corresponding history of values
+    model_accs = []
+    model_losses = []
+    model_val_accs = []
+    model_val_losses = []
 
     for path in log_path_list:
         with open(path) as log_file:
@@ -200,19 +230,49 @@ def plot_models(log_path_list, metric):
                 # Model Name
                 elif line.startswith("Model name"):
                     model_names.append(line.split(":")[1].strip())
-                    print(model_names)
 
                 elif "Training statistics" in line:
-                    log_file.readline()
-                    line = log_file.readline().split()
-                    line.pop()
-                    print(line)
+                    log_file.readline()  # Jump to next line containing first line of stats
+                    end_of_training_stats = False
 
+                    acc = []
+                    loss = []
+                    val_acc = []
+                    val_loss = []
+
+                    while not end_of_training_stats:
+                        line = log_file.readline()
+                        if line == "\n":
+                            end_of_training_stats = True
+                        else:
+                            all_metrics = line.split()  # [acc, loss, val_acc, val_loss]
+                            all_metrics.pop(0)  # Remove history index from the list
+
+                            acc.append(all_metrics[0])
+                            loss.append(all_metrics[1])
+                            val_acc.append(all_metrics[2])
+                            val_loss.append(all_metrics[3])
+
+                    model_accs.append(acc)
+                    model_losses.append(loss)
+                    model_val_accs.append(val_acc)
+                    model_val_losses.append(val_loss)
+
+    statistics = {
+        TRAIN_ACC: model_accs,
+        TRAIN_LOSS: model_losses,
+        VAL_ACC: model_val_accs,
+        VAL_LOSS: model_val_losses
+    }
+
+    return model_names, statistics
 
 if __name__ == '__main__':
     # preds = [[0.4, 0.6], [0.7, 0.3], [0.8, 0.2]]
     # y_pred = [np.argmax(x) for x in preds]
     # create_and_plot_confusion_matrix([1, 1, 0], y_pred, ["Male", "Female"], normalize=False)
 
-    paths = ['/Users/zlash/Dropbox/NTNU/Master/master/logs/character_level_classification/Conv_BiLSTM/18.05.2017_17:47:45_Conv_BiLSTM.txt']
-    plot_models(paths, 'val_loss')
+    #
+    paths = ['../logs/character_level_classification/Conv_BiLSTM/18.05.2017_17:47:45_Conv_BiLSTM.txt',
+             '../logs/character_level_classification/BiLSTM/16.05.2017_14:27:27_BiLSTM_adam.txt']
+    plot_models(paths, TRAIN_LOSS)

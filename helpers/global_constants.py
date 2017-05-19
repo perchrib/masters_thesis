@@ -6,9 +6,15 @@ AGE = 'age'
 MALE = 'MALE'
 FEMALE = 'FEMALE'
 
-# Train or test identifiers
+# Identifiers
 TRAIN = "train"
 TEST = "test"
+
+TRAIN_ACC = "Training Accuracy"
+TRAIN_LOSS = "Training Loss"
+VAL_ACC = "Validation Accuracy"
+VAL_LOSS = "Validation Loss"
+
 
 # Directories
 TRAIN_DATA_DIR = '../data/train/'
