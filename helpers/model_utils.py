@@ -179,7 +179,7 @@ def get_argmax_classes(y_values):
     return np.asarray([np.argmax(confidence) for confidence in y_values])
 
 
-def plot_models(log_path_list, graph_metric):
+def plot_models(log_path_list, graph_metric, save_path=None):
     """
     Given a list of log file paths, plot the training histories for the specified graph_metric
     :param log_path_list: List of log file paths
@@ -201,8 +201,12 @@ def plot_models(log_path_list, graph_metric):
     plt.ylabel(graph_metric)
     plt.xlabel("Epochs")
     plt.legend()
+
+    if save_path:
+        print("Plot saved")
+        plt.savefig(save_path, format='png', dpi=600)
+
     plt.show()
-    print("")
 
 
 def _get_log_statistics(log_path_list):
@@ -272,7 +276,32 @@ if __name__ == '__main__':
     # y_pred = [np.argmax(x) for x in preds]
     # create_and_plot_confusion_matrix([1, 1, 0], y_pred, ["Male", "Female"], normalize=False)
 
+    # Char model plotting
+    char_paths = \
+        [
+            '../logs/character_level_classification/model_comp/16.05.2017_11:33:15_2x512LSTM_adam.txt',     # 2x512LSTM
+            '../logs/character_level_classification/model_comp/16.05.2017_14:27:27_BiLSTM_adam.txt',        # BiLSTM
+            '../logs/character_level_classification/model_comp/18.05.2017_17:47:45_Conv_BiLSTM.txt',        # Conv_BiLSTM
+            '../logs/character_level_classification/model_comp/16.05.2017_07:05:29_2xConv_BiLSTM_adam.txt', # 2xConv_BiLSTM
+            '../logs/character_level_classification/model_comp/20.05.2017_09:38:23_Conv_2xBiLSTM.txt'       # Conv_2xBiLSTM
+        ]
+
+    plot_models(char_paths, VAL_LOSS, save_path='../../images/experiments/char_model_base.png')
+
+    # Word model plotting
+    # word_paths = \
+    #     [
+    #         '../logs/word_embedding_classification/model_comp/15.05.2017_02:09:17_2x512_256LSTM_adam.txt',      # 2x512_256LSTM
+    #         '../logs/word_embedding_classification/model_comp/15.05.2017_19:56:26_3x512_LSTM_adam.txt',         # 3x512_LSTM
+    #         '../logs/word_embedding_classification/model_comp/15.05.2017_18:30:02_Conv_BiLSTM_adam.txt',        # Conv_BiLSTM
+    #         '../logs/word_embedding_classification/model_comp/29.04.2017_18:19:01_3xConv_2xBiLSTM_adam.txt',    # 3xConv_BiLSTM
+    #         '../logs/word_embedding_classification/model_comp/16.04.2017_00:19:44_2x512_256GRU_adam.txt',       # 2x512_256GRU
+    #         '../logs/word_embedding_classification/model_comp/15.05.2017_21:32:18_BiLSTM_adam.txt'              # Stock BiLSTM
+    #     ]
     #
-    paths = ['../logs/character_level_classification/Conv_BiLSTM/18.05.2017_17:47:45_Conv_BiLSTM.txt',
-             '../logs/character_level_classification/BiLSTM/16.05.2017_14:27:27_BiLSTM_adam.txt']
-    plot_models(paths, VAL_LOSS)
+    # plot_models(word_paths, VAL_LOSS, save_path='../../images/experiments/word_model_base.png')
+
+
+
+
+    print("")

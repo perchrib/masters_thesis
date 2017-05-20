@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 from functools import reduce
 
@@ -27,6 +28,7 @@ def format_dataset_char_level(texts, labels, metadata, trained_char_index=None):
         all_text = ''.join(texts)
 
         chars = set(all_text)
+        print("CHARACTER SET:", chars)
         print('Total Chars: %i' % len(chars))
         char_index = dict((char, i) for i, char in enumerate(chars))
     else:

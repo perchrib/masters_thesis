@@ -1,0 +1,65 @@
+Training_log - 15/05/2017 19:56:26
+
+Model name: 3x512_LSTM
+Elapsed training time: 77.6816687822
+
+Training set size: 586620
+Validation set size: 65179
+Validation set fraction: 0.098083
+Test set fraction: 0.019152
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 50
+Max sequence length: 15
+
+-----------Training statistics-----------
+        acc      loss   val_acc  val_loss
+0  0.644467  0.615867  0.665690  0.589841
+1  0.680018  0.571339  0.682321  0.565843
+2  0.713418  0.525986  0.697525  0.551843
+3  0.749753  0.472268  0.710075  0.546568
+4  0.782123  0.418628  0.718038  0.566543
+5  0.809926  0.371542  0.723285  0.583135
+
+Validation PRF
+                 Female          Male  Overall Macro  Overall Micro
+Precision      0.729065      0.719456       0.724261       0.723285
+Recall         0.632571      0.800335       0.716453       0.723285
+F-score        0.677399      0.757743       0.717571       0.723285
+Support    29935.000000  35244.000000            NaN            NaN
+
+--------------Test results---------------
+loss: 0.872370 acc: 0.584740
+
+Test PRF
+                Female         Male  Overall Macro  Overall Micro
+Precision     0.608841     0.563434       0.586138       0.584741
+Recall        0.552164     0.619668       0.585916       0.584741
+F-score       0.579119     0.590215       0.584667       0.584741
+Support    6585.000000  6142.000000            NaN            NaN
+
+--------------Model Diagram---------------
+      InputLayer (None, 15)      
+       Embedding (None, 15, 200) 
+            LSTM (None, 15, 512) 
+         Dropout (None, 15, 512) 
+            LSTM (None, 15, 512) 
+         Dropout (None, 15, 512) 
+            LSTM (None, 512)     
+           Dense (None, 2)       
+
+
+Model information:
+=========================================
+ Dropout 0.500000
+Extra information:
+=========================================
+ Remove stopwords True
+ Lemmatize False
+ Remove punctuation False
+ Remove emoticons False
+ All Internet terms are replaced with tags
+ Removed 3449 tweet because they were shorter than threshold

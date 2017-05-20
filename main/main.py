@@ -12,7 +12,6 @@ from character_level_classification.dataset_formatting import format_dataset_cha
 from character_level_classification.constants import PREDICTION_TYPE as c_PREDICTION_TYPE, MODEL_DIR as c_MODEL_DIR, FILTERS as c_FILTERS
 from character_level_classification.train import train as c_train
 from character_level_classification.models import *
-from character_level_classification.model_sent import get_char_model_3xConv_Bi_lstm_sent
 
 from word_embedding_classification.dataset_formatting import format_dataset_word_level
 from word_embedding_classification.constants import PREDICTION_TYPE as w_PREDICTION_TYPE, MODEL_DIR as w_MODEL_DIR, FILTERS as w_FILTERS
@@ -126,9 +125,11 @@ def char_main(operation, trained_model_path=None, manual_filters=None):
 
         # c_train(*get_char_model_2xConv_BiLSTM(num_output_nodes, num_chars), data=data, extra_info=extra_info)
 
-        # c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False, extra_info=extra_info)
+        c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=True, extra_info=extra_info)
+        # c_train(*get_char_model_Conv_2_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False, extra_info=extra_info)
 
-        c_train(*get_char_model_Conv_2xBiLSTM(num_output_nodes, num_chars), data=data, save_model=False, extra_info=extra_info)
+
+        # c_train(*get_char_model_Conv_2xBiLSTM(num_output_nodes, num_chars), data=data, save_model=False, extra_info=extra_info)
 
         # c_train(*get_char_model_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False,
         #         extra_info=extra_info)
@@ -285,7 +286,7 @@ if __name__ == '__main__':
          LEMMATIZE: False,
          REM_EMOTICONS: False,
          REM_PUNCTUATION: False,
-         REM_INTERNET_TERMS: False}
+         REM_INTERNET_TERMS: True}
     ]
 
     if sys.argv[0] == DOC:
@@ -307,11 +308,11 @@ if __name__ == '__main__':
         # Train all models in word main
         """ WORD MODEL """
         # Word ablation
-        for f in filter_list:
-            word_main(operation=TRAIN, manual_filters=f)
+        # for f in filter_list:
+        #     word_main(operation=TRAIN, manual_filters=f)
 
         # Single word
-        # word_main(operation=TRAIN)
+        word_main(operation=TRAIN)
 
 
     # Load model and run test data on model
