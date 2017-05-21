@@ -71,7 +71,7 @@ Support    6585.000000  6142.000000            NaN            NaN
                                 |                                 
                            Merge (None, 500)                      
                          Dropout (None, 500)                      
-                           Dense (None, 2)                        
+                           Dense (None, 2)
 
 
 Model information:

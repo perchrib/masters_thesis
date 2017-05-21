@@ -50,13 +50,6 @@ def prepare_dataset(prediction_type, folder_path=TRAIN_DATA_DIR, gender=None):
                     gender_author = gender
                 if gender == gender_author:
                     for tweet in data_samples:
-
-                        # TODO: Remove
-                        try:
-                            tweet.decode()
-                        except:
-                            print("%s - %s - %s" % (sub_folder_name, file_name, tweet))
-
                         texts.append(tweet)
                         metadata.append({GENDER: author_data[1].upper(), AGE: author_data[2]})
                         labels.append(labels_index[metadata[-1][prediction_type]])

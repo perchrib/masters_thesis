@@ -64,7 +64,7 @@ def word_main(operation, trained_model_path=None, manual_filters=None):
 
         # ------- Insert models to txt here -----------
         # Remember star before model getter
-        # w_train(*get_word_model_2x512_256_lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+        w_train(*get_word_model_2x512_256_lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
 
         # w_train(*get_word_model_Conv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
 
@@ -73,7 +73,8 @@ def word_main(operation, trained_model_path=None, manual_filters=None):
 
         # w_train(*get_word_model_3x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
 
-        w_train(*get_word_model_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+        # w_train(*get_word_model_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+
         # w_train(*get_word_model_2xBiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info,
         #         save_model=False)
 
@@ -245,6 +246,12 @@ if __name__ == '__main__':
 
     #ABLATION SETUP
     filter_list = [
+        # Base
+        {REM_STOPWORDS: True,
+         LEMMATIZE: False,
+         REM_EMOTICONS: False,
+         REM_PUNCTUATION: False},
+
         # Lemmatize
         {REM_STOPWORDS: True,
          LEMMATIZE: True,
@@ -271,12 +278,6 @@ if __name__ == '__main__':
 
         # Do not remove stopwords
         {REM_STOPWORDS: False,
-         LEMMATIZE: False,
-         REM_EMOTICONS: False,
-         REM_PUNCTUATION: False},
-
-        # Base
-        {REM_STOPWORDS: True,
          LEMMATIZE: False,
          REM_EMOTICONS: False,
          REM_PUNCTUATION: False},
