@@ -15,6 +15,10 @@ TRAIN_LOSS = "Training Loss"
 VAL_ACC = "Validation Accuracy"
 VAL_LOSS = "Validation Loss"
 
+CHAR = "char"
+DOC = "doc"
+WORD = "word"
+
 
 # Directories
 TRAIN_DATA_DIR = '../data/train/'
@@ -26,11 +30,11 @@ EMBEDDINGS_NATIVE_DIR = '../embeddings_native/'
 EMBEDDINGS_INDEX_DIR = '../embeddings_index/'
 
 # Filter constants
-
 REM_STOPWORDS = 'REM_STOPWORDS'
 LEMMATIZE = 'LEMMATIZE'
 REM_PUNCTUATION = 'REM_PUNCTUATION'
 REM_EMOTICONS = 'REM_EMOTICONS'
+LOWERCASE = 'LOWERCASE'
 
 REM_INTERNET_TERMS = 'REM_INTERNET_TERMS'
 

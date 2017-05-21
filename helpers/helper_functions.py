@@ -95,7 +95,7 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=1, barLength
 
 
 def log_session(log_dir, model, history, training_time, num_train, num_val, optimizer, batch_size, max_epochs, prf_val,
-                test_results=None, model_info=None, extra_info=None, num_test=0, max_sequence_length=None, prf_test=None):
+                test_results=None, model_info=None, extra_info=None, num_test=0, max_sequence_length=None, prf_test=None, vocab_size=None):
 
     if not os.path.exists((os.path.join(log_dir, model.name))):
         os.makedirs((os.path.join(log_dir, model.name)))
@@ -123,6 +123,9 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, opti
         log_file.write("\nOptimizer: %s" % optimizer)
         log_file.write("\nBatch size: %i" % batch_size)
         log_file.write("\nMax number of epochs: %i" % max_epochs)
+
+        if vocab_size:
+            log_file.write("\nMax number of words: %i" % vocab_size)
 
         if max_sequence_length:
             log_file.write("\nMax sequence length: %s" % max_sequence_length)

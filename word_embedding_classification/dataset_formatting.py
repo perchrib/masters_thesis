@@ -88,11 +88,6 @@ def construct_embedding_matrix(word_index):
     number_of_missing_occurrences = 0
     total_number_of_words = 0
     for word, i in word_index.items():
-        if i == 0:
-            print("Index 0 is in word index")
-        elif i == 1:
-            print("Index 1 is in word index")
-
         embedding_vector = embeddings_index.get(word)
         if embedding_vector is not None:
             # words not found in embedding index will be all zeros.
@@ -103,7 +98,7 @@ def construct_embedding_matrix(word_index):
 
     print("Total number of word occurrences: %i" % total_number_of_words)
     print('Number of missing word occurrences / unique words with no embedding: %i' % number_of_missing_occurrences)
-    print('Number of unique word embeddings: %i' % (total_number_of_words - number_of_missing_occurrences))
+    print('Number of unique word embeddings available: %i' % (total_number_of_words - number_of_missing_occurrences))
 
     return embedding_matrix
 

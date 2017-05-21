@@ -25,6 +25,7 @@ class Parser:
         self.lemmatizer = WordNetLemmatizer()
 
     def lowercase(self, texts):
+        print("Lowercasing texts")
         return [t.lower() for t in texts]  # Lower_case
 
     def replace_all_twitter_syntax_tokens(self, texts):
@@ -34,7 +35,7 @@ class Parser:
 
         modified_texts = self.replace(texts, url=URL_REPLACE, pic=PIC_REPLACE, mention=MENTION_REPLACE, hashtag=HASHTAG_REPLACE)
 
-        print("Replacing Internet terms and lowercasing - Done")
+        print("Replacing Internet terms - Done")
         return modified_texts
 
     def remove_all_twitter_syntax_tokens(self, texts):
@@ -44,7 +45,7 @@ class Parser:
 
         modified_texts = self.replace(texts, url="", pic="", mention="", hashtag="")
 
-        print("Removing Internet terms and lowercasing - Done")
+        print("Removing Internet terms - Done")
         return modified_texts
 
     def clean_html(self, content):
@@ -187,7 +188,7 @@ class Parser:
 
     def remove_texts_shorter_than_threshold(self, texts, labels, metadata, threshold=2):
         """
-        Remove texts shorter than threshold from list of texts, labels and metadata
+        Remove texts shorter than threshold (length in characters) from list of texts, labels and metadata
         :param modified_texts:
         :param modified_labels:
         :param modified_metadata:

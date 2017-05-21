@@ -165,7 +165,7 @@ def get_word_model_Conv_BiLSTM(embedding_layer, nb_output_nodes):
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int64')
     embedding = embedding_layer(tweet_input)
 
-    kernel_size = 4  # TODO: Kernel size is 4
+    kernel_size = 4
     filters = 1024
     pool_length = 2
     conv_dropout = 0.5
@@ -181,7 +181,7 @@ def get_word_model_Conv_BiLSTM(embedding_layer, nb_output_nodes):
     embedding = Dropout(conv_dropout)(embedding)
     embedding = MaxPooling1D(pool_length=pool_length)(embedding)
 
-    # TODO: num neurons is 150
+
     forward = LSTM(150, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu')(
         embedding)
     backward = LSTM(150, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu',
@@ -195,7 +195,7 @@ def get_word_model_Conv_BiLSTM(embedding_layer, nb_output_nodes):
     model_info = ["Kernel_size: %i" % kernel_size, "Filters: %i" % filters, "Pool length: %i" % pool_length,
                   "LSTM dropout: %f, LSTM recurrent dropout %f" % (lstm_drop, lstm_drop_rec),
                   "Conv dropout: %f" % conv_dropout, "Dense dropout: %f" % dense_drop,
-                  "No dense layer before softmax"]  # TODO: Update last info
+                  "No dense layer before softmax"]
     return model, model_info
 
 
@@ -207,9 +207,11 @@ def get_word_model_BiLSTM(embedding_layer, nb_output_nodes):
     lstm_drop_rec = 0.2
     merge_drop = 0.5
 
-    forward = LSTM(250, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu')(
+
+    # TODO: 500 neurons
+    forward = LSTM(500, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu')(
         embedding)
-    backward = LSTM(250, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu',
+    backward = LSTM(500, return_sequences=False, dropout=lstm_drop, recurrent_dropout=lstm_drop_rec, consume_less='gpu',
                     go_backwards=True)(embedding)
 
     encoding = merge([forward, backward], mode='concat', concat_axis=-1)
@@ -218,7 +220,7 @@ def get_word_model_BiLSTM(embedding_layer, nb_output_nodes):
     model = Model(input=tweet_input, output=output, name='BiLSTM')
 
     model_info = ["LSTM dropout: %f, LSTM recurrent dropout %f" % (lstm_drop, lstm_drop_rec),
-                  "Merge dropout %f" % merge_drop]  # TODO: merge drop
+                  "Merge dropout %f" % merge_drop]
     return model, model_info
 
 
