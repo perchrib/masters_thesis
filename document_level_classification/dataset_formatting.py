@@ -1,41 +1,65 @@
 from __future__ import print_function
 from keras.utils import to_categorical
 
-from document_level_classification.features import TF_IDF, BOW
+from document_level_classification.features import TF_IDF, BOW, SentimentAnalyzer, feature_adder
 from constants import MAX_FEATURE_LENGTH, N_GRAM, DIM_REDUCTION, \
-    DIM_REDUCTION_SIZE, CATEGORICAL, FEATURE_MODEL, C_BAG_OF_WORDS, C_TF_IDF
+    DIM_REDUCTION_SIZE, CATEGORICAL, FEATURE_MODEL, C_BAG_OF_WORDS, C_TF_IDF, C_TF_IDF_DISSIMILARITY, \
+    C_BAG_OF_WORDS_DISSIMILARITY, SENTIMENT_FEATURE
 from preprocessors.dataset_preparation import split_dataset
 import time
 from helpers.helper_functions import get_time_format
-from sklearn.decomposition import SparsePCA
+
 from helpers.dimension_reduction import DimReduction
 import numpy as np
-#
-from preprocessors.dataset_preparation import prepare_dataset
-from preprocessors.parser import Parser
 
-def format_dataset_doc_level(texts, labels, metadata, is_test=False, feature_model=None, reduction_model=None):
-    """
-    Split into training set, validation and test set. It also transform the text into doc_level features ie TFIDF
-     POS-Tags etc
-    :param texts: list of tweets
-    :param labels: list of tweet labels
-    :param metadata: list of dictionaries containing age and gender for each tweet
-    :return:
-    """
 
+def format_dataset_doc_level(texts, labels, metadata, is_test=False, feature_model_type=FEATURE_MODEL, n_gram=N_GRAM,
+                             max_feature_length=MAX_FEATURE_LENGTH, feature_model=None, reduction_model=None):
     if not is_test:
-        x_train, y_train, meta_train, x_val, y_val, meta_val = split_dataset(texts, labels, metadata, data_type_is_string=True)
 
-        if FEATURE_MODEL == C_TF_IDF:
-            feature_model = TF_IDF(x_train, y_train, MAX_FEATURE_LENGTH, N_GRAM)
-        elif FEATURE_MODEL == C_BAG_OF_WORDS:
-            feature_model = BOW(x_train, N_GRAM, max_features=MAX_FEATURE_LENGTH)
+        x_train, y_train, meta_train, x_val, y_val, meta_val = split_dataset(texts, labels, metadata, data_type_is_string=True)
+        x_train_texts = x_train
+        x_val_texts = x_val
+        if feature_model_type == C_TF_IDF:
+            print("USING: ", C_TF_IDF)
+            feature_model = TF_IDF(x_train, y_train, max_feature_length, n_gram)
+
+        elif feature_model_type == C_BAG_OF_WORDS:
+            print("USING: ", C_BAG_OF_WORDS)
+            feature_model = BOW(x_train, n_gram, max_features=max_feature_length)
+
+        elif feature_model_type == C_BAG_OF_WORDS_DISSIMILARITY:
+            print("USING: ", C_BAG_OF_WORDS_DISSIMILARITY)
+            vocabulary = TF_IDF(x_train, y_train, max_feature_length, n_gram, dissimilarity_vocabulary=True).train_vocabulary
+            feature_model = BOW(x_train, n_gram, vocabulary=vocabulary, max_features=max_feature_length)
+
+        elif feature_model_type == C_TF_IDF_DISSIMILARITY:
+            print("USING: ", C_TF_IDF_DISSIMILARITY)
+            feature_model = TF_IDF(x_train, y_train, max_feature_length, n_gram, dissimilarity_vocabulary=True)
+
+
 
         start = time.time()
 
         x_train = feature_model.fit_to_training_data()
         x_val = feature_model.fit_to_new_data(x_val)
+
+        if SENTIMENT_FEATURE:
+            SA = SentimentAnalyzer()
+            print("Validate Training Set Sentiments")
+
+            x_train = SA.analyze_and_merge(x_train_texts, x_train)
+            print("SHAPE X_TRAIN: ", x_train.shape)
+            del x_train_texts
+
+            print("Validate Validation Set Sentiments")
+
+            x_val = SA.analyze_and_merge(x_val_texts, x_val)
+            print("SHAPE X_VAL: ", x_val.shape)
+
+            del x_val_texts
+
+
 
         if DIM_REDUCTION:
             start = time.time()
@@ -62,6 +86,12 @@ def format_dataset_doc_level(texts, labels, metadata, is_test=False, feature_mod
 
     elif is_test:
         x_test = feature_model.fit_to_new_data(texts)
+
+        if SENTIMENT_FEATURE:
+            SA = SentimentAnalyzer()
+            print("Validate Test Set Sentiments")
+            x_test_sentiment = SA.analyze(texts)
+            x_test = feature_adder(x_test, x_test_sentiment)
 
         if DIM_REDUCTION:
             x_test = reduction_model.fit_transform(x_test)

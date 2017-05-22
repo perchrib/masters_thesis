@@ -161,7 +161,7 @@ def log_session(log_dir, model, history, training_time, num_train, num_val, opti
                 log_file.write("\n %s" % info)
 
         if extra_info:
-            log_file.write("\nExtra information:\n=========================================")
+            log_file.write("\n\nExtra information:\n=========================================")
             for info in extra_info:
                 log_file.write("\n %s" % info)
 

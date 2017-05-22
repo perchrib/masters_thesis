@@ -13,13 +13,13 @@ from helper_functions import save_pickle
 import matplotlib.pyplot as plt
 
 
-def get_model_checkpoint(model_name, model_dir, model_optimizer):
+def get_model_checkpoint(model_name, model_dir, model_optimizer=None):
     dir_path = os.path.join(model_dir, model_name)
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
 
     model_file_name = time.strftime(
-        "%d.%m.%Y_%H:%M:%S") + "_" + model_name + "_" + model_optimizer + "_{epoch:02d}_{val_acc:.4f}.h5"
+        "%d.%m.%Y_%H:%M:%S") + "_" + model_name + "_{epoch:02d}_{val_loss:.4f}.h5"
 
     checkpoint = ModelCheckpoint(os.path.join(dir_path, model_file_name), save_best_only=True)
 
