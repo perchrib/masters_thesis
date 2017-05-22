@@ -1,4 +1,5 @@
 import os
+from helpers.global_constants import REM_STOPWORDS, LEMMATIZE, REM_EMOTICONS, REM_PUNCTUATION
 # Prediction type
 GENDER = 'gender'
 AGE = 'age'
@@ -13,6 +14,14 @@ WORD_INDEX_DIR = os.path.join(MODEL_DIR, 'word_index')
 MAX_NB_WORDS = 50000
 MAX_SEQUENCE_LENGTH = 15
 EMBEDDINGS_INDEX = 'glove.twitter.27B.200d'
+
+# Text filtering constants
+FILTERS = {
+    REM_STOPWORDS: True,
+    LEMMATIZE: False,
+    REM_PUNCTUATION: False,
+    REM_EMOTICONS: False
+}
 
 # Model
 MODEL_OPTIMIZER = 'adam'

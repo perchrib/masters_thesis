@@ -5,24 +5,26 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 
 from preprocessors.parser import Parser
-from preprocessors.dataset_preparation import prepare_dataset
-from helpers.global_constants import TEST_DATA_DIR, TRAIN_DATA_DIR
+from preprocessors.dataset_preparation import prepare_dataset, filter_dataset
+from helpers.global_constants import TEST_DATA_DIR, TRAIN_DATA_DIR, TEST, TRAIN
 
 from character_level_classification.dataset_formatting import format_dataset_char_level
-from character_level_classification.constants import PREDICTION_TYPE as c_PREDICTION_TYPE, MODEL_DIR as c_MODEL_DIR
+from character_level_classification.constants import PREDICTION_TYPE as c_PREDICTION_TYPE, MODEL_DIR as c_MODEL_DIR, \
+    FILTERS as c_FILTERS
 from character_level_classification.train import train as c_train
 from character_level_classification.models import *
 from character_level_classification.model_sent import get_char_model_3xConv_Bi_lstm_sent
 
 from word_embedding_classification.dataset_formatting import format_dataset_word_level
-from word_embedding_classification.constants import PREDICTION_TYPE as w_PREDICTION_TYPE, MODEL_DIR as w_MODEL_DIR
+from word_embedding_classification.constants import PREDICTION_TYPE as w_PREDICTION_TYPE, MODEL_DIR as w_MODEL_DIR, \
+    FILTERS as w_FILTERS
 from word_embedding_classification.train import train as w_train, get_embedding_layer
 from word_embedding_classification.models import *
 
 import keras.backend.tensorflow_backend as k_tf
 from helpers.model_utils import load_and_evaluate, load_and_predict
 
-from document_level_classification.constants import PREDICTION_TYPE as DOC_PREDICTION_TYPE
+from document_level_classification.constants import PREDICTION_TYPE as DOC_PREDICTION_TYPE, FILTERS as d_FILTERS
 from document_level_classification.models import get_ann_model, get_logistic_regression
 
 from document_level_classification.train import train as document_trainer
@@ -31,59 +33,30 @@ from document_level_classification.dataset_formatting import format_dataset_doc_
 from char_word_combined.models import get_cw_model
 from char_word_combined.train import train as cw_train
 
-TRAIN = "txt"
-TEST = "test"
-
 
 def word_main(operation, trained_model_path=None):
-    rem_stopwords = True
-    lemmatize = False
-    rem_punctuation = False
-    rem_emoticons = False
-
-    # Load dataset
+    # Load datasets
     train_texts, train_labels, train_metadata, labels_index = prepare_dataset(w_PREDICTION_TYPE)
     test_texts, test_labels, test_metadata, _ = prepare_dataset(w_PREDICTION_TYPE, folder_path=TEST_DATA_DIR)
 
-    # Clean texts
-    text_parser = Parser()
-    train_texts = text_parser.lowercase(train_texts)
-    train_texts = text_parser.replace_all_twitter_syntax_tokens(train_texts)  # Base filtering, i.e lowercase and tags
-
-    test_texts = text_parser.lowercase(test_texts)
-    test_texts = text_parser.replace_all_twitter_syntax_tokens(test_texts)
-
-
-    if rem_stopwords:
-        train_texts = text_parser.remove_stopwords(train_texts)
-        test_texts = text_parser.remove_stopwords(test_texts)
-
-    if rem_punctuation:
-        train_texts = text_parser.remove_punctuation(train_texts)
-        test_texts = text_parser.remove_punctuation(test_texts)
-
-    if lemmatize:
-        train_texts = text_parser.lemmatize(train_texts)
-        test_texts = text_parser.lemmatize(test_texts)
-
-    if rem_emoticons:
-        train_texts = text_parser.remove_emoticons(train_texts)
-        test_texts = text_parser.remove_emoticons(test_texts)
-
-    # Remove short texts from training
-    train_texts, train_labels, train_metadata, count_removed = text_parser.remove_texts_shorter_than_threshold(train_texts, train_labels, train_metadata)
-
-    # Add extra info, e.g., about parsing here
-    extra_info = ["Remove stopwords %s" % rem_stopwords,
-                  "Lemmatize %s" % lemmatize,
-                  "Remove punctuation %s" % rem_punctuation,
-                  "Remove emoticons %s" % rem_emoticons,
-                  "All Internet terms are replaced with tags",
-                  "Removed %i tweet because they were shorter than threshold" % count_removed]
+    # Filter datasets
+    train_texts, train_labels, train_metadata, extra_info = \
+        filter_dataset(texts=train_texts,
+                       labels=train_labels,
+                       metadata=train_metadata,
+                       filters=w_FILTERS,
+                       train_or_test=TRAIN)
+    test_texts, test_labels, test_metadata, _ = \
+        filter_dataset(texts=test_texts,
+                       labels=test_labels,
+                       metadata=test_metadata,
+                       filters=w_FILTERS,
+                       train_or_test=TEST)
 
     print("Formatting dataset")
     data = format_dataset_word_level(train_texts, train_labels, train_metadata)
-    data['x_test'], data['y_test'] = format_dataset_word_level(test_texts, test_labels, test_metadata, trained_word_index=data['word_index'])
+    data['x_test'], data['y_test'] = format_dataset_word_level(test_texts, test_labels, test_metadata,
+                                                               trained_word_index=data['word_index'])
 
     if operation == TRAIN:
         embedding_layer = get_embedding_layer(data['word_index'])
@@ -100,7 +73,8 @@ def word_main(operation, trained_model_path=None):
 
         # w_train(*get_word_model_3x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
 
-        w_train(*get_word_model_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+        w_train(*get_word_model_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info,
+                save_model=False)
 
         # w_train(*get_word_model_3x512_128lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
         # w_train(*get_word_model_4x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
@@ -113,54 +87,28 @@ def word_main(operation, trained_model_path=None):
 
 
 def char_main(operation, trained_model_path=None):
-    rem_stopwords = True  # Part of base
-    lemmatize = False
-    rem_punctuation = False
-    rem_emoticons = False
-
     # Load dataset
     train_texts, train_labels, train_metadata, labels_index = prepare_dataset(c_PREDICTION_TYPE)
     test_texts, test_labels, test_metadata, _ = prepare_dataset(c_PREDICTION_TYPE, folder_path=TEST_DATA_DIR)
 
-    # Clean texts
-    text_parser = Parser()
-    train_texts = text_parser.lowercase(train_texts)
-    train_texts = text_parser.replace_all_twitter_syntax_tokens(train_texts)  # Base filtering, i.e lowercase and tags
-
-    test_texts = text_parser.lowercase(test_texts)
-    test_texts = text_parser.replace_all_twitter_syntax_tokens(test_texts)
-
-    if rem_stopwords:
-        train_texts = text_parser.remove_stopwords(train_texts)
-        test_texts = text_parser.remove_stopwords(test_texts)
-
-    if rem_punctuation:
-        train_texts = text_parser.remove_punctuation(train_texts)
-        test_texts = text_parser.remove_punctuation(test_texts)
-
-    if lemmatize:
-        train_texts = text_parser.lemmatize(train_texts)
-        test_texts = text_parser.lemmatize(test_texts)
-
-    if rem_emoticons:
-        train_texts = text_parser.remove_emoticons(train_texts)
-        test_texts = text_parser.remove_emoticons(test_texts)
-
-    # Remove short texts from training set
-    train_texts, train_labels, train_metadata, count_removed = text_parser.remove_texts_shorter_than_threshold(train_texts, train_labels, train_metadata)
-
-
-    # Add extra info, e.g., about parsing here
-    extra_info = ["Remove stopwords %s" % rem_stopwords,
-                  "Lemmatize %s" % lemmatize,
-                  "Remove punctuation %s" % rem_punctuation,
-                  "Remove emoticons %s" % rem_emoticons,
-                  "All Internet terms are replaced with tags"
-                  "Removed %i tweets because they were shorter than threshold" % count_removed]
+    # Filter datasets
+    train_texts, train_labels, train_metadata, extra_info = \
+        filter_dataset(texts=train_texts,
+                       labels=train_labels,
+                       metadata=train_metadata,
+                       filters=c_FILTERS,
+                       train_or_test=TRAIN)
+    test_texts, test_labels, test_metadata, _ = \
+        filter_dataset(texts=test_texts,
+                       labels=test_labels,
+                       metadata=test_metadata,
+                       filters=c_FILTERS,
+                       train_or_test=TEST)
 
     print("Formatting dataset")
     data = format_dataset_char_level(train_texts, train_labels, train_metadata)
-    data['x_test'], data['y_test'] = format_dataset_char_level(test_texts, test_labels, test_metadata, trained_char_index=data['char_index'])
+    data['x_test'], data['y_test'] = format_dataset_char_level(test_texts, test_labels, test_metadata,
+                                                               trained_char_index=data['char_index'])
 
     num_chars = len(data['char_index'])
     num_output_nodes = len(labels_index)
@@ -170,7 +118,7 @@ def char_main(operation, trained_model_path=None):
         # Remember star before model getter
 
         # c_train(*get_char_model_3xConv_2xBiLSTM(num_output_nodes, num_chars), data=data, extra_info=extra_info)
-        #c_train(*get_char_model_3xConv_LSTM(num_output_nodes, num_chars), data=data)
+        # c_train(*get_char_model_3xConv_LSTM(num_output_nodes, num_chars), data=data)
 
         # c_train(*get_char_model_2xConv_BiLSTM(num_output_nodes, num_chars), data=data, extra_info=extra_info)
 
@@ -194,50 +142,96 @@ def char_main(operation, trained_model_path=None):
 
 def document_main():
     # Load dataset
-    from document_level_classification.constants import Log_Reg, TEST_DATA_DIR
-
+    from document_level_classification.constants import Log_Reg, TEST_DATA_DIR, LAYERS, EXPERIMENTS, N_GRAM, \
+        MAX_FEATURE_LENGTH, FEATURE_MODEL, get_constants_info
+    print("-"*20, " RUNNING DOCUMENT MODEL ", "-"*20)
     # Train and Validation
-    texts, labels, metadata, labels_index = prepare_dataset(DOC_PREDICTION_TYPE)
+    train_texts, train_labels, train_metadata, labels_index = prepare_dataset(DOC_PREDICTION_TYPE)
 
     # This is the Test datset from Kaggle
-    texts_test, labels_test, metadata_test, labels_index_test = prepare_dataset(DOC_PREDICTION_TYPE,
-                                                                                folder_path=TEST_DATA_DIR)
+    test_texts, test_labels, test_metadata, _ = prepare_dataset(DOC_PREDICTION_TYPE,
+                                                                folder_path=TEST_DATA_DIR)
 
-    # Clean texts with parser
-    parser = Parser()
-    print("Remove Stopwords...")
-    texts = parser.remove_stopwords(texts)
-    texts_test = parser.remove_stopwords(texts_test)
-    print("Parsing Twitter Specific Syntax...")
-    texts = parser.replace_all_twitter_syntax_tokens(texts)
-    texts_test = parser.replace_all_twitter_syntax_tokens(texts_test)
+    # Filter datasets
+    train_texts, train_labels, train_metadata, extra_info = \
+        filter_dataset(texts=train_texts,
+                       labels=train_labels,
+                       metadata=train_metadata,
+                       filters=d_FILTERS,
+                       train_or_test=TRAIN)
+
+    test_texts, test_labels, test_metadata, _ = \
+        filter_dataset(texts=test_texts,
+                       labels=test_labels,
+                       metadata=test_metadata,
+                       filters=d_FILTERS,
+                       train_or_test=TEST)
+
     data = {}
-    # Create format_dataset_tfidf
 
-    print("Format Dataset to Document Level")
-    data['x_train'], data['y_train'], data['meta_train'], \
-    data['x_val'], data['y_val'], data['meta_val'], \
-    feature_model, reduction_model = format_dataset_doc_level(texts,
-                                                              labels,
-                                                              metadata,
-                                                              is_test=False)
+    if EXPERIMENTS:
 
-    data['x_test'], data['y_test'], data['meta_test'] = format_dataset_doc_level(texts_test,
-                                                                                 labels_test,
-                                                                                 metadata_test,
-                                                                                 is_test=True,
-                                                                                 feature_model=feature_model,
-                                                                                 reduction_model=reduction_model)
+        for max_length in MAX_FEATURE_LENGTH:
+            for n_gram in N_GRAM:
+                info = extra_info
+                print "-"*20, " Running: ", n_gram, " and max feature length: ", max_length, " ", "-"*20
+                info.extend(get_constants_info(n_gram=n_gram, vocabulary_size=max_length))
+                print("Format Dataset to Document Level")
+                data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], data['meta_val'], \
+                feature_model, reduction_model = format_dataset_doc_level(train_texts,
+                                                                          train_labels,
+                                                                          train_metadata,
+                                                                          is_test=False,
+                                                                          feature_model_type=FEATURE_MODEL,
+                                                                          n_gram=n_gram,
+                                                                          max_feature_length=max_length)
 
-    input_size = data['x_train'].shape[1]
-    output_size = data['y_train'].shape[1]
+                # vocabulary = feature_model.train_vocabulary_counts
+                # keys = sorted(vocabulary, key=vocabulary.get, reverse=True)
+                # i = 0
+                # for key in keys:
+                #     if i < 100:
+                #         print key, " ", vocabulary[key]
+                #         i += 1
+                #     else:
+                #         break
 
-    if not Log_Reg:
-        document_trainer(*get_ann_model(input_size, output_size), data=data)
+                data['x_test'], data['y_test'], data['meta_test'] = format_dataset_doc_level(test_texts,
+                                                                                             test_labels,
+                                                                                             test_metadata,
+                                                                                             is_test=True,
+                                                                                             feature_model_type=FEATURE_MODEL,
+                                                                                             n_gram=n_gram,
+                                                                                             max_feature_length=max_length,
+                                                                                             feature_model=feature_model,
+                                                                                             reduction_model=reduction_model)
+
+                input_size = data['x_train'].shape[1]
+                output_size = data['y_train'].shape[1]
+
+                document_trainer(*get_ann_model(input_size, output_size, LAYERS), data=data, extra_info=info, save_model=False)
+
+
+    # This code are for test a saved model !!!!
+
+    #c_MODEL_DIR, trained_model_path), data = data, prediction_type = c_PREDICTION_TYPE, normalize = True
+    # model_path = "../models/document_level_classification/base_1024_512_256/16.05.2017_23:14:32_base_1024_512_256_01_0.5424.h5"
+    # load_and_predict(model_path, )
+    # load_and_evaluate(model_path, data=data)
+
+    """STANDARD RUNNING"""
+    # if not Log_Reg:
+    #     if type(LAYERS[0]) == list:
+    #         for layers_type in LAYERS:
+    #             document_trainer(*get_ann_model(input_size, output_size, layers_type), data=data, extra_info=extra_info)
+    #     else:
+    #         # when running single models, checkpoint during training are set to True! (save_model=True)
+    #         print("Running Single Model")
+    #         document_trainer(*get_ann_model(input_size, output_size, LAYERS), data=data, extra_info=extra_info, save_model=False)
 
     # Logistic Regression
     if Log_Reg:
-        document_trainer(*get_logistic_regression(input_size, output_size), data=data)
+        document_trainer(*get_logistic_regression(input_size, output_size), data=data, extra_info=extra_info)
 
 
 def char_word_main():
@@ -283,15 +277,18 @@ if __name__ == '__main__':
     k_tf.set_session(k_tf.tf.Session(config=tf_config))
 
     # Train all models in character main
-    # char_main(operation=TRAIN)
+    #char_main(operation=TRAIN)
 
     # Train all models in doc main
     """ DOCUMENT MODEL """
+
     document_main()
 
     # Train all models in word main
     """ WORD MODEL """
-    #word_main(operation=TRAIN)
+
+    # word_main(operation=TRAIN)
+
 
     # Train char-word models in char word main
     # char_word_main()

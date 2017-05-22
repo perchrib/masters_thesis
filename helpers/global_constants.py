@@ -6,9 +6,11 @@ AGE = 'age'
 MALE = 'MALE'
 FEMALE = 'FEMALE'
 
+# Train or test identifiers
+TRAIN = "train"
+TEST = "test"
 
 # Directories
-# TRAIN_DATA_DIR = '../data/txt_backup/'
 TRAIN_DATA_DIR = '../data/train/'
 TEST_DATA_DIR = '../data/test/'
 
@@ -17,6 +19,12 @@ CROWDFLOWER_CSV_PATH = '../data/csv/gender-classifier-DFE-791531.csv'
 EMBEDDINGS_NATIVE_DIR = '../embeddings_native/'
 EMBEDDINGS_INDEX_DIR = '../embeddings_index/'
 
+# Filter constants
+
+REM_STOPWORDS = 'REM_STOPWORDS'
+LEMMATIZE = 'LEMMATIZE'
+REM_PUNCTUATION = 'REM_PUNCTUATION'
+REM_EMOTICONS = 'REM_EMOTICONS'
 
 
 # Dataset split fractions
