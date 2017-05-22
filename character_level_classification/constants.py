@@ -1,5 +1,5 @@
 import os
-from helpers.global_constants import REM_STOPWORDS, LEMMATIZE, REM_EMOTICONS, REM_PUNCTUATION
+from helpers.global_constants import REM_STOPWORDS, LEMMATIZE, REM_EMOTICONS, REM_PUNCTUATION, REM_INTERNET_TERMS, LOWERCASE
 # Prediction type
 GENDER = 'gender'
 AGE = 'age'
@@ -14,17 +14,14 @@ CHAR_INDEX_DIR = os.path.join(MODEL_DIR, 'char_index')
 # Text pre-processing
 MAX_SEQUENCE_LENGTH = 100
 
-# Remove: Not used anymore.
-# For use with sentence encoder
-MAX_SENTENCE_LENGTH = 2  # Max number of sentences to consider when
-MAX_CHAR_SENT_LENGTH = 52
 
 # Filtering constants
 FILTERS = {
     REM_STOPWORDS: True,
     LEMMATIZE: False,
     REM_PUNCTUATION: False,
-    REM_EMOTICONS: False
+    REM_EMOTICONS: True,
+    LOWERCASE: False
 }
 
 # Model

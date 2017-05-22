@@ -10,15 +10,15 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 from word_embedding_classification.dataset_formatting import format_dataset_word_level, construct_embedding_matrix, \
     get_embedding_dim
 from word_embedding_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE, \
-    EMBEDDINGS_INDEX, MAX_SEQUENCE_LENGTH, LOGS_DIR, MODEL_DIR, WORD_INDEX_DIR
+    EMBEDDINGS_INDEX, MAX_SEQUENCE_LENGTH, LOGS_DIR, MODEL_DIR, WORD_INDEX_DIR, MAX_NB_WORDS
 from helpers.model_utils import get_model_checkpoint, save_trained_model, save_term_index
 from word_embedding_classification.models import *
 from preprocessors.parser import Parser
 from preprocessors.dataset_preparation import prepare_dataset
 from keras.layers import Embedding
 from keras.callbacks import EarlyStopping
-from time import time, strftime
-from helpers.helper_functions import log_session
+from time import time
+from helpers.helper_functions import log_session, get_time_format
 from helpers.model_utils import get_precision_recall_f_score
 
 np.random.seed(1337)
@@ -31,7 +31,7 @@ def train(model, model_info, data, save_model=False, extra_info=None):
                   metrics=MODEL_METRICS)
 
     # Callbacks
-    early_stopping = EarlyStopping(monitor='val_loss', patience=2)  # TODO: Patience is 2
+    early_stopping = EarlyStopping(monitor='val_loss', patience=1)  # TODO: Patience is 1
     callbacks = [early_stopping]
 
     # if save_model:
@@ -40,7 +40,7 @@ def train(model, model_info, data, save_model=False, extra_info=None):
     # Time
     start_time = time()
 
-    print('\nCommence training %s model' % model.name)
+    print('\nCommence training %s model -- Vocabulary size: %i' % (model.name, MAX_NB_WORDS))
     print('Embeddings from: %s' % EMBEDDINGS_INDEX)
     history = model.fit(data['x_train'], data['y_train'],
                         validation_data=[data['x_val'], data['y_val']],
@@ -50,8 +50,8 @@ def train(model, model_info, data, save_model=False, extra_info=None):
                         callbacks=callbacks,
                         verbose=1).history
 
-    training_time = (time() - start_time) / 60
-    print('Training time: %i' % training_time)
+    training_time = get_time_format(time() - start_time)
+    print('Training time: %s' % training_time)
 
     # Compute prf for val set
     prf_val = get_precision_recall_f_score(model, data['x_val'], data['y_val'], PREDICTION_TYPE)
@@ -81,7 +81,8 @@ def train(model, model_info, data, save_model=False, extra_info=None):
                 test_results=test_results,
                 model_info=model_info,
                 extra_info=extra_info,
-                prf_test=prf_test)
+                prf_test=prf_test,
+                vocab_size=MAX_NB_WORDS)
 
     if save_model:
         save_trained_model(model, MODEL_DIR, MODEL_OPTIMIZER)
@@ -93,7 +94,7 @@ def get_embedding_layer(word_index):
     return Embedding(len(word_index) + 1, get_embedding_dim(),
                      weights=[embedding_matrix],
                      input_length=MAX_SEQUENCE_LENGTH,
-                     trainable=False)
-                     # mask_zero=True)  # Ignore unknown words
+                     trainable=False,
+                     mask_zero=True)  # Ignore unknown words  # TODO: Mask-zero
     # Not trainable to prevent weights from being updated during training
 

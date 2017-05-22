@@ -1,0 +1,91 @@
+Training_log - 21/05/2017 04:45:33
+
+Model name: BiLSTM
+Elapsed training time: 3h:21m:49s
+
+Training set size: 586620
+Validation set size: 65179
+Validation set fraction: 0.098083
+Test set fraction: 0.019152
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 100
+Max number of words: 5000
+Max sequence length: 15
+
+-----------Training statistics-----------
+         acc      loss   val_acc  val_loss
+0   0.610767  0.650221  0.633931  0.627143
+1   0.628456  0.631041  0.646619  0.612647
+2   0.635984  0.621952  0.652020  0.604353
+3   0.641601  0.615334  0.655549  0.600036
+4   0.645258  0.611212  0.658863  0.594791
+5   0.649199  0.606787  0.662391  0.593260
+6   0.651106  0.604250  0.662192  0.591692
+7   0.653397  0.601748  0.663496  0.590488
+8   0.654632  0.600226  0.664156  0.587223
+9   0.656745  0.598371  0.666411  0.586456
+10  0.657855  0.596760  0.669357  0.584138
+11  0.658546  0.595789  0.669326  0.582917
+12  0.659439  0.594613  0.669357  0.583603
+13  0.661121  0.592997  0.669173  0.582777
+14  0.661551  0.592527  0.668743  0.583029
+15  0.662304  0.591572  0.671811  0.581849
+16  0.663711  0.590894  0.671259  0.581255
+17  0.663061  0.590787  0.671950  0.580071
+18  0.664047  0.589880  0.672011  0.579620
+19  0.664399  0.589451  0.671474  0.579909
+20  0.665136  0.589017  0.673929  0.578825
+21  0.665363  0.588628  0.673223  0.579325
+22  0.665359  0.588452  0.676046  0.577591
+23  0.666501  0.587404  0.675049  0.577684
+24  0.666015  0.586988  0.674343  0.577758
+25  0.666953  0.587227  0.676430  0.576626
+26  0.666408  0.586967  0.675033  0.577232
+27  0.667001  0.586542  0.673837  0.577073
+28  0.667522  0.586420  0.674619  0.578520
+
+Validation PRF
+                 Female          Male  Overall Macro  Overall Micro
+Precision      0.666883      0.679801       0.673342       0.674619
+Recall         0.582495      0.752866       0.667681       0.674619
+F-score        0.621839      0.714470       0.668155       0.674619
+Support    29935.000000  35244.000000            NaN            NaN
+
+--------------Test results---------------
+loss: 0.684390 acc: 0.611850
+
+Test PRF
+                Female         Male  Overall Macro  Overall Micro
+Precision     0.626170     0.596811       0.611490       0.611849
+Recall        0.619894     0.603224       0.611559       0.611849
+F-score       0.623016     0.600000       0.611508       0.611849
+Support    6585.000000  6142.000000            NaN            NaN
+
+--------------Model Diagram---------------
+      InputLayer (None, 15)            InputLayer (None, 15)      
+       Embedding (None, 15, 200)        Embedding (None, 15, 200) 
+            LSTM (None, 250)                 LSTM (None, 250)     
+                 \______________________________/                 
+                                |                                 
+                           Merge (None, 500)                      
+                         Dropout (None, 500)                      
+                           Dense (None, 2)                        
+
+
+Model information:
+=========================================
+ LSTM dropout: 0.500000, LSTM recurrent dropout 0.200000
+ Merge dropout 0.500000
+Extra information:
+=========================================
+ Remove stopwords True
+ Lemmatize False
+ Remove punctuation False
+ Remove emoticons False
+ Text is lowercased
+ Internet terms have been replaced with placeholders
+ Removed 3449 tweet because they were shorter than threshold

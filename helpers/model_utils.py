@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.metrics import confusion_matrix, precision_recall_fscore_support
 from keras.callbacks import ModelCheckpoint
 from keras.models import load_model, save_model, Model
-from global_constants import GENDER, OVERALL_MACRO, OVERALL_MICRO
+from global_constants import GENDER, OVERALL_MACRO, OVERALL_MICRO, TRAIN_ACC, TRAIN_LOSS, VAL_ACC, VAL_LOSS
 from helper_functions import save_pickle
 
 import matplotlib.pyplot as plt
@@ -52,8 +52,8 @@ def save_trained_model(model, model_dir, model_optimizer):
 def save_term_index(term_index, model_name, index_dir):
     print("Saving term index")
 
-    if not os.path.exists(os.path.join(index_dir, model_name)):
-        os.makedirs(os.path.join(index_dir, model_name))
+    if not os.path.exists(index_dir):
+        os.makedirs(index_dir)
 
     index_file_name = time.strftime("%d.%m.%Y_%H:%M:%S") + "_" + model_name
     save_pickle(os.path.join(index_dir, index_file_name), term_index)
@@ -178,7 +178,146 @@ def get_argmax_classes(y_values):
 
     return np.asarray([np.argmax(confidence) for confidence in y_values])
 
-# if __name__ == '__main__':
-#     preds = [[0.4, 0.6], [0.7, 0.3], [0.8, 0.2]]
-#     y_pred = [np.argmax(x) for x in preds]
-#     create_and_plot_confusion_matrix([1, 1, 0], y_pred, ["Male", "Female"], normalize=False)
+
+def plot_models(log_path_list, graph_metric, save_path=None, title=None):
+    """
+    Given a list of log file paths, plot the training histories for the specified graph_metric
+    :param log_path_list: List of log file paths
+    :param graph_metric: Which metric to plot from provided logs. Allowed values are TRAIN_ACC; TRAIN_LOSS; VAL_ACC and VAL_LOSS. Can be a list to plot multiple metrics
+    :return: 
+    """
+
+    # Get statistics for all models in log_path_list
+    # List of lists (for each models) with corresponding history of values
+    model_names, statistics = _get_log_statistics(log_path_list)
+
+    print("Specified models for plotting: %s" % model_names)
+    # Plot correct metric
+    plt.style.use("seaborn-darkgrid")
+
+    if type(graph_metric) is str:
+        for i in range(len(statistics[graph_metric])):  # Iterate over models
+            plt.plot(statistics[graph_metric][i], label=model_names[i])
+            plt.ylabel(graph_metric)
+
+    elif type(graph_metric) is list:
+        for metric in(graph_metric):
+            for i in range(len(statistics[metric])): # Iterate over models
+                plt.plot(statistics[metric][i], label=model_names[i] + " " + metric)
+                plt.ylabel(metric)
+
+
+    plt.xlabel("Epochs")
+    plt.legend()
+
+    if title:
+        plt.title(title)
+
+    if save_path:
+        print("Plot saved")
+        plt.savefig(save_path, format='png', dpi=600)
+
+    plt.show()
+
+
+def _get_log_statistics(log_path_list):
+    """
+    Read log files and mine training statistics
+    :param log_path_list: list of log file paths
+    :return: list of model names and dictionary with training statistics
+    """
+
+    model_names = []
+    # List of lists (for each models) with corresponding history of values
+    model_accs = []
+    model_losses = []
+    model_val_accs = []
+    model_val_losses = []
+
+    for path in log_path_list:
+        with open(path) as log_file:
+            eof = False  # End of file
+            while not eof:
+                line = log_file.readline()
+                if line == "":
+                    eof = True
+
+                # Model Name
+                elif line.startswith("Model name"):
+                    model_names.append(line.split(":")[1].strip())
+
+                elif "Training statistics" in line:
+                    log_file.readline()  # Jump to next line containing first line of stats
+                    end_of_training_stats = False
+
+                    acc = []
+                    loss = []
+                    val_acc = []
+                    val_loss = []
+
+                    while not end_of_training_stats:
+                        line = log_file.readline()
+                        if line == "\n":
+                            end_of_training_stats = True
+                        else:
+                            all_metrics = line.split()  # [acc, loss, val_acc, val_loss]
+                            all_metrics.pop(0)  # Remove history index from the list
+
+                            acc.append(all_metrics[0])
+                            loss.append(all_metrics[1])
+                            val_acc.append(all_metrics[2])
+                            val_loss.append(all_metrics[3])
+
+                    model_accs.append(acc)
+                    model_losses.append(loss)
+                    model_val_accs.append(val_acc)
+                    model_val_losses.append(val_loss)
+
+    statistics = {
+        TRAIN_ACC: model_accs,
+        TRAIN_LOSS: model_losses,
+        VAL_ACC: model_val_accs,
+        VAL_LOSS: model_val_losses
+    }
+
+    return model_names, statistics
+
+if __name__ == '__main__':
+    # preds = [[0.4, 0.6], [0.7, 0.3], [0.8, 0.2]]
+    # y_pred = [np.argmax(x) for x in preds]
+    # create_and_plot_confusion_matrix([1, 1, 0], y_pred, ["Male", "Female"], normalize=False)
+
+    # Char model plotting
+    # char_paths = \
+    #     [
+    #         '../logs/character_level_classification/model_comp/16.05.2017_11:33:15_2x512LSTM_adam.txt',     # 2x512LSTM
+    #         '../logs/character_level_classification/model_comp/16.05.2017_14:27:27_BiLSTM_adam.txt',        # BiLSTM
+    #         '../logs/character_level_classification/model_comp/15.05.2017_21:41:04_Conv_BiLSTM_adam.txt',        # Conv_BiLSTM
+    #         '../logs/character_level_classification/model_comp/16.05.2017_07:05:29_2xConv_BiLSTM_adam.txt', # 2xConv_BiLSTM
+    #         '../logs/character_level_classification/model_comp/20.05.2017_09:38:23_Conv_2xBiLSTM.txt'       # Conv_2xBiLSTM
+    #     ]
+    #
+    # # plot_models(char_paths, VAL_LOSS, save_path='../../images/experiments/char_model_base.png', title="Character model comparison")
+    # # plot_models(char_paths, TRAIN_LOSS, title="Character model comparison")
+    #
+    #
+    # path = ['../logs/character_level_classification/model_comp/15.05.2017_21:41:04_Conv_BiLSTM_adam.txt']
+    # plot_models(path, [VAL_LOSS, TRAIN_LOSS], save_path="../../images/experiments/char_train_val_loss_.png", title="Conv_BiLSTM training loss and validation loss")
+
+    # Word model plotting
+    word_paths = \
+        [
+            '../logs/word_embedding_classification/model_comp/15.05.2017_02:09:17_2x512_256LSTM_adam.txt',      # 2x512_256LSTM
+            '../logs/word_embedding_classification/model_comp/15.05.2017_19:56:26_3x512_LSTM_adam.txt',         # 3x512_LSTM
+            '../logs/word_embedding_classification/model_comp/15.05.2017_18:30:02_Conv_BiLSTM_adam.txt',        # Conv_BiLSTM
+            '../logs/word_embedding_classification/model_comp/29.04.2017_18:19:01_3xConv_2xBiLSTM_adam.txt',    # 3xConv_BiLSTM
+            # '../logs/word_embedding_classification/model_comp/19.05.2017_13:53:14_BiLSTM.txt'                   # Stock BiLSTM
+            '../logs/word_embedding_classification/model_comp/21.05.2017_19:25:45_BiLSTM.txt'
+        ]
+
+    plot_models(word_paths, VAL_LOSS, save_path='../../images/experiments/word_model_base.png', title="Word model comparison")
+
+
+
+
+    print("")

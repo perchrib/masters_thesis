@@ -1,0 +1,60 @@
+Training_log - 16/05/2017 16:12:25
+
+Model name: 2x512LSTM
+Elapsed training time: 2h:40m:45s
+
+Training set size: 586620
+Validation set size: 65179
+Validation set fraction: 0.098083
+Test set fraction: 0.019152
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 50
+Max sequence length: 100
+
+-----------Training statistics-----------
+        acc      loss   val_acc  val_loss
+0  0.541657  0.688850  0.578484  0.675215
+1  0.546214  0.686588  0.550591  0.685786
+2  0.540328  0.688720  0.544899  0.686850
+3  0.544963  0.687049  0.552080  0.685083
+
+Validation PRF
+                 Female          Male  Overall Macro  Overall Micro
+Precision      0.533624      0.555828       0.544726        0.55208
+Recall         0.196158      0.854387       0.525272        0.55208
+F-score        0.286866      0.673503       0.480185        0.55208
+Support    29935.000000  35244.000000            NaN            NaN
+
+--------------Test results---------------
+loss: 0.694380 acc: 0.502080
+
+Test PRF
+                Female         Male  Overall Macro  Overall Micro
+Precision     0.560194     0.490860       0.525527       0.502082
+Recall        0.175247     0.852491       0.513869       0.502082
+F-score       0.266975     0.623000       0.444987       0.502082
+Support    6585.000000  6142.000000            NaN            NaN
+
+--------------Model Diagram---------------
+       InputLayer (None, 100)      
+           Lambda (None, 100, 77)  
+             LSTM (None, 100, 512) 
+          Dropout (None, 100, 512) 
+             LSTM (None, 512)      
+            Dense (None, 2)        
+
+
+Model information:
+=========================================
+ Dropout 0.300000
+Extra information:
+=========================================
+ Remove stopwords True
+ Lemmatize False
+ Remove punctuation False
+ Remove emoticons False
+ All Internet terms are replaced with tagsRemoved 3449 tweets because they were shorter than threshold

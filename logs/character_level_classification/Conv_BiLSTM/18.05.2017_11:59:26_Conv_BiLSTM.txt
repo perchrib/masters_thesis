@@ -1,0 +1,104 @@
+Training_log - 18/05/2017 11:59:26
+
+Model name: Conv_BiLSTM
+Elapsed training time: 6h:53m:46s
+
+Training set size: 587330
+Validation set size: 65258
+Validation set fraction: 0.098086
+Test set fraction: 0.019129
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 50
+Max sequence length: 100
+
+-----------Training statistics-----------
+         acc      loss   val_acc  val_loss
+0   0.608159  0.651626  0.646020  0.616832
+1   0.642666  0.618393  0.657483  0.602107
+2   0.654811  0.604477  0.664271  0.593372
+3   0.662629  0.595673  0.671902  0.590312
+4   0.667955  0.589360  0.670431  0.583018
+5   0.673262  0.583101  0.669910  0.581963
+6   0.678029  0.577750  0.680514  0.574301
+7   0.681349  0.573392  0.684085  0.570828
+8   0.683141  0.570654  0.683564  0.569421
+9   0.686525  0.566681  0.688329  0.565719
+10  0.688727  0.563638  0.688391  0.566256
+11  0.691403  0.560793  0.689846  0.563661
+12  0.692791  0.558907  0.690321  0.563060
+13  0.694492  0.556897  0.691624  0.562978
+14  0.695932  0.554781  0.690184  0.566950
+15  0.697649  0.553565  0.693264  0.560057
+16  0.698648  0.551804  0.693386  0.559039
+17  0.699631  0.550718  0.693402  0.558792
+18  0.701476  0.548545  0.695133  0.557103
+19  0.701481  0.547617  0.695332  0.556516
+20  0.703010  0.546736  0.695884  0.555530
+21  0.703184  0.545402  0.696037  0.556675
+22  0.704267  0.544981  0.697156  0.555723
+23  0.705205  0.543468  0.696681  0.554890
+24  0.705450  0.543365  0.697447  0.553491
+25  0.706085  0.542142  0.697708  0.554332
+26  0.706727  0.541563  0.700067  0.553065
+27  0.708397  0.539798  0.699117  0.552407
+28  0.707839  0.540472  0.699255  0.553073
+29  0.708263  0.539639  0.699485  0.552987
+30  0.707842  0.539547  0.700359  0.552190
+31  0.709589  0.538556  0.700129  0.552567
+32  0.709489  0.538517  0.700098  0.552439
+33  0.709730  0.537566  0.699409  0.552389
+
+Validation PRF
+                 Female          Male  Overall Macro  Overall Micro
+Precision      0.693891      0.703237       0.698564       0.699409
+Recall         0.618625      0.768064       0.693345       0.699409
+F-score        0.654100      0.734222       0.694161       0.699409
+Support    29981.000000  35277.000000            NaN            NaN
+
+--------------Test results---------------
+loss: 0.738300 acc: 0.554490
+
+Test PRF
+                Female         Male  Overall Macro  Overall Micro
+Precision     0.601734     0.528676       0.565205        0.55449
+Recall        0.410934     0.708401       0.559668        0.55449
+F-score       0.488360     0.605483       0.546921        0.55449
+Support    6585.000000  6142.000000            NaN            NaN
+
+--------------Model Diagram---------------
+       InputLayer (None, 100)             InputLayer (None, 100)      
+           Lambda (None, 100, 78)             Lambda (None, 100, 78)  
+           Conv1D (None, 96, 1024)            Conv1D (None, 96, 1024) 
+          Dropout (None, 96, 1024)           Dropout (None, 96, 1024) 
+     MaxPooling1D (None, 48, 1024)      MaxPooling1D (None, 48, 1024) 
+             LSTM (None, 256)                   LSTM (None, 256)      
+                  \________________________________/                  
+                                  |                                   
+                             Merge (None, 512)                        
+                           Dropout (None, 512)                        
+                             Dense (None, 200)                        
+                             Dense (None, 2)                          
+
+
+Model information:
+=========================================
+ Kernel_size: 5
+ Filters: 1024
+ Pool length: 2
+ LSTM dropout: 0.200000, LSTM recurrent dropout 0.200000
+ Conv dropout: 0.500000
+ Dense drop1 0.500000
+ Dense drop2 0.200000
+ No dense layer before softmax
+Extra information:
+=========================================
+ Remove stopwords False
+ Lemmatize False
+ Remove punctuation False
+ Remove emoticons False
+ All Internet terms are replaced with tags
+ Removed 2660 tweet because they were shorter than threshold

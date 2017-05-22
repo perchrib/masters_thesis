@@ -1,6 +1,7 @@
 from __future__ import print_function
 import os
 import sys
+
 # Append path to use modules outside pycharm environment, e.g. remote server
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 from functools import reduce
@@ -9,7 +10,8 @@ from nltk import sent_tokenize
 import numpy as np
 
 from preprocessors.language_detection import detect_language
-from helpers.global_constants import TRAIN_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT, TEST_DATA_DIR, TRAIN, TEST, REM_STOPWORDS, REM_EMOTICONS, REM_PUNCTUATION, LEMMATIZE
+from helpers.global_constants import TRAIN_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT, TEST_DATA_DIR, TRAIN, \
+    TEST, REM_STOPWORDS, REM_EMOTICONS, REM_PUNCTUATION, LEMMATIZE, REM_INTERNET_TERMS, LOWERCASE
 from helpers.helper_functions import shuffle
 
 SEED = 1337
@@ -27,7 +29,6 @@ def prepare_dataset(prediction_type, folder_path=TRAIN_DATA_DIR, gender=None):
     labels_index = construct_labels_index(prediction_type)  # dictionary mapping label name to numeric id
     labels = []  # list of label ids
     metadata = []  # list of dictionaries with author information (age, gender)
-    foreign_tweets = 0
 
     print("\n------Parsing %s files.." % folder_path)
     for sub_folder_name in sorted(filter(lambda x: ".DS" not in x, list(os.listdir(folder_path)))):
@@ -56,7 +57,6 @@ def prepare_dataset(prediction_type, folder_path=TRAIN_DATA_DIR, gender=None):
         print("%i tweets in %s" % (tweet_count, sub_folder_name))
 
     print('\nFound %i texts.' % len(texts))
-    print('\nFound %i foreign tweets.' % foreign_tweets)
     return texts, labels, metadata, labels_index
 
 
@@ -174,18 +174,39 @@ def filter_dataset(texts, labels, metadata, filters, train_or_test):
     :return:
     """
 
+    print("-->Specified filters: ")
+    print(filters)
 
     modified_texts = texts
     modified_labels = labels
     modified_metadata = metadata
     count_removed = 0  # Stays zero unless removed for training set
 
-    # Clean texts
-    text_parser = Parser()
-    # Base filtering, which stays constant. No experiments with these
-    modified_texts = text_parser.lowercase(modified_texts)
-    modified_texts = text_parser.replace_all_twitter_syntax_tokens(modified_texts)
+    # Extra parsing info for use in log
+    extra_info = ["Remove stopwords %s" % filters[REM_STOPWORDS],
+                  "Lemmatize %s" % filters[LEMMATIZE],
+                  "Remove punctuation %s" % filters[REM_PUNCTUATION],
+                  "Remove emoticons %s" % filters[REM_EMOTICONS]]
 
+    # Text pre-processor
+    text_parser = Parser()
+
+    # Lowercase
+    if LOWERCASE in filters and not filters[LOWERCASE]:
+        extra_info.append("Text is not lowercased")
+    else:
+        modified_texts = text_parser.lowercase(modified_texts)
+        extra_info.append("Text is lowercased")
+
+    # Either remove Internet specific tokens or replace with tags
+    if REM_INTERNET_TERMS in filters and filters[REM_INTERNET_TERMS]:
+        modified_texts = text_parser.remove_all_twitter_syntax_tokens(modified_texts)
+        extra_info.append("Internet terms have been REMOVED")
+    else:
+        modified_texts = text_parser.replace_all_twitter_syntax_tokens(modified_texts)
+        extra_info.append("Internet terms have been replaced with placeholders")
+
+    # Other filtering
     if filters[REM_STOPWORDS]:
         modified_texts = text_parser.remove_stopwords(modified_texts)
 
@@ -204,18 +225,12 @@ def filter_dataset(texts, labels, metadata, filters, train_or_test):
             modified_texts, modified_labels, modified_metadata)
 
     # Extra parsing info for use in log
-    extra_info = ["Remove stopwords %s" % filters[REM_STOPWORDS],
-                  "Lemmatize %s" % filters[LEMMATIZE],
-                  "Remove punctuation %s" % filters[REM_PUNCTUATION],
-                  "Remove emoticons %s" % filters[REM_EMOTICONS],
-                  "All Internet terms are replaced with tags",
-                  "Removed %i tweet because they were shorter than threshold" % count_removed]
+    extra_info.append("Removed %i tweet because they were shorter than threshold" % count_removed)
 
     return modified_texts, modified_labels, modified_metadata, extra_info
 
 
 def display_gender_distribution(metadata):
-
     num_total = len(metadata)
     num_males = reduce(lambda total, x: total + 1 if x['gender'] == 'MALE' else total, metadata, 0)
     num_females = reduce(lambda total, x: total + 1 if x['gender'] == 'FEMALE' else total, metadata, 0)

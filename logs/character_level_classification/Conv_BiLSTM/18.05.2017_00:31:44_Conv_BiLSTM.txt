@@ -1,0 +1,103 @@
+Training_log - 18/05/2017 00:31:44
+
+Model name: Conv_BiLSTM
+Elapsed training time: 6h:33m:05s
+
+Training set size: 583993
+Validation set size: 64888
+Validation set fraction: 0.098076
+Test set fraction: 0.019236
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 50
+Max sequence length: 100
+
+-----------Training statistics-----------
+         acc      loss   val_acc  val_loss
+0   0.597136  0.657426  0.629454  0.631409
+1   0.630780  0.628315  0.634493  0.617309
+2   0.640739  0.616763  0.643570  0.609348
+3   0.647408  0.609344  0.652555  0.603676
+4   0.652650  0.603388  0.657703  0.597536
+5   0.657011  0.598578  0.657995  0.594515
+6   0.661321  0.594226  0.660292  0.590994
+7   0.662927  0.591395  0.662326  0.589745
+8   0.666357  0.588203  0.662958  0.588858
+9   0.668842  0.585184  0.663913  0.587032
+10  0.670789  0.582467  0.666148  0.585285
+11  0.673505  0.579688  0.666811  0.583169
+12  0.674827  0.577595  0.668074  0.582086
+13  0.676232  0.576074  0.670031  0.580584
+14  0.677613  0.574263  0.666086  0.584069
+15  0.678881  0.572819  0.671141  0.579034
+16  0.680190  0.570985  0.671403  0.577005
+17  0.680340  0.570736  0.672621  0.577709
+18  0.682118  0.569521  0.674562  0.576894
+19  0.682017  0.569359  0.674424  0.575544
+20  0.683256  0.567215  0.672960  0.576489
+21  0.683477  0.567903  0.666965  0.583891
+22  0.684054  0.567359  0.673730  0.575055
+23  0.684518  0.565346  0.672081  0.574953
+24  0.686030  0.564512  0.673484  0.575815
+25  0.686457  0.563486  0.675472  0.574846
+26  0.686174  0.563569  0.676026  0.573068
+27  0.687808  0.562704  0.673083  0.576475
+28  0.687844  0.562228  0.676751  0.573128
+29  0.688116  0.561594  0.676889  0.572459
+30  0.688171  0.561398  0.675071  0.572762
+31  0.688688  0.561130  0.675579  0.572577
+32  0.689556  0.560383  0.677398  0.572922
+
+Validation PRF
+                 Female          Male  Overall Macro  Overall Micro
+Precision      0.690015      0.669965       0.679990       0.677398
+Recall         0.551920      0.785798       0.668859       0.677398
+F-score        0.613290      0.723273       0.668282       0.677398
+Support    30075.000000  34813.000000            NaN            NaN
+
+--------------Test results---------------
+loss: 0.819430 acc: 0.590630
+
+Test PRF
+                Female         Male  Overall Macro  Overall Micro
+Precision     0.598341     0.581241       0.589791       0.590634
+Recall        0.635232     0.542820       0.589026       0.590634
+F-score       0.616235     0.561374       0.588804       0.590634
+Support    6585.000000  6142.000000            NaN            NaN
+
+--------------Model Diagram---------------
+       InputLayer (None, 100)             InputLayer (None, 100)      
+           Lambda (None, 100, 58)             Lambda (None, 100, 58)  
+           Conv1D (None, 96, 1024)            Conv1D (None, 96, 1024) 
+          Dropout (None, 96, 1024)           Dropout (None, 96, 1024) 
+     MaxPooling1D (None, 48, 1024)      MaxPooling1D (None, 48, 1024) 
+             LSTM (None, 256)                   LSTM (None, 256)      
+                  \________________________________/                  
+                                  |                                   
+                             Merge (None, 512)                        
+                           Dropout (None, 512)                        
+                             Dense (None, 200)                        
+                             Dense (None, 2)                          
+
+
+Model information:
+=========================================
+ Kernel_size: 5
+ Filters: 1024
+ Pool length: 2
+ LSTM dropout: 0.200000, LSTM recurrent dropout 0.200000
+ Conv dropout: 0.500000
+ Dense drop1 0.500000
+ Dense drop2 0.200000
+ No dense layer before softmax
+Extra information:
+=========================================
+ Remove stopwords True
+ Lemmatize False
+ Remove punctuation True
+ Remove emoticons False
+ All Internet terms are replaced with tags
+ Removed 6367 tweet because they were shorter than threshold
