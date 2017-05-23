@@ -1,6 +1,7 @@
 # import tensorflow as tf
 from keras.models import Model, Sequential
 from keras.layers import Input, Dense, LSTM, Dropout, Lambda, Conv1D, MaxPooling1D, merge, Flatten, Masking
+from keras.regularizers import l1
 from character_level_classification.constants import MAX_SEQUENCE_LENGTH
 
 

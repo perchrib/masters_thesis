@@ -21,7 +21,7 @@ def train(model, model_info, data, save_model=False, extra_info=None):
 
 
     # Callbacks
-    early_stopping = EarlyStopping(monitor='val_loss', patience=2)
+    early_stopping = EarlyStopping(monitor='val_loss', patience=0,)
 
     model.compile(optimizer=MODEL_OPTIMIZER,
                   loss=MODEL_LOSS,
@@ -78,13 +78,3 @@ def train(model, model_info, data, save_model=False, extra_info=None):
                 extra_info=extra_info,
                 max_sequence_length=data['x_train'].shape[1],
                 prf_test=prf_test)
-
-    if save_model:
-        save_trained_model(model, MODEL_DIR, MODEL_OPTIMIZER)
-
-
-
-
-
-
-

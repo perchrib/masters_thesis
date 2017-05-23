@@ -180,7 +180,7 @@ def sentiment_tweet_counter(texts):
 
 def is_equals(results):
     del results['compound']
-    if 0 in set(results.values()):
+    if len(set(results.values())) == 1:
         return True
     return False
 

@@ -13,13 +13,13 @@ from helper_functions import save_pickle
 import matplotlib.pyplot as plt
 
 
-def get_model_checkpoint(model_name, model_dir, model_optimizer):
+def get_model_checkpoint(model_name, model_dir, model_optimizer=None):
     dir_path = os.path.join(model_dir, model_name)
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
 
     model_file_name = time.strftime(
-        "%d.%m.%Y_%H:%M:%S") + "_" + model_name + "_" + model_optimizer + "_{epoch:02d}_{val_acc:.4f}.h5"
+        "%d.%m.%Y_%H:%M:%S") + "_" + model_name + "_{epoch:02d}_{val_loss:.4f}.h5"
 
     checkpoint = ModelCheckpoint(os.path.join(dir_path, model_file_name), save_best_only=True)
 
@@ -43,7 +43,7 @@ def save_trained_model(model, model_dir, model_optimizer):
 
     # _{epoch:02d}_{val_acc:.4f}
     model_file_name = time.strftime(
-        "%d.%m.%Y_%H:%M:%S") + "_" + model.name + "_" + model_optimizer + ".h5"
+        "%d.%m.%Y_%H:%M:%S") + "_" + model.name + ".h5"
 
     model.save(os.path.join(model_dir, model.name, model_file_name))
     print("Model saved")
@@ -288,36 +288,30 @@ if __name__ == '__main__':
     # create_and_plot_confusion_matrix([1, 1, 0], y_pred, ["Male", "Female"], normalize=False)
 
     # Char model plotting
-    char_paths = \
-        [
-            '../logs/character_level_classification/model_comp/16.05.2017_11:33:15_2x512LSTM_adam.txt',     # 2x512LSTM
-            '../logs/character_level_classification/model_comp/16.05.2017_14:27:27_BiLSTM_adam.txt',        # BiLSTM
-            '../logs/character_level_classification/model_comp/15.05.2017_21:41:04_Conv_BiLSTM_adam.txt',        # Conv_BiLSTM
-            '../logs/character_level_classification/model_comp/16.05.2017_07:05:29_2xConv_BiLSTM_adam.txt', # 2xConv_BiLSTM
-            '../logs/character_level_classification/model_comp/20.05.2017_09:38:23_Conv_2xBiLSTM.txt'       # Conv_2xBiLSTM
-        ]
-
+    # char_paths = \
+    #     [
+    #         '../logs/character_level_classification/model_comp/16.05.2017_11:33:15_2x512LSTM_adam.txt',     # 2x512LSTM
+    #         '../logs/character_level_classification/model_comp/16.05.2017_14:27:27_BiLSTM_adam.txt',        # BiLSTM
+    #         '../logs/character_level_classification/model_comp/18.05.2017_17:47:45_Conv_BiLSTM_base.txt',        # Conv_BiLSTM
+    #         '../logs/character_level_classification/model_comp/16.05.2017_07:05:29_2xConv_BiLSTM_adam.txt', # 2xConv_BiLSTM
+    #         '../logs/character_level_classification/model_comp/20.05.2017_09:38:23_Conv_2xBiLSTM.txt'       # Conv_2xBiLSTM
+    #     ]
+    #
     # plot_models(char_paths, VAL_LOSS, save_path='../../images/experiments/char_model_base.png', title="Character model comparison")
     # plot_models(char_paths, TRAIN_LOSS, title="Character model comparison")
 
 
-    path = ['../logs/character_level_classification/Ablation/20.05.2017_21:30:39_Conv_BiLSTM_em_lower.txt']
+    path = ['../logs/word_embedding_classification/BiLSTM/22.05.2017_16:37:14_BiLSTM.txt', '../logs/character_level_classification/Ablation/20.05.2017_21:30:39_Conv_BiLSTM_em_lower.txt']
     plot_models(path, [VAL_LOSS, TRAIN_LOSS], title="Conv_BiLSTM training loss and validation loss")  #save_path="../../images/experiments/char_train_val_loss_.png"
 
 
     # Word model plotting
-    # word_paths = \
-    #     [
-    #         '../logs/word_embedding_classification/model_comp/21.05.2017_22:14:59_2x512_256LSTM.txt',      # 2x512_256LSTM
-    #         '../logs/word_embedding_classification/model_comp/15.05.2017_18:30:02_Conv_BiLSTM_adam.txt',        # Conv_BiLSTM
-    #         '../logs/word_embedding_classification/model_comp/29.04.2017_18:19:01_3xConv_2xBiLSTM_adam.txt',    # 3xConv_BiLSTM
-    #         # '../logs/word_embedding_classification/model_comp/19.05.2017_13:53:14_BiLSTM.txt'                   # Stock BiLSTM
-    #         '../logs/word_embedding_classification/model_comp/21.05.2017_19:25:45_BiLSTM.txt'
-    #     ]
+    # model_comp_path = '../logs/word_embedding_classification/model_comp'
+    # word_paths = list(map(lambda file_name: os.path.join(model_comp_path, file_name), os.listdir(model_comp_path)))
     #
     # plot_models(word_paths, VAL_LOSS, save_path='../../images/experiments/word_model_base.png', title="Word model comparison")
     #
-    #
-    #
+
+
 
     print("")

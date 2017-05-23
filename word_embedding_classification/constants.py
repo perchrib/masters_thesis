@@ -20,7 +20,7 @@ FILTERS = {
     REM_STOPWORDS: True,
     LEMMATIZE: False,
     REM_PUNCTUATION: False,
-    REM_EMOTICONS: False,
+    REM_EMOTICONS: True,
     REM_INTERNET_TERMS: False
 }
 
