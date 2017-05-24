@@ -12,7 +12,7 @@ from preprocessors.dataset_preparation import prepare_dataset
 
 import time
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-from helpers.model_utils import get_model_checkpoint, save_trained_model, get_precision_recall_f_score, save_term_index
+from helpers.model_utils import get_model_checkpoint, save_trained_model, predict_and_get_precision_recall_f_score, save_term_index
 from character_level_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE, PREDICTION_TYPE, LOGS_DIR, MODEL_DIR, CHAR_INDEX_DIR
 from helpers.helper_functions import log_session, get_time_format
 import numpy as np
@@ -62,12 +62,12 @@ def train(model, model_info, data, save_model=False, extra_info=None, log_sess=T
     print("Training time: %s" % training_time)
 
     # Compute prf for val set
-    prf_val = get_precision_recall_f_score(model, data['x_val'], data['y_val'], PREDICTION_TYPE)
+    prf_val = predict_and_get_precision_recall_f_score(model, data['x_val'], data['y_val'], PREDICTION_TYPE)
 
     # Evaluate on test set, if supplied
     if 'x_test' in data:
         test_results = model.evaluate(data['x_test'], data['y_test'], batch_size=BATCH_SIZE)
-        prf_test = get_precision_recall_f_score(model, data['x_test'], data['y_test'], PREDICTION_TYPE)
+        prf_test = predict_and_get_precision_recall_f_score(model, data['x_test'], data['y_test'], PREDICTION_TYPE)
         num_test = len(data['x_test'])
     else:
         test_results = None

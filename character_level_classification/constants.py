@@ -21,7 +21,7 @@ FILTERS = {
     LEMMATIZE: False,
     REM_PUNCTUATION: False,
     REM_EMOTICONS: False,
-    LOWERCASE: False
+    LOWERCASE: True
 }
 
 # Model

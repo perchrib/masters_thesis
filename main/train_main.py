@@ -32,7 +32,7 @@ from char_word_combined.models import get_cw_model
 from char_word_combined.train import train as cw_train
 
 
-def word_main(trained_model_path=None, specified_filters=None, train_only_on=None, save_model=False):
+def word_main(specified_filters=None, train_only_on=None, save_model=False):
     print("""WORD MODEL""")
     # Load datasets
     train_texts, train_labels, train_metadata, labels_index = prepare_dataset(w_PREDICTION_TYPE)
@@ -51,7 +51,7 @@ def word_main(trained_model_path=None, specified_filters=None, train_only_on=Non
         filter_dataset(texts=test_texts,
                        labels=test_labels,
                        metadata=test_metadata,
-                       filters=w_FILTERS,
+                       filters=filters,
                        train_or_test=TEST)
 
     print("Formatting dataset")
@@ -95,7 +95,7 @@ def word_main(trained_model_path=None, specified_filters=None, train_only_on=Non
 
 
 
-def char_main(trained_model_path=None, specified_filters=None, train_only_on=None, save_model=False):
+def char_main(specified_filters=None, train_only_on=None, save_model=False):
     print("""CHAR MODEL""")
     # Load dataset
     train_texts, train_labels, train_metadata, labels_index = prepare_dataset(c_PREDICTION_TYPE)
@@ -110,11 +110,12 @@ def char_main(trained_model_path=None, specified_filters=None, train_only_on=Non
                        metadata=train_metadata,
                        filters=filters,
                        train_or_test=TRAIN)
+
     test_texts, test_labels, test_metadata, _ = \
         filter_dataset(texts=test_texts,
                        labels=test_labels,
                        metadata=test_metadata,
-                       filters=c_FILTERS,
+                       filters=filters,
                        train_or_test=TEST)
 
     print("Formatting dataset")

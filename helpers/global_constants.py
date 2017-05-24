@@ -15,10 +15,21 @@ TRAIN_LOSS = "Training Loss"
 VAL_ACC = "Validation Accuracy"
 VAL_LOSS = "Validation Loss"
 
+# Used as sysarg when running main -- Do not change
 CHAR = "char"
 DOC = "doc"
 WORD = "word"
 
+# Dict keys
+X_TEST = 'x_test'
+Y_TEST = 'y_test'
+CHAR_MODEL = "Char model"
+WORD_MODEL = "Word model"
+DOC_MODEL = "Doc model"
+
+# Stacking - Prediction averaging style
+MAX_VOTE = "MAX_VOTE"
+AVERAGE_CONF = "AVERAGE_CONF"
 
 # Directories
 TRAIN_DATA_DIR = '../data/train/'
