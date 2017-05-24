@@ -168,6 +168,8 @@ if __name__ == '__main__':
 
     male_data = Characteristics(male_texts)
     female_data = Characteristics(female_texts)
+    print("MALE: ", male_data.emoticon_count)
+    print("FEMALE: ", female_data.emoticon_count)
 
     print("Characteristics Objects Created...")
 
@@ -191,7 +193,8 @@ if __name__ == '__main__':
     #
     #
     # plot_two_counters(male_data.emoticon_count, normalize(female_data.emoticon_count, SCALE), counter_type="Emoticons")
-    plot_two_counters(male_data.twitter_syntax_token_count, normalize(female_data.twitter_syntax_token_count, SCALE), counter_type="Twitter Syntax Tokens")
+
+    #plot_two_counters(male_data.twitter_syntax_token_count, normalize(female_data.twitter_syntax_token_count, SCALE), counter_type="Twitter Syntax Tokens")
     #
     # plot_text_length(male_data.length_of_text_char_count, female_data.length_of_text_char_count, "Characters")
     # plot_text_length(male_data.length_of_text_word_count, female_data.length_of_text_word_count, "Words")
@@ -226,10 +229,10 @@ if __name__ == '__main__':
 
     print("Finding Sentiments...")
 
-    # male_sentiment = sentiment_tweet_counter(male_texts)
-    # female_sentiment = normalize(sentiment_tweet_counter(female_texts), SCALE)
-    # print("M: ", male_sentiment)
-    # print("F: ", female_sentiment)
+    male_sentiment = sentiment_tweet_counter(male_texts)
+    female_sentiment = normalize(sentiment_tweet_counter(female_texts), SCALE)
+    print("M: ", male_sentiment)
+    print("F: ", female_sentiment)
 
     # Words
 
