@@ -146,14 +146,12 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style):
                     aggregated_preds[i][j] += predictions[i][j]
 
         # Average
-        print(aggregated_preds[0])
         for sample in aggregated_preds:
             for i in range(len(sample)):
                 sample[i] /= float(len(model_paths))
-        print(aggregated_preds[0])
-        aggregated_preds = get_argmax_classes(aggregated_preds)
-        print("LENGTH", len(aggregated_preds), len(aggregated_preds[0]))
-        print("")
+
+        aggregated_preds = get_argmax_classes(aggregated_preds)  # Single class values
+
 
     elif averaging_style == MAX_VOTE:
         votes = [[] for _ in range(len(y_true))]
