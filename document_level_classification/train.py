@@ -2,7 +2,7 @@ from keras.callbacks import EarlyStopping
 from document_level_classification.constants import MODEL_OPTIMIZER, MODEL_LOSS, MODEL_METRICS, NB_EPOCHS, BATCH_SIZE, \
     PREDICTION_TYPE, LOGS_DIR, MODEL_DIR
 
-from helpers.model_utils import get_model_checkpoint, save_trained_model, get_precision_recall_f_score
+from helpers.model_utils import get_model_checkpoint, save_trained_model, predict_and_get_precision_recall_f_score
 
 
 
@@ -48,12 +48,12 @@ def train(model, model_info, data, save_model=False, extra_info=None):
     print "Training time: %s" % training_time
 
     # Compute prf for val set
-    prf_val = get_precision_recall_f_score(model, data['x_val'], data['y_val'], PREDICTION_TYPE)
+    prf_val = predict_and_get_precision_recall_f_score(model, data['x_val'], data['y_val'], PREDICTION_TYPE)
 
     # Evaluate on test set, if supplied
     if 'x_test' in data:
         test_results = model.evaluate(data['x_test'], data['y_test'], batch_size=BATCH_SIZE)
-        prf_test = get_precision_recall_f_score(model, data['x_test'], data['y_test'], PREDICTION_TYPE)
+        prf_test = predict_and_get_precision_recall_f_score(model, data['x_test'], data['y_test'], PREDICTION_TYPE)
         num_test = len(data['x_test'])
     else:
         test_results = None

@@ -33,7 +33,7 @@ LAYERS = [1024, 512]
 # Can be represent as one structure ie [128,64] or multiple structure [[100, 50, 20], [22, 44, 22],]
 
 
-from random_search import generate_random_layers
+# from random_search import generate_random_layers
 #LAYERS = [[2048], [4096], [2048, 1024], [4096, 1024]]
 # Regularization
 DROPOUT = 0

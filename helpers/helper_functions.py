@@ -56,7 +56,7 @@ def load_pickle(file_path, feedback=False):
     if feedback:
         print('Loading %s', file_path)
 
-    with open(file_path + '.pkl', 'rb') as f:
+    with open(file_path, 'rb') as f:
         data = pickle.load(f)
 
     if feedback:

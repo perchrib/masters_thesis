@@ -20,8 +20,8 @@ FILTERS = {
     REM_STOPWORDS: True,
     LEMMATIZE: False,
     REM_PUNCTUATION: False,
-    REM_EMOTICONS: True,
-    LOWERCASE: False
+    REM_EMOTICONS: False,
+    LOWERCASE: True
 }
 
 # Model

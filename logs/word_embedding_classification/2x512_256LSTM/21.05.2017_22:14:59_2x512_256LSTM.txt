@@ -1,0 +1,67 @@
+Training_log - 21/05/2017 22:14:59
+
+Model name: 2x512_256LSTM
+Elapsed training time: 2h:01m:44s
+
+Training set size: 586620
+Validation set size: 65179
+Validation set fraction: 0.098083
+Test set fraction: 0.019152
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 100
+Max number of words: 50000
+Max sequence length: 15
+
+-----------Training statistics-----------
+        acc      loss   val_acc  val_loss
+0  0.644719  0.617097  0.665521  0.593806
+1  0.677808  0.575793  0.680096  0.571744
+2  0.706169  0.536632  0.693889  0.555555
+3  0.737218  0.491113  0.705856  0.552522
+4  0.766958  0.444155  0.713205  0.558233
+5  0.792054  0.401165  0.719342  0.568708
+
+Validation PRF
+                 Female          Male  Overall Macro  Overall Micro
+Precision      0.718588      0.719863       0.719226       0.719342
+Recall         0.639252      0.787368       0.713310       0.719342
+F-score        0.676602      0.752104       0.714353       0.719342
+Support    29935.000000  35244.000000            NaN            NaN
+
+--------------Test results---------------
+loss: 0.818680 acc: 0.592910
+
+Test PRF
+                Female         Male  Overall Macro  Overall Micro
+Precision     0.612069     0.574346       0.593208       0.592913
+Recall        0.582232     0.604363       0.593298       0.592913
+F-score       0.596778     0.588973       0.592875       0.592913
+Support    6585.000000  6142.000000            NaN            NaN
+
+--------------Model Diagram---------------
+      InputLayer (None, 15)      
+       Embedding (None, 15, 200) 
+            LSTM (None, 15, 512) 
+         Dropout (None, 15, 512) 
+            LSTM (None, 15, 512) 
+         Dropout (None, 15, 512) 
+            LSTM (None, 256)     
+           Dense (None, 2)       
+
+
+Model information:
+=========================================
+ Dropout: 0.5
+Extra information:
+=========================================
+ Remove stopwords True
+ Lemmatize False
+ Remove punctuation False
+ Remove emoticons False
+ Text is lowercased
+ Internet terms have been replaced with placeholders
+ Removed 3449 tweet because they were shorter than threshold

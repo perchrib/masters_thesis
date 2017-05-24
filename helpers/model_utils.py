@@ -3,12 +3,13 @@ import os
 import time
 import itertools
 import numpy as np
+import pandas as pd
 
 from sklearn.metrics import confusion_matrix, precision_recall_fscore_support
 from keras.callbacks import ModelCheckpoint
 from keras.models import load_model, save_model, Model
 from global_constants import GENDER, OVERALL_MACRO, OVERALL_MICRO, TRAIN_ACC, TRAIN_LOSS, VAL_ACC, VAL_LOSS
-from helper_functions import save_pickle
+from helper_functions import save_pickle, get_time_format
 
 import matplotlib.pyplot as plt
 
@@ -43,7 +44,7 @@ def save_trained_model(model, model_dir, model_optimizer):
 
     # _{epoch:02d}_{val_acc:.4f}
     model_file_name = time.strftime(
-        "%d.%m.%Y_%H:%M:%S") + "_" + model.name + "_" + model_optimizer + ".h5"
+        "%d.%m.%Y_%H:%M:%S") + "_" + model.name + "_model.h5"
 
     model.save(os.path.join(model_dir, model.name, model_file_name))
     print("Model saved")
@@ -55,7 +56,7 @@ def save_term_index(term_index, model_name, index_dir):
     if not os.path.exists(index_dir):
         os.makedirs(index_dir)
 
-    index_file_name = time.strftime("%d.%m.%Y_%H:%M:%S") + "_" + model_name
+    index_file_name = time.strftime("%d.%m.%Y_%H:%M:%S") + "_" + model_name + "_index"
     save_pickle(os.path.join(index_dir, index_file_name), term_index)
 
     print("Term index saved")
@@ -77,32 +78,46 @@ def load_and_evaluate(model_path, data):
     print("%s: %f" % (model.metrics_names[1], round(test_results[1], 5)))
 
 
-def load_and_predict(model_path, data, prediction_type, normalize):
+def load_and_predict(model_path, x_data, y_data):
     """
     Load model and predict/classify dataset; then graph confusion matrix
     :param model_path: file path to model
-    :param data: dictionary of data; need data['x_test']
-    :param prediction_type: generalization in case of multiple prediction types; 'GENDER'
-    :param normalize: True if values should be normalized by number of elements in the class
+    :param x_data: data samples
+    :param y_data: data labels
     :return:
     """
 
     model = load_model(model_path)
-    predictions = model.predict(data['x_test'])  # List of lists with confidence in each class, for each test sample
+    start_time = time.time()
+    print("Generating predictions with model from path: %s..." % model_path, end="")
+    categorical_preds = model.predict(x_data)  # List of lists with confidence in each class, for each test sample
 
     # List of indices of highest value in each list in predictions. Corresponds to the prediction class
-    y_pred = get_argmax_classes(predictions)
-    y_true = get_argmax_classes(data['y_test'])
+    y_pred = get_argmax_classes(categorical_preds)
+    y_true = get_argmax_classes(y_data)
 
-    class_names = get_class_names(prediction_type)
+    end_time = get_time_format(time.time() - start_time)
+    print("Done. Elapsed time: %s" % end_time)
+    return y_pred, categorical_preds, model
 
-    create_and_plot_confusion_matrix(y_true=y_true, y_pred=y_pred, class_names=class_names, normalize=normalize)
+    # create_and_plot_confusion_matrix(y_true=y_true, y_pred=y_pred, normalize=normalize)
 
 
-def create_and_plot_confusion_matrix(y_true, y_pred, class_names, normalize):
+def create_and_plot_confusion_matrix(y_true, y_pred, normalize, class_names=None):
+    """
+    
+    :param y_true: 
+    :param y_pred: 
+    :param normalize: True if values should be normalized by number of elements in the class
+    :param class_names: 
+    :return: 
+    """
     # Compute confusion matrix
     cnf_matrix = confusion_matrix(y_true, y_pred)
     # np.set_printoptions(precision=2)
+
+    if class_names is None:
+        class_names = get_class_names(GENDER)
 
     # Plot non-normalized confusion matrix
     plt.figure()
@@ -148,13 +163,34 @@ def get_class_names(prediction_type):
         return ["Male", "Female"]
 
 
-def get_precision_recall_f_score(model, x_data, y_data, prediction_type):
-    classes = get_class_names(prediction_type)
+def predict_and_get_precision_recall_f_score(model, x_data, y_data, prediction_type=GENDER):
+    """
+    Predict using model and return PRF-scores
+    :param model: ANN model. h5 file
+    :param x_data: formatted data samples
+    :param y_data: categorical labels
+    :param prediction_type: GENDER by default
+    :return: PRF dictionary
+    """
     predictions = model.predict(x_data)
 
     # List of indices of highest value in each list in predictions. Corresponds to the prediction class
     y_pred = get_argmax_classes(predictions)
     y_true = get_argmax_classes(y_data)
+
+    return get_precision_recall_f_score(y_pred=y_pred, y_true=y_true, prediction_type=prediction_type)
+
+
+def get_precision_recall_f_score(y_pred, y_true, prediction_type=GENDER):
+    """
+    Given predictions and true labels, return PRF
+    :param y_pred: Single class predictions
+    :param y_true: Single class true labels
+    :param prediction_type: GENDER by default
+    :return: PRF dictionary
+    """
+
+    classes = get_class_names(prediction_type)
 
     # Calculate precision, recall, f-scores for all classes and
     prf_scores = {OVERALL_MICRO: precision_recall_fscore_support(y_true=y_true, y_pred=y_pred, average='micro'),
@@ -166,6 +202,10 @@ def get_precision_recall_f_score(model, x_data, y_data, prediction_type):
         prf_scores[classes[i]] = tuple(metric[i] for metric in prf_each)
 
     return prf_scores
+
+
+def get_prf_repr(prf_scores):
+    return pd.DataFrame(data=prf_scores, index=pd.Index(["Precision", "Recall", "F-score", "Support"])).__repr__()
 
 
 def get_argmax_classes(y_values):
@@ -282,6 +322,21 @@ def _get_log_statistics(log_path_list):
 
     return model_names, statistics
 
+
+def print_prf_scores(model_path, x_data, y_data):
+    """
+    Print PRF_scores in a readable fashion given model path, samples and labels
+    :param model_path: path to h5 model file
+    :param x_data: data samples
+    :param y_data: categorical labels
+    :return: 
+    """
+
+    model = load_model(model_path)
+
+    prf = predict_and_get_precision_recall_f_score(model, x_data, y_data)
+    print(get_prf_repr(prf))
+
 if __name__ == '__main__':
     # preds = [[0.4, 0.6], [0.7, 0.3], [0.8, 0.2]]
     # y_pred = [np.argmax(x) for x in preds]
@@ -292,31 +347,37 @@ if __name__ == '__main__':
     #     [
     #         '../logs/character_level_classification/model_comp/16.05.2017_11:33:15_2x512LSTM_adam.txt',     # 2x512LSTM
     #         '../logs/character_level_classification/model_comp/16.05.2017_14:27:27_BiLSTM_adam.txt',        # BiLSTM
-    #         '../logs/character_level_classification/model_comp/15.05.2017_21:41:04_Conv_BiLSTM_adam.txt',        # Conv_BiLSTM
+    #         '../logs/character_level_classification/model_comp/18.05.2017_17:47:45_Conv_BiLSTM_base.txt',        # Conv_BiLSTM
     #         '../logs/character_level_classification/model_comp/16.05.2017_07:05:29_2xConv_BiLSTM_adam.txt', # 2xConv_BiLSTM
     #         '../logs/character_level_classification/model_comp/20.05.2017_09:38:23_Conv_2xBiLSTM.txt'       # Conv_2xBiLSTM
     #     ]
     #
-    # # plot_models(char_paths, VAL_LOSS, save_path='../../images/experiments/char_model_base.png', title="Character model comparison")
-    # # plot_models(char_paths, TRAIN_LOSS, title="Character model comparison")
-    #
-    #
-    # path = ['../logs/character_level_classification/model_comp/15.05.2017_21:41:04_Conv_BiLSTM_adam.txt']
-    # plot_models(path, [VAL_LOSS, TRAIN_LOSS], save_path="../../images/experiments/char_train_val_loss_.png", title="Conv_BiLSTM training loss and validation loss")
+    # plot_models(char_paths, VAL_LOSS, save_path='../../images/experiments/char_model_base.png', title="Character model comparison")
+    # plot_models(char_paths, TRAIN_LOSS, title="Character model comparison")
+
+
+
+    ##REGULARIZATION AND DROPOUT##
+
+    char_paths = \
+        [
+            '../logs/character_level_classification/Ablation/18.05.2017_17:47:45_Conv_BiLSTM_base.txt',  # Base
+            '../logs/character_level_classification/Regularizer/23.05.2017_10:18:48_Conv_BiLSTM_l1.txt',      # Regularizer
+            '../logs/character_level_classification/No dropout/22.05.2017_16:39:37_Conv_BiLSTM.txt'   # No dropout
+         ]
+
+    plot_models(char_paths, VAL_LOSS, save_path='../../images/experiments/char_model_comp.png', title="Character model comparison")
+
+    # path = ['../logs/word_embedding_classification/BiLSTM/22.05.2017_16:37:14_BiLSTM.txt', '../logs/character_level_classification/Ablation/20.05.2017_21:30:39_Conv_BiLSTM_em_lower.txt']
+    # plot_models(path, [VAL_LOSS, TRAIN_LOSS], title="Conv_BiLSTM training loss and validation loss")  #save_path="../../images/experiments/char_train_val_loss_.png"
+
 
     # Word model plotting
-    word_paths = \
-        [
-            '../logs/word_embedding_classification/model_comp/15.05.2017_02:09:17_2x512_256LSTM_adam.txt',      # 2x512_256LSTM
-            '../logs/word_embedding_classification/model_comp/15.05.2017_19:56:26_3x512_LSTM_adam.txt',         # 3x512_LSTM
-            '../logs/word_embedding_classification/model_comp/15.05.2017_18:30:02_Conv_BiLSTM_adam.txt',        # Conv_BiLSTM
-            '../logs/word_embedding_classification/model_comp/29.04.2017_18:19:01_3xConv_2xBiLSTM_adam.txt',    # 3xConv_BiLSTM
-            # '../logs/word_embedding_classification/model_comp/19.05.2017_13:53:14_BiLSTM.txt'                   # Stock BiLSTM
-            '../logs/word_embedding_classification/model_comp/21.05.2017_19:25:45_BiLSTM.txt'
-        ]
-
-    plot_models(word_paths, VAL_LOSS, save_path='../../images/experiments/word_model_base.png', title="Word model comparison")
-
+    # model_comp_path = '../logs/word_embedding_classification/model_comp'
+    # word_paths = list(map(lambda file_name: os.path.join(model_comp_path, file_name), os.listdir(model_comp_path)))
+    #
+    # plot_models(word_paths, VAL_LOSS, save_path='../../images/experiments/word_model_base.png', title="Word model comparison")
+    #
 
 
 

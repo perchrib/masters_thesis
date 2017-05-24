@@ -1,0 +1,68 @@
+Training_log - 23/05/2017 15:47:36
+
+Model name: BiLSTM
+Elapsed training time: 0h:56m:23s
+
+Training set size: 315197
+Validation set size: 64885
+Validation set fraction: 0.165182
+Test set fraction: 0.032400
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 100
+Max number of words: 50000
+Max sequence length: 15
+
+-----------Training statistics-----------
+        acc      loss   val_acc  val_loss
+0  0.999772  0.002263  0.536981  7.412788
+1  1.000000  0.000575  0.536981  7.441245
+2  1.000000  0.000282  0.536981  7.451101
+
+Validation PRF
+            Female          Male  Overall Macro  Overall Micro
+Precision      0.0      0.536981       0.268490       0.536981
+Recall         0.0      1.000000       0.500000       0.536981
+F-score        0.0      0.698748       0.349374       0.536981
+Support    30043.0  34842.000000            NaN            NaN
+
+--------------Test results---------------
+loss: 8.291950 acc: 0.482600
+
+Test PRF
+           Female         Male  Overall Macro  Overall Micro
+Precision     0.0     0.482596       0.241298       0.482596
+Recall        0.0     1.000000       0.500000       0.482596
+F-score       0.0     0.651015       0.325507       0.482596
+Support    6585.0  6142.000000            NaN            NaN
+
+--------------Model Diagram---------------
+      InputLayer (None, 15)            InputLayer (None, 15)      
+       Embedding (None, 15, 200)        Embedding (None, 15, 200) 
+            LSTM (None, 250)                 LSTM (None, 250)     
+                 \______________________________/                 
+                                |                                 
+                           Merge (None, 500)                      
+                         Dropout (None, 500)                      
+                           Dense (None, 2)                        
+
+
+Model information:
+=========================================
+ LSTM dropout: 0.200000, LSTM recurrent dropout 0.200000
+ Merge dropout 0.500000
+
+Extra information:
+=========================================
+ Remove stopwords True
+ Lemmatize False
+ Remove punctuation True
+ Remove emoticons True
+ Text is lowercased
+ Internet terms have been replaced with placeholders
+ Removed 6394 tweet because they were shorter than threshold
+ Data is only trained on MALE
+ Training on 315197 training samples
