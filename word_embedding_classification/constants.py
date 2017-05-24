@@ -11,7 +11,7 @@ MODEL_DIR = '../models/word_embedding_classification/'
 WORD_INDEX_DIR = os.path.join(MODEL_DIR, 'word_index')
 
 # Text pre-processing
-MAX_NB_WORDS = 50000   # TODO:
+MAX_NB_WORDS = 5000   # TODO:
 MAX_SEQUENCE_LENGTH = 15
 EMBEDDINGS_INDEX = 'glove.twitter.27B.200d'
 
@@ -20,8 +20,7 @@ FILTERS = {
     REM_STOPWORDS: True,
     LEMMATIZE: False,
     REM_PUNCTUATION: False,
-    REM_EMOTICONS: True,
-    REM_INTERNET_TERMS: False
+    REM_EMOTICONS: False
 }
 
 # Model

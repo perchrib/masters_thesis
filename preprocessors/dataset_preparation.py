@@ -13,6 +13,7 @@ from preprocessors.language_detection import detect_language
 from helpers.global_constants import TRAIN_DATA_DIR, GENDER, AGE, VALIDATION_SPLIT, TEST_SPLIT, TEST_DATA_DIR, TRAIN, \
     TEST, REM_STOPWORDS, REM_EMOTICONS, REM_PUNCTUATION, LEMMATIZE, REM_INTERNET_TERMS, LOWERCASE
 from helpers.helper_functions import shuffle
+from helpers.model_utils import get_argmax_classes
 
 SEED = 1337
 
@@ -102,12 +103,31 @@ def construct_labels_index(prediction_type):
         return {'18-24': 0, '25-34': 1, '35-49': 2, '50-64': 3, '65-xx': 4}
 
 
-def prepare_dataset_men():
-    return prepare_dataset(prediction_type=GENDER, gender='MALE')
+def filter_gender(x_train, y_train, meta_train, labels_index, gender):
+    """
+    Given training samples and labels, filter the set leaving only the specified gender
+    :param x_train: formatted training samples
+    :param y_train: categorical labels
+    :param labels_index: dictionary containing label integer indices for each gender
+    :param gender: the gender to keep. Constants MALE or FEMALE
+    :return: filtered training samples and labels, containing only the specified gender
+    """
 
+    print("Keeping only %s in the training set" % gender)
+    modified_y_train = []
+    modified_x_train = []
+    modified_metadata = []
 
-def prepare_dataset_women():
-    return prepare_dataset(prediction_type=GENDER, gender='FEMALE')
+    # Convert from categorical form
+    y_labels = get_argmax_classes(y_train)
+
+    for i in range(len(x_train)):
+        if y_labels[i] == labels_index[gender]:
+            modified_x_train.append(x_train[i])
+            modified_y_train.append(y_train[i])
+            modified_metadata.append(meta_train[i])
+
+    return np.asarray(modified_x_train), np.asarray(modified_y_train), modified_metadata
 
 
 def display_dataset_statistics(texts):
@@ -148,19 +168,19 @@ def display_dataset_statistics(texts):
     print("Min number of characters in a tweet: %f" % min_char_length)
 
 
-    # # Split list of texts into lists of sentences
-    # txt_sents = list(map(lambda tweet: sent_tokenize(tweet), texts))
-    #
-    # # Number of sentences per tweet
-    # avg_sents_per_tweet = reduce(lambda total_len, sents: total_len + len(sents), txt_sents, 0) / float(len(texts))
-    #
-    # # Number of characters per sentence - len in chars
-    # sent_len_tweets = [list(map(lambda s: len(s), tweet)) for tweet in txt_sents]  # Lists of sentence lengths
-    # avg_sent_len_tweets = [reduce(lambda total_len, s_l: total_len + s_l, tweet, 0) / float(len(tweet)) for tweet in sent_len_tweets]  # len(tweet) here is number of sentences
-    # avg_char_per_sent = reduce(lambda total_len, avg_chars: total_len + avg_chars, avg_sent_len_tweets, 0) / float(len(texts))
-    #
-    # print("Average number of sentences per tweet: %f" % avg_sents_per_tweet)
-    # print("Average number of characters per sentences: %f" % avg_char_per_sent)
+    # Split list of texts into lists of sentences
+    txt_sents = list(map(lambda tweet: sent_tokenize(tweet), texts))
+
+    # Number of sentences per tweet
+    avg_sents_per_tweet = reduce(lambda total_len, sents: total_len + len(sents), txt_sents, 0) / float(len(texts))
+
+    # Number of characters per sentence - len in chars
+    sent_len_tweets = [list(map(lambda s: len(s), tweet)) for tweet in txt_sents]  # Lists of sentence lengths
+    avg_sent_len_tweets = [reduce(lambda total_len, s_l: total_len + s_l, tweet, 0) / float(len(tweet)) for tweet in sent_len_tweets]  # len(tweet) here is number of sentences
+    avg_char_per_sent = reduce(lambda total_len, avg_chars: total_len + avg_chars, avg_sent_len_tweets, 0) / float(len(texts))
+
+    print("Average number of sentences per tweet: %f" % avg_sents_per_tweet)
+    print("Average number of characters per sentences: %f" % avg_char_per_sent)
 
 
 def filter_dataset(texts, labels, metadata, filters, train_or_test):
@@ -240,14 +260,16 @@ def display_gender_distribution(metadata):
     print("Number of female texts: %i Fraction of total: %f" % (num_females, float(num_females) / num_total))
 
 
-if __name__ == '__main__':
-    txts, labels, metadata, labels_index = prepare_dataset(GENDER)
-    display_gender_distribution(metadata)
-    parser = Parser()
-    txts = parser.replace_all_twitter_syntax_tokens(txts)  # Replace Internet terms and lowercase
-    # txts = parser.remove_stopwords(txts)
-    txts, labels, metadata = parser.remove_texts_shorter_than_threshold(txts, labels, metadata)
-    # txts = parser.remove_emoticons(txts)
-    # txts = parser.remove_punctuation(txts)
-    # txts = parser.lemmatize(txts)
-    display_dataset_statistics(txts)
+# if __name__ == '__main__':
+#     txts, labels, metadata, labels_index = prepare_dataset(GENDER)
+#     display_gender_distribution(metadata)
+#     parser = Parser()
+#     # txts = parser.replace_all_twitter_syntax_tokens(txts)  # Replace Internet terms and lowercase
+#
+#     # txts = parser.remove_stopwords(txts)
+#     # txts, labels, metadata = parser.remove_texts_shorter_than_threshold(txts, labels, metadata)
+#
+#     # txts = parser.remove_emoticons(txts)
+#     # txts = parser.remove_punctuation(txts)
+#     # txts = parser.lemmatize(txts)
+#     display_dataset_statistics(txts)

@@ -43,7 +43,7 @@ def save_trained_model(model, model_dir, model_optimizer):
 
     # _{epoch:02d}_{val_acc:.4f}
     model_file_name = time.strftime(
-        "%d.%m.%Y_%H:%M:%S") + "_" + model.name + ".h5"
+        "%d.%m.%Y_%H:%M:%S") + "_" + model.name + "_model.h5"
 
     model.save(os.path.join(model_dir, model.name, model_file_name))
     print("Model saved")
@@ -55,7 +55,7 @@ def save_term_index(term_index, model_name, index_dir):
     if not os.path.exists(index_dir):
         os.makedirs(index_dir)
 
-    index_file_name = time.strftime("%d.%m.%Y_%H:%M:%S") + "_" + model_name
+    index_file_name = time.strftime("%d.%m.%Y_%H:%M:%S") + "_" + model_name + "_index"
     save_pickle(os.path.join(index_dir, index_file_name), term_index)
 
     print("Term index saved")
@@ -94,15 +94,17 @@ def load_and_predict(model_path, data, prediction_type, normalize):
     y_pred = get_argmax_classes(predictions)
     y_true = get_argmax_classes(data['y_test'])
 
-    class_names = get_class_names(prediction_type)
 
-    create_and_plot_confusion_matrix(y_true=y_true, y_pred=y_pred, class_names=class_names, normalize=normalize)
+    # create_and_plot_confusion_matrix(y_true=y_true, y_pred=y_pred, normalize=normalize)
 
 
-def create_and_plot_confusion_matrix(y_true, y_pred, class_names, normalize):
+def create_and_plot_confusion_matrix(y_true, y_pred, normalize, class_names=None):
     # Compute confusion matrix
     cnf_matrix = confusion_matrix(y_true, y_pred)
     # np.set_printoptions(precision=2)
+
+    if class_names is None:
+        class_names = get_class_names(GENDER)
 
     # Plot non-normalized confusion matrix
     plt.figure()
@@ -301,8 +303,20 @@ if __name__ == '__main__':
     # plot_models(char_paths, TRAIN_LOSS, title="Character model comparison")
 
 
-    path = ['../logs/word_embedding_classification/BiLSTM/22.05.2017_16:37:14_BiLSTM.txt', '../logs/character_level_classification/Ablation/20.05.2017_21:30:39_Conv_BiLSTM_em_lower.txt']
-    plot_models(path, [VAL_LOSS, TRAIN_LOSS], title="Conv_BiLSTM training loss and validation loss")  #save_path="../../images/experiments/char_train_val_loss_.png"
+
+    ##REGULARIZATION AND DROPOUT##
+
+    char_paths = \
+        [
+            '../logs/character_level_classification/Ablation/18.05.2017_17:47:45_Conv_BiLSTM_base.txt',  # Base
+            '../logs/character_level_classification/Regularizer/23.05.2017_10:18:48_Conv_BiLSTM_l1.txt',      # Regularizer
+            '../logs/character_level_classification/No dropout/22.05.2017_16:39:37_Conv_BiLSTM.txt'   # No dropout
+         ]
+
+    plot_models(char_paths, VAL_LOSS, save_path='../../images/experiments/char_model_comp.png', title="Character model comparison")
+
+    # path = ['../logs/word_embedding_classification/BiLSTM/22.05.2017_16:37:14_BiLSTM.txt', '../logs/character_level_classification/Ablation/20.05.2017_21:30:39_Conv_BiLSTM_em_lower.txt']
+    # plot_models(path, [VAL_LOSS, TRAIN_LOSS], title="Conv_BiLSTM training loss and validation loss")  #save_path="../../images/experiments/char_train_val_loss_.png"
 
 
     # Word model plotting

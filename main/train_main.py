@@ -5,8 +5,8 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 
 from preprocessors.parser import Parser
-from preprocessors.dataset_preparation import prepare_dataset, filter_dataset
-from helpers.global_constants import TEST_DATA_DIR, TRAIN_DATA_DIR, TEST, TRAIN, REM_PUNCTUATION, REM_STOPWORDS, REM_EMOTICONS, LEMMATIZE, REM_INTERNET_TERMS, CHAR, DOC, WORD
+from preprocessors.dataset_preparation import prepare_dataset, filter_dataset, filter_gender
+from helpers.global_constants import TEST_DATA_DIR, TRAIN_DATA_DIR, TEST, TRAIN, REM_PUNCTUATION, REM_STOPWORDS, REM_EMOTICONS, LEMMATIZE, REM_INTERNET_TERMS, CHAR, DOC, WORD, MALE, FEMALE
 
 from character_level_classification.dataset_formatting import format_dataset_char_level
 from character_level_classification.constants import PREDICTION_TYPE as c_PREDICTION_TYPE, MODEL_DIR as c_MODEL_DIR, \
@@ -21,7 +21,6 @@ from word_embedding_classification.train import train as w_train, get_embedding_
 from word_embedding_classification.models import *
 
 import keras.backend.tensorflow_backend as k_tf
-from helpers.model_utils import load_and_evaluate, load_and_predict
 
 from document_level_classification.constants import PREDICTION_TYPE as DOC_PREDICTION_TYPE, FILTERS as d_FILTERS
 from document_level_classification.models import get_ann_model, get_logistic_regression
@@ -33,13 +32,13 @@ from char_word_combined.models import get_cw_model
 from char_word_combined.train import train as cw_train
 
 
-def word_main(operation, trained_model_path=None, manual_filters=None):
+def word_main(trained_model_path=None, specified_filters=None, train_only_on=None, save_model=False):
     print("""WORD MODEL""")
     # Load datasets
     train_texts, train_labels, train_metadata, labels_index = prepare_dataset(w_PREDICTION_TYPE)
     test_texts, test_labels, test_metadata, _ = prepare_dataset(w_PREDICTION_TYPE, folder_path=TEST_DATA_DIR)
 
-    filters = w_FILTERS if manual_filters is None else manual_filters
+    filters = w_FILTERS if specified_filters is None else specified_filters
 
     # Filter datasets
     train_texts, train_labels, train_metadata, extra_info = \
@@ -60,45 +59,49 @@ def word_main(operation, trained_model_path=None, manual_filters=None):
     data['x_test'], data['y_test'] = format_dataset_word_level(test_texts, test_labels, test_metadata,
                                                                trained_word_index=data['word_index'])
 
-    if operation == TRAIN:
-        embedding_layer = get_embedding_layer(data['word_index'])
-        num_output_nodes = len(labels_index)
+    # Train on one gender only
+    if train_only_on:
+        data['x_train'], data['y_train'], data['meta_train'] = filter_gender(data['x_train'],
+                                                                             data['y_train'],
+                                                                             data['meta_train'],
+                                                                             labels_index,
+                                                                             train_only_on)
+        extra_info.append("Data is only trained on %s" % train_only_on)
+        extra_info.append("Training on %i training samples" % len(data['x_train']))
 
-        # ------- Insert models to txt here -----------
-        # Remember star before model getter
-        # w_train(*get_word_model_2x512_256_lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+    embedding_layer = get_embedding_layer(data['word_index'])
+    num_output_nodes = len(labels_index)
 
-        # w_train(*get_word_model_Conv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+    # ------- Insert models to txt here -----------
+    # Remember star before model getter
+    # w_train(*get_word_model_2x512_256_lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
 
-        # w_train(*get_word_model_3xConv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
-        # w_train(*get_word_model_2x512_256_lstm_128_full(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+    # w_train(*get_word_model_Conv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
 
-
-
-        w_train(*get_word_model_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=True)  # TODO: Save model is True
-
-
-        # w_train(*get_word_model_2xBiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info,
-        #         save_model=False)
-
-
-        # w_train(*get_word_model_3x512_128lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
-        # w_train(*get_word_model_4x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
-
-    elif operation == TEST:
-        # Evaluate model on te  st set
-        load_and_evaluate(os.path.join(w_MODEL_DIR, trained_model_path), data=data)
-        # load_and_predict(os.path.join(w_MODEL_DIR, trained_model_path), data=data, prediction_type=w_PREDICTION_TYPE,
-        #                  normalize=True)
+    # w_train(*get_word_model_3xConv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+    # w_train(*get_word_model_2x512_256_lstm_128_full(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
 
 
-def char_main(operation, trained_model_path=None, manual_filters=None):
+
+    w_train(*get_word_model_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=save_model)
+
+
+    # w_train(*get_word_model_2xBiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info,
+    #         save_model=False)
+
+
+    # w_train(*get_word_model_3x512_128lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+    # w_train(*get_word_model_4x512lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+
+
+
+def char_main(trained_model_path=None, specified_filters=None, train_only_on=None, save_model=False):
     print("""CHAR MODEL""")
     # Load dataset
     train_texts, train_labels, train_metadata, labels_index = prepare_dataset(c_PREDICTION_TYPE)
     test_texts, test_labels, test_metadata, _ = prepare_dataset(c_PREDICTION_TYPE, folder_path=TEST_DATA_DIR)
 
-    filters = c_FILTERS if manual_filters is None else manual_filters
+    filters = c_FILTERS if specified_filters is None else specified_filters
 
     # Filter datasets
     train_texts, train_labels, train_metadata, extra_info = \
@@ -119,39 +122,44 @@ def char_main(operation, trained_model_path=None, manual_filters=None):
     data['x_test'], data['y_test'] = format_dataset_char_level(test_texts, test_labels, test_metadata,
                                                                trained_char_index=data['char_index'])
 
+
+    # Train on one gender only
+    if train_only_on:
+        data['x_train'], data['y_train'], data['meta_train'] = filter_gender(data['x_train'],
+                                                                             data['y_train'],
+                                                                             data['meta_train'],
+                                                                             labels_index,
+                                                                             train_only_on)
+        extra_info.append("Data is only trained on %s" % train_only_on)
+        extra_info.append("Training on %i training samples" % len(data['x_train']))
+
     num_chars = len(data['char_index'])
     num_output_nodes = len(labels_index)
 
-    if operation == TRAIN:
-        # ------- Insert models to txt here -----------
-        # Remember star before model getter
 
-        # c_train(*get_char_model_3xConv_2xBiLSTM(num_output_nodes, num_chars), data=data, extra_info=extra_info)
-        # c_train(*get_char_model_3xConv_LSTM(num_output_nodes, num_chars), data=data)
+    # ------- Insert models to txt here -----------
+    # Remember star before model getter
 
-        # c_train(*get_char_model_2xConv_BiLSTM(num_output_nodes, num_chars), data=data, extra_info=extra_info)
+    # c_train(*get_char_model_3xConv_2xBiLSTM(num_output_nodes, num_chars), data=data, extra_info=extra_info)
+    # c_train(*get_char_model_3xConv_LSTM(num_output_nodes, num_chars), data=data)
 
-        c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=True, extra_info=extra_info)
-        # c_train(*get_char_model_Conv_2_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False, extra_info=extra_info)
+    # c_train(*get_char_model_2xConv_BiLSTM(num_output_nodes, num_chars), data=data, extra_info=extra_info)
 
-
-        # c_train(*get_char_model_Conv_2xBiLSTM(num_output_nodes, num_chars), data=data, save_model=False, extra_info=extra_info)
-
-        # c_train(*get_char_model_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False,
-        #         extra_info=extra_info)
-
-        # c_train(*get_char_model_512lstm(num_output_nodes, num_chars), data=data, save_model=False,
-        #         extra_info=extra_info)
-
-        # c_train(*get_char_model_2x512lstm(num_output_nodes, num_chars), data=data, save_model=False,
-        #         extra_info=extra_info)
+    c_train(*get_char_model_Conv_BiLSTM(num_output_nodes, num_chars), data=data, save_model=save_model, extra_info=extra_info)
+    # c_train(*get_char_model_Conv_2_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False, extra_info=extra_info)
 
 
-    elif operation == TEST:
-        # Evaluate model on test set
-        # load_and_evaluate(os.path.join(c_MODEL_DIR, trained_model_path), data=data)
-        # load_and_predict(os.path.join(c_MODEL_DIR, trained_model_path), data=data, prediction_type=c_PREDICTION_TYPE, normalize=True)
-        print("")
+    # c_train(*get_char_model_Conv_2xBiLSTM(num_output_nodes, num_chars), data=data, save_model=False, extra_info=extra_info)
+
+    # c_train(*get_char_model_BiLSTM(num_output_nodes, num_chars), data=data, save_model=False,
+    #         extra_info=extra_info)
+
+    # c_train(*get_char_model_512lstm(num_output_nodes, num_chars), data=data, save_model=False,
+    #         extra_info=extra_info)
+
+    # c_train(*get_char_model_2x512lstm(num_output_nodes, num_chars), data=data, save_model=False,
+    #         extra_info=extra_info)
+
 
 def document_main():
     # Load dataset
@@ -348,7 +356,7 @@ if __name__ == '__main__':
         #     char_main(operation=TRAIN, manual_filters=f)
 
         # Single char
-        char_main(operation=TRAIN)
+        char_main(save_model=False)
 
         # Load model and run test data on model
         # char_main(operation=TEST, trained_model_path="Conv_BiLSTM/27.04.2017_21:07:34_Conv_BiLSTM_adam_31_0.70.h5")
@@ -361,7 +369,7 @@ if __name__ == '__main__':
         #     word_main(operation=TRAIN, manual_filters=f)
 
         # Single word
-        word_main(operation=TRAIN)
+        word_main(save_model=True)
 
 
         # Load model and run test data on model

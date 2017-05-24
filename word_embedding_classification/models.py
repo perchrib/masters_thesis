@@ -107,7 +107,7 @@ def get_word_model_3x512_128lstm(embedding_layer, nb_output_nodes):
 def get_word_model_4x512lstm(embedding_layer, nb_output_nodes):
     model = Sequential(name="4x512LSTM")
 
-    dropout = 0.3
+    dropout = 0.5
     model.add(embedding_layer)
     model.add(LSTM(512, return_sequences=True))
     model.add(Dropout(dropout))

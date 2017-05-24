@@ -1,6 +1,6 @@
 Training_log - 22/05/2017 16:39:37
 
-Model name: Conv_BiLSTM
+Model name: Conv_BiLSTM w/o dropout
 Elapsed training time: 4h:08m:20s
 
 Training set size: 586620
