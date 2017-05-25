@@ -171,6 +171,7 @@ def sentiment_tweet_counter(texts):
     for t in texts:
         result = analyzer.polarity_scores(t)
         if is_equals(result):
+            print("NEUTRAL")
             sentiment_counts.append('neu')
         else:
             result['compound'] = -1
@@ -180,7 +181,7 @@ def sentiment_tweet_counter(texts):
 
 def is_equals(results):
     del results['compound']
-    if len(set(results.values())) == 1:
+    if set(results.values()) == 0:
         return True
     return False
 

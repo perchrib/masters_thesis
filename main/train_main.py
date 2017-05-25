@@ -5,8 +5,10 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 
 from preprocessors.parser import Parser
+
 from preprocessors.dataset_preparation import prepare_dataset, filter_dataset, filter_gender
 from helpers.global_constants import TEST_DATA_DIR, TRAIN_DATA_DIR, TEST, TRAIN, REM_PUNCTUATION, REM_STOPWORDS, REM_EMOTICONS, LEMMATIZE, REM_INTERNET_TERMS, CHAR, DOC, WORD, MALE, FEMALE
+
 
 from character_level_classification.dataset_formatting import format_dataset_char_level
 from character_level_classification.constants import PREDICTION_TYPE as c_PREDICTION_TYPE, MODEL_DIR as c_MODEL_DIR, \
@@ -76,7 +78,9 @@ def word_main(specified_filters=None, train_only_on=None, save_model=False):
     # Remember star before model getter
     # w_train(*get_word_model_2x512_256_lstm(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
 
+
     # w_train(*get_word_model_Conv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
+
 
     # w_train(*get_word_model_3xConv_BiLSTM(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
     # w_train(*get_word_model_2x512_256_lstm_128_full(embedding_layer, num_output_nodes), data=data, extra_info=extra_info, save_model=False)
@@ -141,8 +145,10 @@ def char_main(specified_filters=None, train_only_on=None, save_model=False):
     # ------- Insert models to txt here -----------
     # Remember star before model getter
 
+
     # c_train(*get_char_model_3xConv_2xBiLSTM(num_output_nodes, num_chars), data=data, extra_info=extra_info)
     # c_train(*get_char_model_3xConv_LSTM(num_output_nodes, num_chars), data=data)
+
 
     # c_train(*get_char_model_2xConv_BiLSTM(num_output_nodes, num_chars), data=data, extra_info=extra_info)
 
@@ -165,9 +171,22 @@ def char_main(specified_filters=None, train_only_on=None, save_model=False):
 def document_main():
     # Load dataset
     from document_level_classification.constants import Log_Reg, TEST_DATA_DIR, LAYERS, EXPERIMENTS, N_GRAM, \
-        MAX_FEATURE_LENGTH, FEATURE_MODEL, get_constants_info
-    print("-"*20, " RUNNING DOCUMENT MODEL ", "-"*20)
+        MAX_FEATURE_LENGTH, FEATURE_MODEL, get_constants_info, AUTOENCODER_DIR, SAVE_FEATUREMODEL
+
+    from keras.models import load_model
+
+
+
+
+    print("-" * 20, " RUNNING DOCUMENT MODEL ", "-" * 20)
     # Train and Validation
+
+    n_gram = N_GRAM
+    max_length = MAX_FEATURE_LENGTH
+    reduction_model = None
+    # reduction_model_name = "10k_500_autoencoder_deep_tanh_softmax_categorical_crossentropy.h5"
+    # reduction_model = load_model(os.path.join(AUTOENCODER_DIR, reduction_model_name))
+
     train_texts, train_labels, train_metadata, labels_index = prepare_dataset(DOC_PREDICTION_TYPE)
 
     # This is the Test datset from Kaggle
@@ -191,65 +210,61 @@ def document_main():
 
     data = {}
 
-    if EXPERIMENTS:
+    info = extra_info
+    print "-" * 20, " Running: ", n_gram, " and max feature length: ", max_length, " ", "-" * 20
 
-        for max_length in MAX_FEATURE_LENGTH:
-            for n_gram in N_GRAM:
-                info = extra_info
-                print "-"*20, " Running: ", n_gram, " and max feature length: ", max_length, " ", "-"*20
-                info.extend(get_constants_info(n_gram=n_gram, vocabulary_size=max_length))
-                print("Format Dataset to Document Level")
-                data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], data['meta_val'], \
-                feature_model, reduction_model = format_dataset_doc_level(train_texts,
-                                                                          train_labels,
-                                                                          train_metadata,
-                                                                          is_test=False,
-                                                                          feature_model_type=FEATURE_MODEL,
-                                                                          n_gram=n_gram,
-                                                                          max_feature_length=max_length)
+    info.extend(get_constants_info(n_gram=n_gram, vocabulary_size=max_length))
 
-                # vocabulary = feature_model.train_vocabulary_counts
-                # keys = sorted(vocabulary, key=vocabulary.get, reverse=True)
-                # i = 0
-                # for key in keys:
-                #     if i < 100:
-                #         print key, " ", vocabulary[key]
-                #         i += 1
-                #     else:
-                #         break
+    print("Format Dataset to Document Level")
 
-                data['x_test'], data['y_test'], data['meta_test'] = format_dataset_doc_level(test_texts,
-                                                                                             test_labels,
-                                                                                             test_metadata,
-                                                                                             is_test=True,
-                                                                                             feature_model_type=FEATURE_MODEL,
-                                                                                             n_gram=n_gram,
-                                                                                             max_feature_length=max_length,
-                                                                                             feature_model=feature_model,
-                                                                                             reduction_model=reduction_model)
+    data['x_train'], data['y_train'], data['meta_train'], data['x_val'], data['y_val'], data['meta_val'], \
+    feature_model, reduction_model = format_dataset_doc_level(train_texts,
+                                                              train_labels,
+                                                              train_metadata,
+                                                              is_test=False,
+                                                              feature_model_type=FEATURE_MODEL,
+                                                              n_gram=n_gram,
+                                                              max_feature_length=max_length,
+                                                              reduction_model=reduction_model)
 
-                input_size = data['x_train'].shape[1]
-                output_size = data['y_train'].shape[1]
+    if SAVE_FEATUREMODEL:
+        from helpers.helper_functions import save_pickle
+        save_pickle("../models/document_level_classification/feature_models/bow_10k_most_freq", feature_model)
+        print("Succesfully saved to file")
 
-                document_trainer(*get_ann_model(input_size, output_size, LAYERS), data=data, extra_info=info, save_model=False)
+    data['x_test'], data['y_test'], data['meta_test'] = format_dataset_doc_level(test_texts,
+                                                                                 test_labels,
+                                                                                 test_metadata,
+                                                                                 is_test=True,
+                                                                                 feature_model_type=FEATURE_MODEL,
+                                                                                 n_gram=n_gram,
+                                                                                 max_feature_length=max_length,
+                                                                                 feature_model=feature_model,
+                                                                                 reduction_model=reduction_model)
+
+    input_size = data['x_train'].shape[1]
+    output_size = data['y_train'].shape[1]
+
+    #document_trainer(*get_ann_model(input_size, output_size, LAYERS), data=data, extra_info=info, save_model=False)
 
 
-    # This code are for test a saved model !!!!
+        # This code are for test a saved model !!!!
 
-    #c_MODEL_DIR, trained_model_path), data = data, prediction_type = c_PREDICTION_TYPE, normalize = True
+
+    # c_MODEL_DIR, trained_model_path), data = data, prediction_type = c_PREDICTION_TYPE, normalize = True
     # model_path = "../models/document_level_classification/base_1024_512_256/16.05.2017_23:14:32_base_1024_512_256_01_0.5424.h5"
     # load_and_predict(model_path, )
     # load_and_evaluate(model_path, data=data)
 
     """STANDARD RUNNING"""
-    # if not Log_Reg:
-    #     if type(LAYERS[0]) == list:
-    #         for layers_type in LAYERS:
-    #             document_trainer(*get_ann_model(input_size, output_size, layers_type), data=data, extra_info=extra_info)
-    #     else:
-    #         # when running single models, checkpoint during training are set to True! (save_model=True)
-    #         print("Running Single Model")
-    #         document_trainer(*get_ann_model(input_size, output_size, LAYERS), data=data, extra_info=extra_info, save_model=False)
+    if not Log_Reg:
+        if type(LAYERS[0]) == list:
+            for layers_type in LAYERS:
+                document_trainer(*get_ann_model(input_size, output_size, layers_type), data=data, extra_info=extra_info, save_model=True)
+        else:
+            # when running single models, checkpoint during training are set to True! (save_model=True)
+            print("Running Single Model")
+            document_trainer(*get_ann_model(input_size, output_size, LAYERS), data=data, extra_info=extra_info, save_model=False)
 
     # Logistic Regression
     if Log_Reg:
@@ -375,6 +390,4 @@ if __name__ == '__main__':
 
         # Load model and run test data on model
         # word_main(operation=TEST, trained_model_path="Conv_BiLSTM/28.04.2017_18:59:55_Conv_BiLSTM_adam_{epoch:02d}_{val_acc:.4f}.h5")
-
-
 
