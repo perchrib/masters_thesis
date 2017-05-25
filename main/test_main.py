@@ -35,7 +35,7 @@ from document_level_classification.dataset_formatting import format_dataset_doc_
 
 
 def pre_process_test_word(trained_word_index_path, specified_filters=None):
-    print("Pre-processing data for word model")
+    print("\nPre-processing data for word model")
     filters = w_FILTERS if specified_filters is None else specified_filters
 
     # Load word index
@@ -61,7 +61,7 @@ def pre_process_test_word(trained_word_index_path, specified_filters=None):
 
 
 def pre_process_test_char(trained_char_index_path, specified_filters=None):
-    print("Pre-processing data for char model")
+    print("\nPre-processing data for char model")
     filters = c_FILTERS if specified_filters is None else specified_filters
 
     # Load char index
@@ -85,11 +85,12 @@ def pre_process_test_char(trained_char_index_path, specified_filters=None):
 
 def pre_process_test_doc(vocabulary_path, specified_filters=None):
     # TODO: Implement appropriate document level pre-processing
-    print("Pre-processing data for doc model")
+    print("\nPre-processing data for doc model")
     filters = d_FILTERS if specified_filters is None else specified_filters
 
     feature_model = load_pickle(vocabulary_path)
 
+    print(feature_model)
     test_texts, test_labels, test_metadata, _ = prepare_dataset(DOC_PREDICTION_TYPE,
                                                                 folder_path=TEST_DATA_DIR)
 
@@ -106,13 +107,12 @@ def pre_process_test_doc(vocabulary_path, specified_filters=None):
                                                                                  test_labels,
                                                                                  test_metadata,
                                                                                  is_test=True,
-                                                                                 feature_model_type=feature_model
-                                                                                 )
+                                                                                 feature_model=feature_model)
 
     return data
 
 
-def predict_stacked_model(model_paths, vocabularies, averaging_style):
+def predict_stacked_model(model_paths, vocabularies, averaging_style, print_individual_prfs=False):
     """
     Use several models (char-, word-, doc-level) to predict using a stacked model
     :param model_paths: dictionary with key, value pairs of model name/type, model path
@@ -141,7 +141,12 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style):
             REM_EMOTICONS: False,
             LOWERCASE: False
         }),
-        DOC_MODEL: None
+        DOC_MODEL: pre_process_test_doc(vocabulary_path=vocabularies[DOC_MODEL], specified_filters={
+            REM_STOPWORDS: True,
+            LEMMATIZE: False,
+            REM_PUNCTUATION: False,
+            REM_EMOTICONS: False,
+        })
     }
 
     # TODO: Add d_data
@@ -156,13 +161,13 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style):
 
     # Load and predict with each model
     for name, path in model_paths.iteritems():
-        pred_dict[name], pred_dict_categorical[name], loaded_models[name] = load_and_predict(model_path=path,
-                                                                                             x_data=
-                                                                                             formatted_data[name][
-                                                                                                 X_TEST],
-                                                                                             y_data=
-                                                                                             formatted_data[name][
-                                                                                                 Y_TEST])
+        pred_dict[name], pred_dict_categorical[name], loaded_models[name] = \
+            load_and_predict(model_path=path, x_data=formatted_data[name][X_TEST], y_data= formatted_data[name][Y_TEST])
+
+    if print_individual_prfs:
+        for name, predictions in pred_dict.iteritems():
+            print("\n---PRF for %s" % name)
+            print_prf_scores(y_pred=predictions, y_true=y_true)
 
     print("Averaging predictions using: %s" % averaging_style)
     if averaging_style == AVERAGE_CONF:
@@ -175,14 +180,11 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style):
                     aggregated_preds[i][j] += predictions[i][j]
 
         # Average
-        print(aggregated_preds[0])
         for sample in aggregated_preds:
             for i in range(len(sample)):
                 sample[i] /= float(len(model_paths))
-        print(aggregated_preds[0])
-        aggregated_preds = get_argmax_classes(aggregated_preds)
-        print("LENGTH", len(aggregated_preds), len(aggregated_preds[0]))
-        print("")
+
+        aggregated_preds = get_argmax_classes(aggregated_preds)  # Single class values
 
     elif averaging_style == MAX_VOTE:
         votes = [[] for _ in range(len(y_true))]
@@ -200,9 +202,8 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style):
     else:
         raise Exception("Invalid averaging style. Should be MAX_VOTE or AVERAGE_CONF")
 
-    # PRF
-    prf = get_precision_recall_f_score(y_pred=aggregated_preds, y_true=y_true)
-    print(get_prf_repr(prf))
+    # PRF - Stacked model
+    print_prf_scores(y_pred=aggregated_preds, y_true=y_true)
 
 
 if __name__ == '__main__':
@@ -234,5 +235,6 @@ if __name__ == '__main__':
             CHAR_MODEL: '../models/character_level_classification/char_index/23.05.2017_05:36:06_Conv_BiLSTM_no_lower.pkl',
             DOC_MODEL: '../models/document_level_classification/feature_models/bow_10k_most_freq.pkl'
         },
-        averaging_style=AVERAGE_CONF
+        averaging_style=AVERAGE_CONF,
+        print_individual_prfs=True
     )

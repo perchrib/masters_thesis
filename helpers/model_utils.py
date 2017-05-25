@@ -323,7 +323,7 @@ def _get_log_statistics(log_path_list):
     return model_names, statistics
 
 
-def print_prf_scores(model_path, x_data, y_data):
+def print_prf_scores(y_pred, y_true):
     """
     Print PRF_scores in a readable fashion given model path, samples and labels
     :param model_path: path to h5 model file
@@ -332,9 +332,7 @@ def print_prf_scores(model_path, x_data, y_data):
     :return: 
     """
 
-    model = load_model(model_path)
-
-    prf = predict_and_get_precision_recall_f_score(model, x_data, y_data)
+    prf = get_precision_recall_f_score(y_pred=y_pred, y_true=y_true)
     print(get_prf_repr(prf))
 
 if __name__ == '__main__':
