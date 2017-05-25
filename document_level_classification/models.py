@@ -2,13 +2,13 @@
 from keras.layers import Input, Dense, Dropout, BatchNormalization
 from keras.models import Model
 from constants import N_GRAM, FEATURE_MODEL, DIM_REDUCTION_SIZE, DIM_REDUCTION, ACTIVATION, \
-    OUTPUT_ACTIVATION, DROPOUT, L1, L2, MODEL_TYPE, LAYER_PENALTY
+    OUTPUT_ACTIVATION, DROPOUT, L1, L2, MODEL_TYPE, LAYER_PENALTY, DROPOUT_FIRST_LAYER
 
 from keras import regularizers
 
 
 def generate_model(input_shape, output_layer, hidden_layers):
-    if DROPOUT > 0:
+    if DROPOUT_FIRST_LAYER:
         print("Dropout added on input layer")
         input_layers = Dropout(DROPOUT)(input_shape)
     else:
