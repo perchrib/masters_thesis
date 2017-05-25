@@ -21,7 +21,7 @@ def train(model, model_info, data, save_model=False, extra_info=None):
 
 
     # Callbacks
-    early_stopping = EarlyStopping(monitor='val_loss', patience=0,)
+    early_stopping = EarlyStopping(monitor='val_loss', patience=1,)
 
     model.compile(optimizer=MODEL_OPTIMIZER,
                   loss=MODEL_LOSS,

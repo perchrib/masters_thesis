@@ -18,8 +18,10 @@ def format_dataset_doc_level(texts, labels, metadata, is_test=False, feature_mod
     if not is_test:
 
         x_train, y_train, meta_train, x_val, y_val, meta_val = split_dataset(texts, labels, metadata, data_type_is_string=True)
+
         x_train_texts = x_train
         x_val_texts = x_val
+
         if feature_model_type == C_TF_IDF:
             print("USING: ", C_TF_IDF)
             feature_model = TF_IDF(x_train, y_train, max_feature_length, n_gram)
@@ -38,9 +40,6 @@ def format_dataset_doc_level(texts, labels, metadata, is_test=False, feature_mod
             feature_model = TF_IDF(x_train, y_train, max_feature_length, n_gram, dissimilarity_vocabulary=True)
 
 
-
-        start = time.time()
-
         x_train = feature_model.fit_to_training_data()
         x_val = feature_model.fit_to_new_data(x_val)
 
@@ -48,31 +47,36 @@ def format_dataset_doc_level(texts, labels, metadata, is_test=False, feature_mod
             SA = SentimentAnalyzer()
             print("Validate Training Set Sentiments")
 
-            x_train = SA.analyze_and_merge(x_train_texts, x_train)
+            x_train_sentiments = SA.analyze(x_train_texts)
             print("SHAPE X_TRAIN: ", x_train.shape)
             del x_train_texts
 
+            x_train = feature_adder(x_train, x_train_sentiments, feature_model)
+
             print("Validate Validation Set Sentiments")
 
-            x_val = SA.analyze_and_merge(x_val_texts, x_val)
+            x_val_sentiments = SA.analyze(x_val_texts)
             print("SHAPE X_VAL: ", x_val.shape)
-
             del x_val_texts
 
-
+            x_val = feature_adder(x_val, x_val_sentiments, feature_model)
 
         if DIM_REDUCTION:
             start = time.time()
             print("Starting With Dimensionality Reduction From Size %i to %i..." % (x_train.shape[1], DIM_REDUCTION_SIZE))
-            reduction_model = DimReduction(DIM_REDUCTION_SIZE, train=True)
+
+            if not reduction_model:
+                reduction_model = DimReduction(DIM_REDUCTION_SIZE, train=True)
+
+            elif reduction_model:
+                print("REDUCTION MODEL::: ", reduction_model)
+                print("Load pretrained encoder...")
+                reduction_model = DimReduction(DIM_REDUCTION_SIZE, train=False, encoder=reduction_model)
+
             x_train = reduction_model.fit_transform(x_train, x_val)
             x_val = reduction_model.fit_transform(x_val)
 
             print("Reduction Time: ", get_time_format(time.time() - start))
-            # for x in x_train[:3]:
-            #     print("Length: ", len(x))
-            #     print(x)
-            #     print("")
 
         if CATEGORICAL:
             y_train = to_categorical(y_train)
@@ -90,8 +94,8 @@ def format_dataset_doc_level(texts, labels, metadata, is_test=False, feature_mod
         if SENTIMENT_FEATURE:
             SA = SentimentAnalyzer()
             print("Validate Test Set Sentiments")
-            x_test_sentiment = SA.analyze(texts)
-            x_test = feature_adder(x_test, x_test_sentiment)
+            x_test_sentiments = SA.analyze(texts)
+            x_test = feature_adder(x_test, x_test_sentiments, feature_model)
 
         if DIM_REDUCTION:
             x_test = reduction_model.fit_transform(x_test)

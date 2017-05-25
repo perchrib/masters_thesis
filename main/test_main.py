@@ -10,7 +10,8 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 from preprocessors.parser import Parser
 from preprocessors.dataset_preparation import prepare_dataset, filter_dataset
 from helpers.global_constants import TEST_DATA_DIR, TRAIN_DATA_DIR, TEST, TRAIN, REM_PUNCTUATION, REM_STOPWORDS, \
-    REM_EMOTICONS, LEMMATIZE, REM_INTERNET_TERMS, CHAR_MODEL, DOC_MODEL, WORD_MODEL, X_TEST, Y_TEST, LOWERCASE, MAX_VOTE, AVERAGE_CONF
+    REM_EMOTICONS, LEMMATIZE, REM_INTERNET_TERMS, CHAR_MODEL, DOC_MODEL, WORD_MODEL, X_TEST, Y_TEST, LOWERCASE, \
+    MAX_VOTE, AVERAGE_CONF
 
 from keras.models import load_model
 
@@ -82,9 +83,33 @@ def pre_process_test_char(trained_char_index_path, specified_filters=None):
     return data
 
 
-def pre_process_test_doc(specified_filters=None):
+def pre_process_test_doc(vocabulary_path, specified_filters=None):
     # TODO: Implement appropriate document level pre-processing
-    pass
+    print("Pre-processing data for doc model")
+    filters = d_FILTERS if specified_filters is None else specified_filters
+
+    feature_model = load_pickle(vocabulary_path)
+
+    test_texts, test_labels, test_metadata, _ = prepare_dataset(DOC_PREDICTION_TYPE,
+                                                                folder_path=TEST_DATA_DIR)
+
+    test_texts, test_labels, test_metadata, _ = \
+        filter_dataset(texts=test_texts,
+                       labels=test_labels,
+                       metadata=test_metadata,
+                       filters=filters,
+                       train_or_test=TEST)
+
+    data = {}
+    print("Format Dataset to Document Level")
+    data['x_test'], data['y_test'], data['meta_test'] = format_dataset_doc_level(test_texts,
+                                                                                 test_labels,
+                                                                                 test_metadata,
+                                                                                 is_test=True,
+                                                                                 feature_model_type=feature_model
+                                                                                 )
+
+    return data
 
 
 def predict_stacked_model(model_paths, vocabularies, averaging_style, print_individual_prfs=False):
@@ -132,8 +157,12 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style, print_indi
     # Load and predict with each model
     for name, path in model_paths.iteritems():
         pred_dict[name], pred_dict_categorical[name], loaded_models[name] = load_and_predict(model_path=path,
-                                                                          x_data=formatted_data[name][X_TEST],
-                                                                          y_data=formatted_data[name][Y_TEST])
+                                                                                             x_data=
+                                                                                             formatted_data[name][
+                                                                                                 X_TEST],
+                                                                                             y_data=
+                                                                                             formatted_data[name][
+                                                                                                 Y_TEST])
 
     if print_individual_prfs:
         for name, predictions in pred_dict.iteritems():
@@ -199,12 +228,13 @@ if __name__ == '__main__':
     predict_stacked_model(
         model_paths={
             WORD_MODEL: '../models/word_embedding_classification/BiLSTM/23.05.2017_18:12:26_BiLSTM_punct_em.h5',
-            CHAR_MODEL: '../models/character_level_classification/Conv_BiLSTM/23.05.2017_05:36:06_Conv_BiLSTM_no_lower.h5'
+            CHAR_MODEL: '../models/character_level_classification/Conv_BiLSTM/23.05.2017_05:36:06_Conv_BiLSTM_no_lower.h5',
+            DOC_MODEL: '../models/document_level_classification/final_2048_1024_512/25.05.2017_10:04:09_final_2048_1024_512_01_0.5349.h5'
         },
         vocabularies={
             WORD_MODEL: '../models/word_embedding_classification/word_index/23.05.2017_18:12:28_BiLSTM_punct_em.pkl',
             CHAR_MODEL: '../models/character_level_classification/char_index/23.05.2017_05:36:06_Conv_BiLSTM_no_lower.pkl',
-            DOC_MODEL: None
+            DOC_MODEL: '../models/document_level_classification/feature_models/bow_10k_most_freq.pkl'
         },
         averaging_style=AVERAGE_CONF,
         print_individual_prfs=True
