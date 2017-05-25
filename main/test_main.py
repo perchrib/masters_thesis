@@ -227,7 +227,7 @@ if __name__ == '__main__':
         model_paths={
             WORD_MODEL: '../models/word_embedding_classification/BiLSTM/23.05.2017_18:12:26_BiLSTM_punct_em.h5',
             CHAR_MODEL: '../models/character_level_classification/Conv_BiLSTM/23.05.2017_05:36:06_Conv_BiLSTM_no_lower.h5',
-            DOC_MODEL: '../models/document_level_classification/final_'
+            DOC_MODEL: '../models/document_level_classification/final_2048_1024_512/25.05.2017_10:04:09_final_2048_1024_512_01_0.5349.h5'
         },
         vocabularies={
             WORD_MODEL: '../models/word_embedding_classification/word_index/23.05.2017_18:12:28_BiLSTM_punct_em.pkl',
