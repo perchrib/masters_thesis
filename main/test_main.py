@@ -29,7 +29,8 @@ from helpers.model_utils import load_and_evaluate, load_and_predict, get_precisi
     print_prf_scores, get_argmax_classes
 from helpers.helper_functions import load_pickle
 
-from document_level_classification.constants import PREDICTION_TYPE as DOC_PREDICTION_TYPE, FILTERS as d_FILTERS
+from document_level_classification.constants import PREDICTION_TYPE as DOC_PREDICTION_TYPE, FILTERS as d_FILTERS, \
+    AUTOENCODER_DIR
 from document_level_classification.models import get_ann_model, get_logistic_regression
 
 from document_level_classification.dataset_formatting import format_dataset_doc_level
@@ -90,6 +91,8 @@ def pre_process_test_doc(vocabulary_path, specified_filters=None):
     filters = d_FILTERS if specified_filters is None else specified_filters
 
     feature_model = load_pickle(vocabulary_path)
+    #reduction_model_name = "10k_500_autoencoder_deep_tanh_softmax_categorical_crossentropy.h5"
+    #reduction_model = load_model(os.path.join(AUTOENCODER_DIR, reduction_model_name))
 
     test_texts, test_labels, test_metadata, _ = prepare_dataset(DOC_PREDICTION_TYPE,
                                                                 folder_path=TEST_DATA_DIR)
@@ -150,7 +153,6 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style, print_indi
         })
     }
 
-    # TODO: Add d_data
 
     # Dictionary with predictions for each system. Predictions in categorical confidence form
     pred_dict_categorical = {}
@@ -223,6 +225,13 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style, print_indi
 
     # PRF - Stacked model
     print_prf_scores(y_pred=aggregated_preds, y_true=y_true)
+
+    # if True:
+    #     from helpers.model_utils import plot_prediction_confidence
+    #     print("Confidence created")
+    #     for name, preds in pred_dict_categorical.iteritems():
+    #         print("Plotting The predictions for ", name)
+    #         plot_prediction_confidence(preds)
 
 
 if __name__ == '__main__':

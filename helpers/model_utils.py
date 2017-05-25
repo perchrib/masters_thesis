@@ -263,6 +263,21 @@ def plot_models(log_path_list, graph_metric, save_path=None, title=None):
 
     plt.show()
 
+def plot_prediction_confidence(predictions):
+    dx = 0.05
+    x_values = []
+    for preds in predictions:
+        abs(preds[0] - preds[1])
+
+    # num tweets
+    x_values = 0
+
+    #np.where(np.logical_and(a >= 6, a <= 10))
+
+    # predicted probability
+
+
+
 
 def _get_log_statistics(log_path_list):
     """

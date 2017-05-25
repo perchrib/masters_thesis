@@ -83,8 +83,8 @@ def format_dataset_doc_level(texts, labels, metadata, is_test=False, feature_mod
             y_val = to_categorical(y_val)
 
         else:
-            y_train = np.asarray([[i] for i in y_train])
-            y_val = np.asarray([[i] for i in y_val])
+            y_train = np.asarray([i for i in y_train])
+            y_val = np.asarray([i for i in y_val])
 
         return x_train, y_train, meta_train, x_val, y_val, meta_val, feature_model, reduction_model
 
@@ -97,14 +97,16 @@ def format_dataset_doc_level(texts, labels, metadata, is_test=False, feature_mod
             x_test_sentiments = SA.analyze(texts)
             x_test = feature_adder(x_test, x_test_sentiments, feature_model)
 
-        if DIM_REDUCTION:
+        if reduction_model:
+            print("Using reduction model")
+            reduction_model = DimReduction(500, train=False, encoder=reduction_model)
             x_test = reduction_model.fit_transform(x_test)
 
         if CATEGORICAL:
             y_test = to_categorical(labels)
 
         else:
-            y_test = np.asarray([[i] for i in labels])
+            y_test = np.asarray([i for i in labels])
 
         return x_test, y_test, metadata,
 
