@@ -31,7 +31,7 @@ if not DIM_REDUCTION:
 
 # set TYPE = "" when not using "base"
 
-MODEL_TYPE = "final"
+MODEL_TYPE = "final_male"
 LAYERS = [[2048, 1024, 512]]
 # Can be represent as one structure ie [128,64] or multiple structure [[100, 50, 20], [22, 44, 22],]
 
@@ -39,10 +39,11 @@ LAYERS = [[2048, 1024, 512]]
 # from random_search import generate_random_layers
 #LAYERS = [[2048], [4096], [2048, 1024], [4096, 1024]]
 # Regularization
-DROPOUT = 0
+DROPOUT = 0.0
+DROPOUT_FIRST_LAYER = False
 L1 = 0
 L2 = 0
-LAYER_PENALTY = 0
+LAYER_PENALTY = 2
 
 # Text pre-processing
 FEATURE_MODEL = C_BAG_OF_WORDS
@@ -65,7 +66,7 @@ OUTPUT_ACTIVATION = 'softmax'
 CATEGORICAL = True
 
 # For Logistic Regression
-Log_Reg = False
+Log_Reg = True
 if Log_Reg:
     CATEGORICAL = False
     MODEL_LOSS = 'binary_crossentropy'

@@ -168,7 +168,7 @@ def char_main(specified_filters=None, train_only_on=None, save_model=False):
     #         extra_info=extra_info)
 
 
-def document_main():
+def document_main(train_only_on=None):
     # Load dataset
     from document_level_classification.constants import Log_Reg, TEST_DATA_DIR, LAYERS, EXPERIMENTS, N_GRAM, \
         MAX_FEATURE_LENGTH, FEATURE_MODEL, get_constants_info, AUTOENCODER_DIR, SAVE_FEATUREMODEL
@@ -242,8 +242,17 @@ def document_main():
                                                                                  feature_model=feature_model,
                                                                                  reduction_model=reduction_model)
 
-    input_size = data['x_train'].shape[1]
-    output_size = data['y_train'].shape[1]
+    # Train on one gender only
+    if train_only_on:
+        print('Training only on: ', train_only_on)
+        data['x_train'], data['y_train'], data['meta_train'] = filter_gender(data['x_train'],
+                                                                             data['y_train'],
+                                                                             data['meta_train'],
+                                                                             labels_index,
+                                                                             train_only_on)
+        extra_info.append("Data is only trained on %s" % train_only_on)
+        extra_info.append("Training on %i training samples" % len(data['x_train']))
+
 
     #document_trainer(*get_ann_model(input_size, output_size, LAYERS), data=data, extra_info=info, save_model=False)
 
@@ -258,9 +267,12 @@ def document_main():
 
     """STANDARD RUNNING"""
     if not Log_Reg:
+
+        input_size = data['x_train'].shape[1]
+        output_size = data['y_train'].shape[1]
         if type(LAYERS[0]) == list:
             for layers_type in LAYERS:
-                document_trainer(*get_ann_model(input_size, output_size, layers_type), data=data, extra_info=extra_info, save_model=True)
+                document_trainer(*get_ann_model(input_size, output_size, layers_type), data=data, extra_info=extra_info, save_model=False)
         else:
             # when running single models, checkpoint during training are set to True! (save_model=True)
             print("Running Single Model")
@@ -268,7 +280,13 @@ def document_main():
 
     # Logistic Regression
     if Log_Reg:
-        document_trainer(*get_logistic_regression(input_size, output_size), data=data, extra_info=extra_info)
+        from ml_models.models import logisitc_regression, svm
+        #logisitc_regression(data)
+        print("--- LINEAR ---")
+        svm(data)
+
+
+        #document_trainer(*get_logistic_regression(input_size, output_size), data=data, extra_info=extra_info)
 
 
 def char_word_main():
