@@ -1,0 +1,76 @@
+Training_log - 23/05/2017 16:01:36
+
+Model name: Conv_BiLSTM
+Elapsed training time: 1h:14m:30s
+
+Training set size: 316974
+Validation set size: 65264
+Validation set fraction: 0.165240
+Test set fraction: 0.032223
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 50
+Max sequence length: 100
+
+-----------Training statistics-----------
+        acc          loss   val_acc  val_loss
+0  0.999609  9.514457e-04  0.539869  7.416438
+1  1.000000  1.192093e-07  0.539869  7.416438
+2  1.000000  1.192093e-07  0.539869  7.416438
+3  1.000000  1.192093e-07  0.539869  7.416438
+
+Validation PRF
+            Female          Male  Overall Macro  Overall Micro
+Precision      0.0      0.539869       0.269934       0.539869
+Recall         0.0      1.000000       0.500000       0.539869
+F-score        0.0      0.701188       0.350594       0.539869
+Support    30030.0  35234.000000            NaN            NaN
+
+--------------Test results---------------
+loss: 8.339570 acc: 0.482600
+
+Test PRF
+           Female         Male  Overall Macro  Overall Micro
+Precision     0.0     0.482596       0.241298       0.482596
+Recall        0.0     1.000000       0.500000       0.482596
+F-score       0.0     0.651015       0.325507       0.482596
+Support    6585.0  6142.000000            NaN            NaN
+
+--------------Model Diagram---------------
+       InputLayer (None, 100)             InputLayer (None, 100)      
+           Lambda (None, 100, 94)             Lambda (None, 100, 94)  
+           Conv1D (None, 96, 1024)            Conv1D (None, 96, 1024) 
+          Dropout (None, 96, 1024)           Dropout (None, 96, 1024) 
+     MaxPooling1D (None, 48, 1024)      MaxPooling1D (None, 48, 1024) 
+             LSTM (None, 256)                   LSTM (None, 256)      
+                  \________________________________/                  
+                                  |                                   
+                             Merge (None, 512)                        
+                           Dropout (None, 512)                        
+                             Dense (None, 200)                        
+                             Dense (None, 2)                          
+
+
+Model information:
+=========================================
+ Kernel_size: 5
+ Filters: 1024
+ Pool length: 2
+ LSTM dropout: 0.200000, LSTM recurrent dropout 0.200000
+ Conv dropout: 0.500000
+ Dense drop1 0.500000
+
+Extra information:
+=========================================
+ Remove stopwords True
+ Lemmatize False
+ Remove punctuation False
+ Remove emoticons False
+ Text is not lowercased
+ Internet terms have been replaced with placeholders
+ Removed 2608 tweet because they were shorter than threshold
+ Data is only trained on MALE
+ Training on 316974 training samples

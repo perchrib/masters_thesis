@@ -1,0 +1,82 @@
+Training_log - 22/05/2017 06:33:15
+
+Model name: BiLSTM
+Elapsed training time: 6h:13m:32s
+
+Training set size: 586617
+Validation set size: 65179
+Validation set fraction: 0.098084
+Test set fraction: 0.019152
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 100
+Max number of words: 50000
+Max sequence length: 15
+
+-----------Training statistics-----------
+         acc      loss   val_acc  val_loss
+0   0.622016  0.640658  0.647939  0.611321
+1   0.642849  0.617670  0.661517  0.596341
+2   0.650966  0.606703  0.668436  0.585541
+3   0.657855  0.598635  0.674297  0.579097
+4   0.662436  0.593308  0.678056  0.575570
+5   0.666384  0.588584  0.681278  0.570530
+6   0.669843  0.585278  0.683472  0.566877
+7   0.672601  0.581723  0.686371  0.564186
+8   0.674184  0.579761  0.688473  0.562810
+9   0.675969  0.577656  0.687553  0.563156
+10  0.678054  0.575645  0.688642  0.561228
+11  0.678611  0.574311  0.689547  0.559384
+12  0.679413  0.573339  0.690913  0.558614
+13  0.681453  0.571960  0.691649  0.556240
+14  0.681414  0.571262  0.690729  0.557965
+15  0.682762  0.570358  0.693797  0.555862
+16  0.682929  0.569373  0.693536  0.555191
+17  0.683245  0.569666  0.694718  0.554426
+18  0.683454  0.568774  0.693506  0.555723
+19  0.684061  0.568661  0.697142  0.554553
+
+Validation PRF
+                 Female          Male  Overall Macro  Overall Micro
+Precision      0.678645      0.711559       0.695102       0.697142
+Recall         0.647139      0.739628       0.693384       0.697142
+F-score        0.662518      0.725322       0.693920       0.697142
+Support    29941.000000  35238.000000            NaN            NaN
+
+--------------Test results---------------
+loss: 0.676780 acc: 0.614130
+
+Test PRF
+                Female         Male  Overall Macro  Overall Micro
+Precision     0.619401     0.607661       0.613531       0.614127
+Recall        0.659377     0.565614       0.612496       0.614127
+F-score       0.638764     0.585884       0.612324       0.614127
+Support    6585.000000  6142.000000            NaN            NaN
+
+--------------Model Diagram---------------
+      InputLayer (None, 15)            InputLayer (None, 15)      
+       Embedding (None, 15, 200)        Embedding (None, 15, 200) 
+            LSTM (None, 500)                 LSTM (None, 500)     
+                 \______________________________/                 
+                                |                                 
+                           Merge (None, 1000)                     
+                         Dropout (None, 1000)                     
+                           Dense (None, 2)                        
+
+
+Model information:
+=========================================
+ LSTM dropout: 0.500000, LSTM recurrent dropout 0.200000
+ Merge dropout 0.500000
+Extra information:
+=========================================
+ Remove stopwords True
+ Lemmatize False
+ Remove punctuation False
+ Remove emoticons True
+ Text is lowercased
+ Internet terms have been replaced with placeholders
+ Removed 3452 tweet because they were shorter than threshold

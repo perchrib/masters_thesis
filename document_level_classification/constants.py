@@ -7,6 +7,7 @@ C_BAG_OF_WORDS = 'bow'
 C_TF_IDF = 'tfidf'
 C_TF_IDF_DISSIMILARITY = 'tfidf_dissimilarity'
 C_BAG_OF_WORDS_DISSIMILARITY = 'bow_dissimilarity'
+SAVE_FEATUREMODEL = False
 
 PREDICTION_TYPE = GENDER
 
@@ -30,17 +31,18 @@ if not DIM_REDUCTION:
 
 # set TYPE = "" when not using "base"
 
-MODEL_TYPE = ""
-LAYERS = [[800, 400, 200]]
+MODEL_TYPE = "final"
+LAYERS = [[2048, 1024, 512]]
 # Can be represent as one structure ie [128,64] or multiple structure [[100, 50, 20], [22, 44, 22],]
 
 
-from random_search import generate_random_layers
+# from random_search import generate_random_layers
 #LAYERS = [[2048], [4096], [2048, 1024], [4096, 1024]]
 # Regularization
 DROPOUT = 0
-L1 = 0.00001
+L1 = 0
 L2 = 0
+LAYER_PENALTY = 0
 
 # Text pre-processing
 FEATURE_MODEL = C_BAG_OF_WORDS

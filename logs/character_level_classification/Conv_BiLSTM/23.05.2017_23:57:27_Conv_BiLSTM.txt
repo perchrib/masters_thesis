@@ -1,0 +1,101 @@
+Training_log - 23/05/2017 23:57:27
+
+Model name: Conv_BiLSTM
+Elapsed training time: 6h:42m:08s
+
+Training set size: 587376
+Validation set size: 65264
+Validation set fraction: 0.098087
+Test set fraction: 0.019128
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 128
+Max number of epochs: 50
+Max sequence length: 100
+
+-----------Training statistics-----------
+         acc      loss   val_acc  val_loss
+0   0.603225  0.657235  0.637105  0.627524
+1   0.636087  0.627643  0.659797  0.603556
+2   0.647204  0.614756  0.662080  0.599378
+3   0.654872  0.606472  0.669987  0.593622
+4   0.659152  0.600955  0.671044  0.587296
+5   0.662892  0.595977  0.676713  0.584291
+6   0.664802  0.592488  0.675503  0.579502
+7   0.669020  0.588488  0.681892  0.577790
+8   0.671759  0.585688  0.684895  0.574638
+9   0.672487  0.583835  0.684911  0.571144
+10  0.674680  0.582156  0.685401  0.570926
+11  0.676596  0.578910  0.689032  0.569681
+12  0.678147  0.577262  0.680023  0.569700
+13  0.678853  0.575831  0.690687  0.564799
+14  0.680316  0.573977  0.689783  0.565082
+15  0.681196  0.573081  0.692526  0.564979
+16  0.681994  0.571556  0.692388  0.559707
+17  0.683182  0.570162  0.690304  0.561691
+18  0.684332  0.568718  0.690503  0.560187
+19  0.685111  0.567545  0.694410  0.556792
+20  0.686118  0.566030  0.691300  0.559302
+21  0.686724  0.565622  0.692495  0.557285
+22  0.687900  0.564692  0.693997  0.555095
+23  0.687428  0.574430  0.695330  0.555435
+24  0.689065  0.563756  0.695759  0.552845
+25  0.689545  0.561900  0.697873  0.552357
+26  0.690570  0.561542  0.694763  0.552583
+27  0.691271  0.560140  0.696985  0.549914
+28  0.691683  0.559153  0.695529  0.551857
+29  0.693103  0.557928  0.695069  0.551120
+30  0.692863  0.558286  0.696019  0.550412
+
+Validation PRF
+                 Female          Male  Overall Macro  Overall Micro
+Precision      0.730243      0.678460       0.704351       0.696019
+Recall         0.538162      0.830561       0.684362       0.696019
+F-score        0.619658      0.746845       0.683252       0.696019
+Support    30030.000000  35234.000000            NaN            NaN
+
+--------------Test results---------------
+loss: 0.691900 acc: 0.578140
+
+Test PRF
+                Female         Male  Overall Macro  Overall Micro
+Precision     0.630026     0.548006       0.589016       0.578141
+Recall        0.447380     0.718333       0.582857       0.578141
+F-score       0.523222     0.621715       0.572468       0.578141
+Support    6585.000000  6142.000000            NaN            NaN
+
+--------------Model Diagram---------------
+      InputLayer (None, 100)           InputLayer (None, 100)     
+          Lambda (None, 100, 94)           Lambda (None, 100, 94) 
+          Conv1D (None, 96, 128)           Conv1D (None, 96, 128) 
+         Dropout (None, 96, 128)          Dropout (None, 96, 128) 
+    MaxPooling1D (None, 48, 128)     MaxPooling1D (None, 48, 128) 
+            LSTM (None, 256)                 LSTM (None, 256)     
+                 \______________________________/                 
+                                |                                 
+                           Merge (None, 512)                      
+                         Dropout (None, 512)                      
+                           Dense (None, 200)                      
+                           Dense (None, 2)                        
+
+
+Model information:
+=========================================
+ Kernel_size: 5
+ Filters: 128
+ Pool length: 2
+ LSTM dropout: 0.200000, LSTM recurrent dropout 0.200000
+ Conv dropout: 0.500000
+ Dense drop1 0.500000
+
+Extra information:
+=========================================
+ Remove stopwords True
+ Lemmatize False
+ Remove punctuation False
+ Remove emoticons False
+ Text is not lowercased
+ Internet terms have been replaced with placeholders
+ Removed 2608 tweet because they were shorter than threshold

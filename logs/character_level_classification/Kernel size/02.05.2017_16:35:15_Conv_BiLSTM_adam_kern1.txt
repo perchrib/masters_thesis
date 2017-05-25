@@ -1,0 +1,61 @@
+Training_log - 02/05/2017 16:35:15
+
+Model name: Conv_BiLSTM
+Elapsed training time: 3h:03m:35s
+
+Training set size: 530222
+Validation set size: 66277
+Validation set fraction: 0.099999
+Test set fraction: 0.099999
+
+Hyperparameters
+=========================================
+Optimizer: adam
+Batch size: 256
+Max number of epochs: 50
+Max sequence length: 55
+
+-----------Training statistics-----------
+         acc      loss   val_acc  val_loss
+0   0.577824  0.675000  0.586614  0.667879
+1   0.590042  0.664365  0.597341  0.658174
+2   0.602765  0.652951  0.607813  0.646564
+3   0.613452  0.642330  0.618842  0.636426
+4   0.625977  0.630855  0.627986  0.628154
+5   0.636530  0.620284  0.635439  0.620560
+6   0.647293  0.609937  0.639769  0.616829
+7   0.655810  0.600909  0.643149  0.612880
+8   0.664016  0.591406  0.647706  0.609697
+9   0.672796  0.582305  0.652066  0.608981
+10  0.679655  0.573475  0.653983  0.606828
+11  0.685720  0.565554  0.655265  0.605430
+12  0.691618  0.559045  0.658569  0.604996
+13  0.697498  0.551978  0.659882  0.607669
+14  0.702298  0.545621  0.659671  0.609590
+15  0.706866  0.540042  0.663639  0.606792
+
+--------------Test results---------------
+loss: 0.606960acc: 0.661480
+
+--------------Model Diagram---------------
+       InputLayer (None, 55)              InputLayer (None, 55)       
+           Lambda (None, 55, 78)              Lambda (None, 55, 78)   
+           Conv1D (None, 55, 1024)            Conv1D (None, 55, 1024) 
+          Dropout (None, 55, 1024)           Dropout (None, 55, 1024) 
+     MaxPooling1D (None, 27, 1024)      MaxPooling1D (None, 27, 1024) 
+             LSTM (None, 256)                   LSTM (None, 256)      
+                  \________________________________/                  
+                                  |                                   
+                             Merge (None, 512)                        
+                             Dense (None, 128)                        
+                             Dense (None, 2)                          
+
+
+Model information:
+=========================================
+ Kernel_size: 1
+ Filters: 1024
+ Pool length: 2
+ Conv dropout: 0.500000
+ LSTM dropout = 0.2, 0.2
+ No dense dropout
