@@ -87,7 +87,7 @@ def pre_process_test_doc(specified_filters=None):
     pass
 
 
-def predict_stacked_model(model_paths, vocabularies, averaging_style):
+def predict_stacked_model(model_paths, vocabularies, averaging_style, print_individual_prfs=False):
     """
     Use several models (char-, word-, doc-level) to predict using a stacked model
     :param model_paths: dictionary with key, value pairs of model name/type, model path
@@ -135,6 +135,12 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style):
                                                                           x_data=formatted_data[name][X_TEST],
                                                                           y_data=formatted_data[name][Y_TEST])
 
+    if print_individual_prfs:
+        for name, predictions in pred_dict.iteritems():
+            print("\n---PRF for %s" % name)
+            print_prf_scores(y_pred=predictions, y_true=y_true)
+
+
     print("Averaging predictions using: %s" % averaging_style)
     if averaging_style == AVERAGE_CONF:
         aggregated_preds = [[0 for _ in y_categorical[0]] for _ in y_categorical]
@@ -152,7 +158,6 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style):
 
         aggregated_preds = get_argmax_classes(aggregated_preds)  # Single class values
 
-
     elif averaging_style == MAX_VOTE:
         votes = [[] for _ in range(len(y_true))]
 
@@ -169,9 +174,8 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style):
     else:
         raise Exception("Invalid averaging style. Should be MAX_VOTE or AVERAGE_CONF")
 
-    # PRF
-    prf = get_precision_recall_f_score(y_pred=aggregated_preds, y_true=y_true)
-    print(get_prf_repr(prf))
+    # PRF - Stacked model
+    print_prf_scores(y_pred=aggregated_preds, y_true=y_true)
 
 
 if __name__ == '__main__':
@@ -202,5 +206,6 @@ if __name__ == '__main__':
             CHAR_MODEL: '../models/character_level_classification/char_index/23.05.2017_05:36:06_Conv_BiLSTM_no_lower.pkl',
             DOC_MODEL: None
         },
-        averaging_style=AVERAGE_CONF
+        averaging_style=AVERAGE_CONF,
+        print_individual_prfs=True
     )
