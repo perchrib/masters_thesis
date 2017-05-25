@@ -193,13 +193,17 @@ def get_precision_recall_f_score(y_pred, y_true, prediction_type=GENDER):
     classes = get_class_names(prediction_type)
 
     # Calculate precision, recall, f-scores for all classes and
-    prf_scores = {OVERALL_MICRO: precision_recall_fscore_support(y_true=y_true, y_pred=y_pred, average='micro'),
-                  OVERALL_MACRO: precision_recall_fscore_support(y_true=y_true, y_pred=y_pred, average='macro')}
+    prf_scores = {OVERALL_MICRO: precision_recall_fscore_support(y_true=y_true, y_pred=y_pred, average='micro')}
+                  # OVERALL_MACRO: precision_recall_fscore_support(y_true=y_true, y_pred=y_pred, average='macro')}
 
+    # Classes individually
     prf_each = precision_recall_fscore_support(y_true=y_true, y_pred=y_pred)
-
     for i in range(len(classes)):
         prf_scores[classes[i]] = tuple(metric[i] for metric in prf_each)
+
+    # Round values
+    for cls, metrics in prf_scores.iteritems():
+        prf_scores[cls] = tuple(np.round(m, 3) if m is not None else m for m in metrics)
 
     return prf_scores
 
@@ -325,10 +329,10 @@ def _get_log_statistics(log_path_list):
 
 def print_prf_scores(y_pred, y_true):
     """
-    Print PRF_scores in a readable fashion given model path, samples and labels
-    :param model_path: path to h5 model file
-    :param x_data: data samples
-    :param y_data: categorical labels
+    Print PRF_scores in a readable fashion given predictions and true labels
+    :param y_pred: single value predictions
+    :param y_true: single value correct classes
+    :param latex_friendly: for copying into latex
     :return: 
     """
 

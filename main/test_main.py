@@ -3,6 +3,7 @@ from collections import Counter
 import sys
 import os
 import random
+import numpy as np
 
 # Append path to use modules outside pycharm environment, e.g. remote server
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
@@ -11,7 +12,7 @@ from preprocessors.parser import Parser
 from preprocessors.dataset_preparation import prepare_dataset, filter_dataset
 from helpers.global_constants import TEST_DATA_DIR, TRAIN_DATA_DIR, TEST, TRAIN, REM_PUNCTUATION, REM_STOPWORDS, \
     REM_EMOTICONS, LEMMATIZE, REM_INTERNET_TERMS, CHAR_MODEL, DOC_MODEL, WORD_MODEL, X_TEST, Y_TEST, LOWERCASE, \
-    MAX_VOTE, AVERAGE_CONF
+    MAJORITY, AVERAGE_CONF, MAX_CONF
 
 from keras.models import load_model
 
@@ -90,7 +91,6 @@ def pre_process_test_doc(vocabulary_path, specified_filters=None):
 
     feature_model = load_pickle(vocabulary_path)
 
-    print(feature_model)
     test_texts, test_labels, test_metadata, _ = prepare_dataset(DOC_PREDICTION_TYPE,
                                                                 folder_path=TEST_DATA_DIR)
 
@@ -114,17 +114,18 @@ def pre_process_test_doc(vocabulary_path, specified_filters=None):
 
 def predict_stacked_model(model_paths, vocabularies, averaging_style, print_individual_prfs=False):
     """
-    Use several models (char-, word-, doc-level) to predict using a stacked model
+    Use several models (char-, word-, doc-level) to predict as a stacked model
     :param model_paths: dictionary with key, value pairs of model name/type, model path
     :param vocabularies: corresponding word_index, char-index and bow vocabulary
     :param averaging_style: prediction averaging style. Can be:
-        MAX_VOTE: Each system votes on the max confidence class. The class with most votes is predicted
         AVERAGE_CONF: Take the average of each system's confidence values and choose the class with highest average confidence
+        MAJORITY: Each system votes on the max confidence class. The class with most votes is predicted
+        MAX_CONF: Rely on the prediction of the system with highest confidence for each sample
     :type model_paths: dict
     :return: 
     """
-
-    print("Number of input models to stack: %i" % len(model_paths))
+    number_of_models = len(model_paths)
+    print("Number of input models to stack: %i" % number_of_models)
 
     # Dictionary containing a dictionary for each sub-system, with appropriately formatted data vectors - dict[X_TEST], dict[Y_TEST]
     formatted_data = {
@@ -162,7 +163,7 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style, print_indi
     # Load and predict with each model
     for name, path in model_paths.iteritems():
         pred_dict[name], pred_dict_categorical[name], loaded_models[name] = \
-            load_and_predict(model_path=path, x_data=formatted_data[name][X_TEST], y_data= formatted_data[name][Y_TEST])
+            load_and_predict(model_path=path, x_data=formatted_data[name][X_TEST], y_data=formatted_data[name][Y_TEST])
 
     if print_individual_prfs:
         for name, predictions in pred_dict.iteritems():
@@ -173,7 +174,7 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style, print_indi
     if averaging_style == AVERAGE_CONF:
         aggregated_preds = [[0 for _ in y_categorical[0]] for _ in y_categorical]
 
-        # Aggregate/Summation
+        # Summation
         for name, predictions in pred_dict_categorical.iteritems():
             for i in range(len(predictions)):  # For each sample
                 for j in range(len(predictions[i])):  # For each confidence value
@@ -181,12 +182,12 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style, print_indi
 
         # Average
         for sample in aggregated_preds:
-            for i in range(len(sample)):
-                sample[i] /= float(len(model_paths))
+            for i in range(len(sample)):  # For each confidence
+                sample[i] /= float(number_of_models)
 
         aggregated_preds = get_argmax_classes(aggregated_preds)  # Single class values
 
-    elif averaging_style == MAX_VOTE:
+    elif averaging_style == MAJORITY:
         votes = [[] for _ in range(len(y_true))]
 
         # Gather votes
@@ -198,6 +199,24 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style, print_indi
         aggregated_preds = []
         for sample in votes:
             aggregated_preds.append(Counter(sample).most_common(1)[0][0])
+
+    elif averaging_style == MAX_CONF:
+        all_confs = [[] for _ in y_true]
+
+        # Gather all confidences
+        for name, predictions in pred_dict_categorical.iteritems():
+            for i in range(len(predictions)):  # For each sample
+                all_confs[i].append(predictions[i])
+
+        all_confs = np.asarray(all_confs)  # Numpy array for convenience in next step
+
+        # Find highest confidence value and the corresponding gender
+        aggregated_preds = []
+        for confs in all_confs:
+            max_confs = np.amax(confs, axis=1)  # Each system's max conf
+            system_index = np.argmax(max_confs)  # Index of system with highest conf value
+            aggregated_preds.append(np.argmax(confs[system_index]))  # Append gender index
+
 
     else:
         raise Exception("Invalid averaging style. Should be MAX_VOTE or AVERAGE_CONF")
@@ -235,6 +254,6 @@ if __name__ == '__main__':
             CHAR_MODEL: '../models/character_level_classification/char_index/23.05.2017_05:36:06_Conv_BiLSTM_no_lower.pkl',
             DOC_MODEL: '../models/document_level_classification/feature_models/bow_10k_most_freq.pkl'
         },
-        averaging_style=AVERAGE_CONF,
-        print_individual_prfs=True
+        averaging_style=MAX_CONF,
+        print_individual_prfs=False
     )
