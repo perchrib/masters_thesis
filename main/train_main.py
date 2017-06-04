@@ -227,6 +227,22 @@ def document_main(train_only_on=None):
                                                               max_feature_length=max_length,
                                                               reduction_model=reduction_model)
 
+
+    pretrained_model = False
+    if pretrained_model:
+        from helpers.model_utils import predict_and_get_precision_recall_f_score
+        import pandas as pd
+        model = load_model('../models/document_level_classification/final_2048_1024_512/25.05.2017_10:04:09_final_2048_1024_512_01_0.5349.h5')
+        print("model loaded")
+        preds = model.predict(data['x_val'])
+        for p in preds:
+            print(p)
+        prf_val = predict_and_get_precision_recall_f_score(model, data['x_val'], data['y_val'], PREDICTION_TYPE)
+        prf_val_df = pd.DataFrame(data=prf_val, index=pd.Index(["Precision", "Recall", "F-score", "Support"]))
+        print(pd.DataFrame(prf_val_df).__repr__())
+        return
+
+
     if SAVE_FEATUREMODEL:
         from helpers.helper_functions import save_pickle
         save_pickle("../models/document_level_classification/feature_models/bow_10k_most_freq", feature_model)
@@ -280,13 +296,11 @@ def document_main(train_only_on=None):
 
     # Logistic Regression
     if Log_Reg:
-        from ml_models.models import logisitc_regression, svm
+        from ml_models.models import logisitc_regression, svm, random_forests
         #logisitc_regression(data)
-        print("--- LINEAR ---")
+
+        #random_forests(data)
         svm(data)
-
-
-        #document_trainer(*get_logistic_regression(input_size, output_size), data=data, extra_info=extra_info)
 
 
 def char_word_main():

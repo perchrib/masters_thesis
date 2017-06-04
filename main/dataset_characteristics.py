@@ -11,7 +11,8 @@ from preprocessors.parser import Parser
 
 MALE_COLOR = "C0"
 FEMALE_COLOR = "C1"
-
+GENDER_COLOR = [MALE_COLOR, FEMALE_COLOR]
+GENDER = ['male', 'female']
 SCALE = 1.1711
 
 def tag_plotter(male_tags, female_tags, tag_type):
@@ -104,6 +105,79 @@ def plot_length_of_tweet_by_gender_and_the_total(male, female, total):
     visualizer.plot_boxplot(distributions=[male, female, s], xlabel=["Male", "Female", "Both"])
     visualizer.save_plot(filename="Number of Tweets by Gender")
 
+##################################################################################################
+
+def plot_emoticons(male, female):
+    male_emo = male.keys()
+    female_emo = female.keys()
+    x_values = sorted(list(set(male_emo + female_emo)))
+
+    y_male = [male[emo] for emo in x_values]
+    y_female = [female[emo] for emo in x_values]
+    v = Visualizer(title='Frequency of Emoticons', xlabel='Emoticons', ylabel='Frequency')
+    v.plot_histogram(x_values, y_male, gender='male', rotation=270)
+    v.plot_histogram(x_values, y_female, gender='female', rotation=270)
+    v.save_plot('emoticons-histogram', 'emoticons')
+
+def plot_stop_words(male, female):
+    male_stop = male.keys()
+    female_stop = female.keys()
+    unwanted_stop_words = ['d', 'f', 'n', 't', 'll', 'm', 'ma', 'o', 're', 's', 've', 'y']
+    x_values = sorted(list(set(male_stop + female_stop)))
+    x_values = [stop for stop in x_values if stop not in unwanted_stop_words]
+    y_male = [male[stop] for stop in x_values]
+    y_female = [female[stop] for stop in x_values]
+    print("LENGTH***********: ", len(x_values))
+    v = Visualizer(title='Frequency of Stopwords', xlabel='Stopwords', ylabel='Frequency')
+    # for i in range(4):
+    #     if i == 3:
+    #         v.plot_histogram(x_values[i * 33:], y_male[i * 33:], gender='male', subplot=True)
+    #         v.plot_histogram(x_values[i * 33:], y_female[i * 33:], gender='female', subplot=True)
+    #
+    #     v.plot_histogram(x_values[i*33:(i+1)*33], y_male[i*33:(i+1)*33], gender='male', subplot=True)
+    #     v.plot_histogram(x_values[i*33:(i+1)*33], y_female[i*33:(i+1)*33], gender='female', subplot=True)
+    v.plot_histogram(x_values[:68], y_male[:68], gender='male', subplot=True)
+    v.plot_histogram(x_values[:68], y_female[:68], gender='female', subplot=False)
+
+    v.plot_histogram(x_values[68:], y_male[68:], gender='male', subplot=True)
+    v.plot_histogram(x_values[68:], y_female[68:], gender='female', subplot=False)
+    v.save_plot("stopwords-histogram", 'stopwords')
+
+def plot_twitter_syntax_tokens(male, female):
+    male_ = male.keys()
+    female_ = female.keys()
+    x_values = sorted(list(set(male_ + female_)))
+    y_male = [male[pos] for pos in x_values]
+    y_female = [female[pos] for pos in x_values]
+    v = Visualizer(title='Frequency of Twitter Internet Terms', xlabel="Internet Terms", ylabel='Frequency')
+    v.plot_histogram(x_values, y_male, gender='male')
+    v.plot_histogram(x_values, y_female, gender='female')
+    v.save_plot('internet-terms-histogram', 'twitter syntax tokens')
+
+def plot_pos_tags(male, female, counter_type):
+    male_pos = male.keys()
+    female_pos = female.keys()
+    x_values = sorted(list(set(male_pos + female_pos)))
+
+    y_male = [male[pos] for pos in x_values]
+    y_female = [female[pos] for pos in x_values]
+    v = Visualizer(title='Frequency of ' + counter_type, xlabel=counter_type, ylabel='Frequency')
+    v.plot_histogram(x_values, y_male, gender='male')
+    v.plot_histogram(x_values, y_female, gender='female')
+    v.save_plot(counter_type + '-histogram', 'pos-tags')
+
+def plot_sentiments(male, female):
+    male_ = male.keys()
+    female_ = female.keys()
+    x_values = sorted(list(set(male_ + female_)))
+    y_male = [male[pos] for pos in x_values]
+    y_female = [female[pos] for pos in x_values]
+    v = Visualizer(title='Frequency of Sentiments', xlabel="Sentiments", ylabel='Frequency')
+    v.plot_histogram(x_values, y_male, gender='male', log=False)
+    v.plot_histogram(x_values, y_female, gender='female', log=False)
+    v.save_plot('sentiments-histogram', 'sentiments')
+
+
 
 def find_avg_and_median_tweet_amount_by_author(authors):
     avg_total = 0
@@ -139,13 +213,6 @@ def normalize(counts, scale):
     scaled_counts = Counter({k: v for k, v in zip(counts.keys(), scaled_values)})
     return scaled_counts
 
-
-
-
-
-
-
-
 if __name__ == '__main__':
 
     authors, female_texts, male_texts = get_data(TRAIN_DATA_DIR)
@@ -168,6 +235,24 @@ if __name__ == '__main__':
 
     male_data = Characteristics(male_texts)
     female_data = Characteristics(female_texts)
+
+    # plot emoticons
+    #plot_emoticons(male_data.emoticon_count, normalize(female_data.emoticon_count, SCALE))
+
+    # plot stopwords
+    #plot_stop_words(male_data.stopwords_count, normalize(female_data.stopwords_count, SCALE))
+
+    # plot simple pos tags
+    #plot_pos_tags(pos_tag_counter(word_tokenize(male_texts)), normalize(pos_tag_counter(word_tokenize(female_texts)), SCALE), counter_type="Simple POS-tags")
+
+    # plot all pos-tags
+    #plot_pos_tags(pos_tag_counter(word_tokenize(male_texts), simple_pos_tags=False), normalize(pos_tag_counter(word_tokenize(female_texts), simple_pos_tags=False), SCALE), counter_type="Pos-Tags")
+
+    # Twitter Syntax Tokens
+    #plot_twitter_syntax_tokens(male_data.twitter_syntax_token_count, normalize(female_data.twitter_syntax_token_count, SCALE))
+
+
+
     print("MALE: ", male_data.emoticon_count)
     print("FEMALE: ", female_data.emoticon_count)
 
@@ -285,3 +370,4 @@ if __name__ == '__main__':
 
     # print("Start Plotting Sentiment Analazys on Tweets...")
     # plot_sentiment_tweets(male_sentiment, female_sentiment)
+    #plot_sentiments(male_sentiment, female_sentiment)
