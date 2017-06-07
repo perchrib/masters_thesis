@@ -223,7 +223,7 @@ def get_argmax_classes(y_values):
     return np.asarray([np.argmax(confidence) for confidence in y_values])
 
 
-def plot_models(log_path_list, graph_metric, save_path=None, title=None):
+def plot_models(log_path_list, graph_metric, y_label=None, save_path=None, title=None):
     """
     Given a list of log file paths, plot the training histories for the specified graph_metric
     :param log_path_list: List of log file paths
@@ -248,7 +248,9 @@ def plot_models(log_path_list, graph_metric, save_path=None, title=None):
         for metric in(graph_metric):
             for i in range(len(statistics[metric])): # Iterate over models
                 plt.plot(statistics[metric][i], label=model_names[i] + " " + metric)
-                plt.ylabel(metric)
+
+    if y_label:
+        plt.ylabel(y_label)
 
 
     plt.xlabel("Epochs")
@@ -375,18 +377,13 @@ if __name__ == '__main__':
 
 
     ##REGULARIZATION AND DROPOUT##
+    # model_comp_path = '../logs/character_level_classification/Regularizer'
+    # char_paths =list(map(lambda file_name: os.path.join(model_comp_path, file_name), os.listdir('../logs/character_level_classification/Regularizer')))
 
-    char_paths = \
-        [
-            '../logs/character_level_classification/Ablation/18.05.2017_17:47:45_Conv_BiLSTM_base.txt',  # Base
-            '../logs/character_level_classification/Regularizer/23.05.2017_10:18:48_Conv_BiLSTM_l1.txt',      # Regularizer
-            '../logs/character_level_classification/No dropout/22.05.2017_16:39:37_Conv_BiLSTM.txt'   # No dropout
-         ]
-
-    plot_models(char_paths, VAL_LOSS, save_path='../../images/experiments/char_model_comp.png', title="Character model comparison")
-
-    # path = ['../logs/word_embedding_classification/BiLSTM/22.05.2017_16:37:14_BiLSTM.txt', '../logs/character_level_classification/Ablation/20.05.2017_21:30:39_Conv_BiLSTM_em_lower.txt']
-    # plot_models(path, [VAL_LOSS, TRAIN_LOSS], title="Conv_BiLSTM training loss and validation loss")  #save_path="../../images/experiments/char_train_val_loss_.png"
+    # plot_models(char_paths, VAL_LOSS, save_path='../../images/experiments/char_reg.png', title="Character Conv_BiLSTM regularization")
+    #
+    path = ['../logs/character_level_classification/Ablation/18.05.2017_17:47:45_Conv_BiLSTM_base.txt']  #'../logs/character_level_classification/Ablation/20.05.2017_21:30:39_Conv_BiLSTM_em_lower.txt''
+    plot_models(path, [VAL_LOSS, TRAIN_LOSS], save_path="../../images/experiments/char_train_val_loss.png", y_label="Loss", title="Conv_BiLSTM training loss and validation loss")  #save_path="../../images/experiments/char_train_val_loss_.png"
 
 
     # Word model plotting
@@ -394,8 +391,15 @@ if __name__ == '__main__':
     # word_paths = list(map(lambda file_name: os.path.join(model_comp_path, file_name), os.listdir(model_comp_path)))
     #
     # plot_models(word_paths, VAL_LOSS, save_path='../../images/experiments/word_model_base.png', title="Word model comparison")
-    #
 
+
+    # Word regularizer
+    # word_reg_dir = '../logs/word_embedding_classification/Regularizer'
+    # reg_paths = list(map(lambda file_name: os.path.join(word_reg_dir, file_name), os.listdir(word_reg_dir)))
+    # plot_models(reg_paths, VAL_LOSS, save_path='../../images/experiments/word_reg.png', title="Word BiLSTM regularization")
+
+    # path = ['../logs/word_embedding_classification/Regularizer/22.05.2017_15:38:57_BiLSTM_base.txt']
+    # plot_models(path, [VAL_LOSS, TRAIN_LOSS], y_label="Loss", title="Word BiLSTM training loss and validation loss", save_path="../../images/experiments/word_train_val_loss.png")  #save_path="../../images/experiments/char_train_val_loss_.png"
 
 
     print("")

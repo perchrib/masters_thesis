@@ -334,10 +334,10 @@ if __name__ == '__main__':
     # Ablation setup
     filter_list = [
         # Base
-        # {REM_STOPWORDS: True,
-        #  LEMMATIZE: False,
-        #  REM_EMOTICONS: False,
-        #  REM_PUNCTUATION: False},
+        {REM_STOPWORDS: True,
+         LEMMATIZE: False,
+         REM_EMOTICONS: False,
+         REM_PUNCTUATION: False},
 
         # Lemmatize
         {REM_STOPWORDS: True,
@@ -346,10 +346,10 @@ if __name__ == '__main__':
          REM_PUNCTUATION: False},
 
         # Emoticons
-        # {REM_STOPWORDS: True,
-        #  LEMMATIZE: False,
-        #  REM_EMOTICONS: True,
-        #  REM_PUNCTUATION: False},
+        {REM_STOPWORDS: True,
+         LEMMATIZE: False,
+         REM_EMOTICONS: True,
+         REM_PUNCTUATION: False},
 
         # Punctuation
         {REM_STOPWORDS: True,
@@ -369,12 +369,19 @@ if __name__ == '__main__':
          REM_EMOTICONS: True,
          REM_PUNCTUATION: True},
 
-        # Remove Internet terms instead of replacing
+        # All true
         {REM_STOPWORDS: True,
-         LEMMATIZE: False,
-         REM_EMOTICONS: False,
-         REM_PUNCTUATION: False,
-         REM_INTERNET_TERMS: True}
+         LEMMATIZE: True,
+         REM_EMOTICONS: True,
+         REM_PUNCTUATION: True,
+         LOWERCASE: True}
+
+        # Remove Internet terms instead of replacing
+        # {REM_STOPWORDS: True,
+        #  LEMMATIZE: False,
+        #  REM_EMOTICONS: False,
+        #  REM_PUNCTUATION: False,
+        #  REM_INTERNET_TERMS: True}
     ]
 
     if sys.argv[1] == DOC:
@@ -390,7 +397,7 @@ if __name__ == '__main__':
         #     char_main(operation=TRAIN, manual_filters=f)
 
         # Single char
-        char_main(save_model=False)
+        char_main(save_model=True)
 
         # Load model and run test data on model
         # char_main(operation=TEST, trained_model_path="Conv_BiLSTM/27.04.2017_21:07:34_Conv_BiLSTM_adam_31_0.70.h5")
