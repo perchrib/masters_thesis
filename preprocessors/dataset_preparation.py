@@ -18,7 +18,7 @@ from helpers.model_utils import get_argmax_classes
 SEED = 1337
 
 
-def prepare_dataset(prediction_type, folder_path=TRAIN_DATA_DIR, gender=None):
+def prepare_dataset(prediction_type=GENDER, folder_path=TRAIN_DATA_DIR, gender=None):
     """
     --Used in both word_level and character_level--
     Iterate over dataset folder and create sequences of word indices
