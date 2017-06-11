@@ -2,15 +2,19 @@
 from keras.layers import Input, Dense, Dropout, BatchNormalization
 from keras.models import Model
 from constants import N_GRAM, FEATURE_MODEL, DIM_REDUCTION_SIZE, DIM_REDUCTION, ACTIVATION, \
-    OUTPUT_ACTIVATION, DROPOUT, L1, L2, MODEL_TYPE, LAYER_PENALTY, DROPOUT_FIRST_LAYER
+    OUTPUT_ACTIVATION, DROPOUT, L1, L2, MODEL_TYPE, LAYER_PENALTY, DROPOUT_FIRST_LAYER, BATCH_NORM
 
 from keras import regularizers
+
 
 
 def generate_model(input_shape, output_layer, hidden_layers):
     if DROPOUT_FIRST_LAYER:
         print("Dropout added on input layer")
         input_layers = Dropout(DROPOUT)(input_shape)
+    elif BATCH_NORM:
+        print("Batch normalization added")
+        input_layers = BatchNormalization()(input_shape)
     else:
         input_layers = input_shape
 
@@ -27,6 +31,8 @@ def generate_model(input_shape, output_layer, hidden_layers):
                 input_layers = Dense(layer, activation=ACTIVATION,
                                      kernel_regularizer=l2_reg,
                                      activity_regularizer=l1_reg)(input_layers)
+            if i + 1 == len(hidden_layers):
+                continue
 
         print("dens layer added, layer: ", layer)
         input_layers = Dense(layer, activation=ACTIVATION)(input_layers)

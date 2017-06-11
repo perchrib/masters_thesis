@@ -129,6 +129,8 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style, print_indi
     number_of_models = len(model_paths)
     print("Number of input models to stack: %i" % number_of_models)
 
+
+
     # Dictionary containing a dictionary for each sub-system, with appropriately formatted data vectors - dict[X_TEST], dict[Y_TEST]
     formatted_data = {
         WORD_MODEL: pre_process_test_word(trained_word_index_path=vocabularies[WORD_MODEL], specified_filters={
@@ -225,12 +227,44 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style, print_indi
     # PRF - Stacked model
     print_prf_scores(y_pred=aggregated_preds, y_true=y_true)
 
-    # if True:
-    #     from helpers.model_utils import plot_prediction_confidence
-    #     print("Confidence created")
-    #     for name, preds in pred_dict_categorical.iteritems():
-    #         print("Plotting The predictions for ", name)
-    #         plot_prediction_confidence(preds)
+    plot_conf = False
+    analyze_outliers = True
+
+    if plot_conf:
+        from helpers.model_utils import plot_prediction_confidence
+        print("Confidence created")
+
+        for name, preds in pred_dict_categorical.iteritems():
+            print("Plotting The predictions for ", name)
+            truth = list(y_true)
+            plot_prediction_confidence(preds, name, truth=None)
+
+    if analyze_outliers:
+        test_texts, test_labels, test_metadata, _ = prepare_dataset(DOC_PREDICTION_TYPE,
+                                                                    folder_path=TEST_DATA_DIR)
+
+
+        from helpers.model_utils import find_differences_in_prediction
+        index = find_differences_in_prediction(pred_dict_categorical, y_true, true_positive=True)
+
+        indexes = sorted(index.keys())
+        doc_count = 0
+        word_count = 0
+        char_count = 0
+        for i in indexes:
+            models = index[i]
+            print("index: ", i, " Models: ", index[i], " ", test_texts[i])
+            for m in models:
+                if WORD_MODEL in m:
+                    word_count += 1
+                elif CHAR_MODEL in m:
+                    char_count += 1
+                elif DOC_MODEL in m:
+                    doc_count += 1
+
+        print("Char: ", char_count)
+        print("Word: ", word_count)
+        print("DOC: ", doc_count)
 
 
 if __name__ == '__main__':

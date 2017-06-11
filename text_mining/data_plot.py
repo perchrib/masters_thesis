@@ -24,13 +24,15 @@ class Visualizer():
 
 
     def determine_fontsize(self, n_tokens):
-        if n_tokens <= 25:
+        if n_tokens <= 22:
+            return 14
+        elif n_tokens <= 25:
             return 10
         elif n_tokens <= 50:
             return 6
         elif n_tokens <= 100:
-            return 5
-        return 3
+            return 6
+        return 4
 
 
     def plot_two_dataset_token_counts(self, tc1, tc2, tc1_label="male", tc2_label="female"):
@@ -73,6 +75,7 @@ class Visualizer():
         tokens = sorted(tc.keys())
         if subplot:
             self.subplot_checker()
+            self.subplot_counter += 1
 
         font_size = self.determine_fontsize(len(tokens))
         tc_freq = [tc[token] for token in tokens]
@@ -98,6 +101,7 @@ class Visualizer():
         avg_length = round(float(total_sum_of_lengths)/float(total_elements), 2)
         if subplot:
             self.subplot_checker()
+            self.subplot_counter += 1
 
 
         plt.axvline(x=avg_length, color='black', label="avg length " + str(avg_length))
@@ -105,6 +109,26 @@ class Visualizer():
 
         plt.bar(x_values, y_values, color=color, label=label)
         plt.legend(loc='best', frameon=False)
+        plt.tight_layout()
+
+    def plot_histogram(self, x_values, y_values, rotation=90, gender=None, subplot=False, log=True):
+        x_ = np.arange(len(x_values))
+        width = 0.35
+        font_size = self.determine_fontsize(len(x_))
+        if subplot:
+            self.subplot_checker()
+        if gender =='male':
+            plt.bar(x_ - width, y_values, width=width, label=gender, align='edge', log=log)
+        if gender == 'female':
+            plt.bar(x_, y_values, width=width, label=gender, align='edge', log=log)
+            self.subplot_counter += 1
+
+        plt.xticks(x_, x_values, rotation=rotation, fontsize=font_size)
+        plt.grid(False)
+        if len(x_) > 50:
+            plt.legend(loc='upper right', frameon=False, fontsize='x-small')
+        else:
+            plt.legend(loc='best', frameon=False)
         plt.tight_layout()
 
     def plot_simple_histograms(self, x_labels, y_labels, color=["C0", "C1"]):
@@ -159,7 +183,8 @@ class Visualizer():
         else:
             plt.ylabel(self.ylabel, size=15)
             plt.xlabel(self.xlabel, size=15)
-        self.subplot_counter += 1
+
+
 
 
     def save_plot(self, filename=None, topic=None):

@@ -12,7 +12,7 @@ from global_constants import GENDER, OVERALL_MACRO, OVERALL_MICRO, TRAIN_ACC, TR
 from helper_functions import save_pickle, get_time_format
 
 import matplotlib.pyplot as plt
-
+from collections import Counter
 
 def get_model_checkpoint(model_name, model_dir, model_optimizer=None):
     dir_path = os.path.join(model_dir, model_name)
@@ -252,7 +252,7 @@ def plot_models(log_path_list, graph_metric, y_label=None, save_path=None, title
     if y_label:
         plt.ylabel(y_label)
 
-
+    #plt.ylabel("Validation & Training Loss")
     plt.xlabel("Epochs")
     plt.legend()
 
@@ -265,20 +265,170 @@ def plot_models(log_path_list, graph_metric, y_label=None, save_path=None, title
 
     plt.show()
 
-def plot_prediction_confidence(predictions):
-    dx = 0.05
-    x_values = []
-    for preds in predictions:
-        abs(preds[0] - preds[1])
+def plot_prediction_confidence(predictions, name, plot_type='graph', common_plot=True, truth=None):
+    if not common_plot:
+        figure = plt.figure()
 
-    # num tweets
-    x_values = 0
+    confidence_values = []
+    num_of_preds = len(predictions)
+    predicted_correct_values = []
+    for i in range(len(predictions)):
+        preds = predictions[i]
+        confidence = preds[0] - preds[1]
+        confidence_values.append(round(confidence, 2))
 
-    #np.where(np.logical_and(a >= 6, a <= 10))
+        if truth:
+            correct = truth[i]
 
-    # predicted probability
+            if confidence > 0 and correct == 0:
+                predicted_correct_values.append(round(confidence, 2))
+
+            elif confidence < 0 and correct == 1:
+                predicted_correct_values.append(round(confidence, 2))
+            else:
+                print("conf: ", round(confidence, 2), " correct: ", correct)
 
 
+
+    # confidence_values = sorted(confidence_values)
+    #
+    # for c in confidence_values:
+    #     print("C: ", c)
+
+    counts = Counter(confidence_values)
+    x_values = sorted(counts.keys())
+    y_values = [counts[i] for i in x_values]
+
+    y_values_norm = np.asarray(y_values) / float(num_of_preds)
+    y_values = []
+    for y in y_values_norm:
+        y_values.append(round(y, 4))
+    y_max = max(y_values)
+    print("Y_mAX: ", y_max)
+
+    if truth:
+        truth_counts = Counter(predicted_correct_values)
+        truth_x_values = sorted(truth_counts.keys())
+        truth_y_values = [truth_counts[i] for i in truth_x_values]
+
+        truth_y_values_norm = np.asarray(truth_y_values) / float(num_of_preds)
+        truth_y_values = []
+        for y in truth_y_values_norm:
+            truth_y_values.append(round(y, 4))
+
+
+
+
+
+
+    mu = np.mean(confidence_values) # mean of distribution
+    sigma = np.std(confidence_values) # standard deviation of distribution
+
+
+    if "Doc" in name:
+        name = "Document-level"
+        color = "C0"
+    elif "Char" in name:
+        name = "Character-level"
+        color = "C1"
+    elif "Word" in name:
+        name = "Word-level"
+        color = "C2"
+
+    if common_plot:
+        title_name = "All Models"
+
+    if plot_type == 'graph':
+        x_values = np.linspace(-1, 1, 201)
+        # for smoothing
+        x = np.linspace(-1, 1, 1000)
+        poly_deg = 3
+        coefs = np.polyfit(x_values, y_values, poly_deg)
+        y_poly = np.polyval(coefs, x)
+        plt.plot(x, y_poly, label=name, color=color)
+
+        if truth:
+            coefs_ = np.polyfit(x_values, truth_y_values, poly_deg)
+            y_poly_ = np.polyval(coefs_, x)
+            plt.plot(x, y_poly_, label="Truth", color="C3", alpha=0.7)
+
+    elif plot_type == 'bar':
+        x_ = np.linspace(-1, 1, 201)
+        plt.bar(x_, y_values, width=0.01, color=color, alpha=0.5, label=name)
+
+    else:
+        fig, ax = plt.subplots()
+        import matplotlib.mlab as mlab
+        weights = np.ones_like(confidence_values) / float(len(confidence_values))
+        n, bins, patches = ax.hist(confidence_values, 400, weights=weights)
+        y = mlab.normpdf(bins, mu, sigma)
+        #ax.plot(bins, y, '--')
+        ax.set_xlabel('Confidence')
+        ax.set_ylabel('Probability density')
+        print("MU_exp ", mu, " sigma_std: ", sigma)
+        ax.set_title('Histogram of Confidence: ' + name)
+        print(n)
+        print(bins)
+
+
+    plt.xlabel('Degree of Confidence')
+    plt.ylabel('Probability Density, Number of Tweets')
+
+
+    if common_plot:
+        plt.title('Confidence Distributions of ' + title_name)
+    else:
+        plt.title('Confidence Distributions of ' + name)
+
+    file_format = 'png'
+    quality = 750
+    plt.legend()
+    if common_plot:
+        plt.savefig(os.path.join("../wfigs", "conf_distribution_" + title_name.lower() + "." + file_format), format=file_format, dpi=quality)
+    else:
+        plt.savefig(os.path.join("../wfigs", "conf_distribution_" + name.lower() + "." + file_format),
+                    format=file_format, dpi=quality)
+
+
+def find_differences_in_prediction(y_preds, y_true, m_conf=1, f_conf=-1, true_positive=True):
+    from helpers.global_constants import CHAR_MODEL, DOC_MODEL, WORD_MODEL
+    word_preds = y_preds[WORD_MODEL]
+    char_preds = y_preds[CHAR_MODEL]
+    doc_preds = y_preds[DOC_MODEL]
+    index = dict()
+    print("length y_true. ", len(y_true), " length w_pred: ", len(word_preds))
+    for index_pred in range(len(y_true)):
+        correct_pred_models = []
+        word_pred = word_preds[index_pred]
+        doc_pred = doc_preds[index_pred]
+        char_pred = char_preds[index_pred]
+
+        models_name = [WORD_MODEL, DOC_MODEL, CHAR_MODEL]
+        models_pred = [word_pred, doc_pred, char_pred]
+
+        for i in range(len(models_pred)):
+            y = y_true[index_pred]
+            m_pred = models_pred[i]
+            confidence = round(m_pred[0] - m_pred[1], 2)
+
+            if true_positive:
+                if confidence == m_conf and y == 0:
+                    correct_pred_models.append(models_name[i] + " -> " + "M " + str(m_conf))
+
+                elif confidence == f_conf and y == 1:
+                    correct_pred_models.append(models_name[i] + " -> " + "F " + str(f_conf))
+
+            else:
+                if confidence == m_conf and y == 1:
+                    correct_pred_models.append(models_name[i] + " -> " + "F " + str(m_conf))
+
+                elif confidence == f_conf and y == 0:
+                    correct_pred_models.append(models_name[i] + " -> " + "M " + str(f_conf))
+
+        if correct_pred_models:
+            index[index_pred] = correct_pred_models
+
+    return index
 
 
 def _get_log_statistics(log_path_list):
@@ -380,6 +530,35 @@ if __name__ == '__main__':
     # model_comp_path = '../logs/character_level_classification/Regularizer'
     # char_paths =list(map(lambda file_name: os.path.join(model_comp_path, file_name), os.listdir('../logs/character_level_classification/Regularizer')))
 
+    char_paths = \
+        [
+            '../logs/character_level_classification/Ablation/18.05.2017_17:47:45_Conv_BiLSTM_base.txt',  # Base
+            '../logs/character_level_classification/Regularizer/23.05.2017_10:18:48_Conv_BiLSTM_l1.txt',      # Regularizer
+            '../logs/character_level_classification/No dropout/22.05.2017_16:39:37_Conv_BiLSTM.txt'   # No dropout
+         ]
+    doc_paths = [
+        '../logs/document_level_classification/final_2048_1024_512/25.05.2017_10:22:27_final_2048_1024_512.txt',
+        #'../logs/document_level_classification/old/base_1024_512/24.05.2017_14:02:53_base_1024_512.txt',
+        #'../logs/document_level_classification/old/base_1024_512/24.05.2017_15:54:44_base_1024_512.txt',
+        '../logs/document_level_classification/old/base_1024_512/24.05.2017_01:18:41_base_1024_512.txt'
+    ]
+    doc_final_paths = [
+        '../logs/document_level_classification/final_2048_1024_512/25.05.2017_10:22:27_final_2048_1024_512.txt',
+        '../logs/document_level_classification/final_2048_1024_512_batch_norm/05.06.2017_17:37:23_final_2048_1024_512.txt',
+        '../logs/document_level_classification/final_2048_1024_512_dropout_0.1/25.05.2017_16:07:25_final_2048_1024_512_dropout_0.1.txt',
+        '../logs/document_level_classification/final_2048_1024_512_l1_reg_1e-05/06.06.2017_15:09:49_final_2048_1024_512_l1_reg_1e-05.txt',
+        '../logs/document_level_classification/final_2048_1024_512_l2_reg_0.1/06.06.2017_16:55:37_final_2048_1024_512_l2_reg_0.1.txt'
+
+    ]
+
+    #plot_models(doc_paths, VAL_LOSS, save_path='../autoencoder-dimension.png', title='Autoencoder Dimensionality Reduction Compared to Base')
+    #plot_models(doc_paths, [VAL_LOSS, TRAIN_LOSS], save_path='../autoencoder-dimension-val.png', title='Autoencoder Dimensionality Reduction Compared to Base')
+    plot_models(doc_final_paths, VAL_LOSS, save_path='../base_reg_loss.png', title='Final Model Regularization')
+
+    #plot_models(char_paths, VAL_LOSS, save_path='../../images/experiments/char_model_comp.png', title="Character model comparison")
+
+    # path = ['../logs/word_embedding_classification/BiLSTM/22.05.2017_16:37:14_BiLSTM.txt', '../logs/character_level_classification/Ablation/20.05.2017_21:30:39_Conv_BiLSTM_em_lower.txt']
+    # plot_models(path, [VAL_LOSS, TRAIN_LOSS], title="Conv_BiLSTM training loss and validation loss")  #save_path="../../images/experiments/char_train_val_loss_.png"
     # plot_models(char_paths, VAL_LOSS, save_path='../../images/experiments/char_reg.png', title="Character Conv_BiLSTM regularization")
     #
     path = ['../logs/character_level_classification/Ablation/18.05.2017_17:47:45_Conv_BiLSTM_base.txt']  #'../logs/character_level_classification/Ablation/20.05.2017_21:30:39_Conv_BiLSTM_em_lower.txt''

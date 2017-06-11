@@ -20,7 +20,7 @@ TEST_DATA_DIR = TEST_DATA_DIR
 
 # Autoencoder
 DIM_REDUCTION = False
-DIM_REDUCTION_SIZE = 400
+DIM_REDUCTION_SIZE = 500
 
 if not DIM_REDUCTION:
     DIM_REDUCTION_SIZE = None
@@ -31,7 +31,7 @@ if not DIM_REDUCTION:
 
 # set TYPE = "" when not using "base"
 
-MODEL_TYPE = "final_male"
+MODEL_TYPE = "final"
 LAYERS = [[2048, 1024, 512]]
 # Can be represent as one structure ie [128,64] or multiple structure [[100, 50, 20], [22, 44, 22],]
 
@@ -41,6 +41,7 @@ LAYERS = [[2048, 1024, 512]]
 # Regularization
 DROPOUT = 0.0
 DROPOUT_FIRST_LAYER = False
+BATCH_NORM = False
 L1 = 0
 L2 = 0
 LAYER_PENALTY = 2
@@ -66,7 +67,7 @@ OUTPUT_ACTIVATION = 'softmax'
 CATEGORICAL = True
 
 # For Logistic Regression
-Log_Reg = True
+Log_Reg = False
 if Log_Reg:
     CATEGORICAL = False
     MODEL_LOSS = 'binary_crossentropy'

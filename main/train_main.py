@@ -168,10 +168,10 @@ def char_main(specified_filters=None, train_only_on=None, save_model=False):
     #         extra_info=extra_info)
 
 
-def document_main(train_only_on=None):
+def document_main(train_only_on=None, pretrained_model = False):
     # Load dataset
     from document_level_classification.constants import Log_Reg, TEST_DATA_DIR, LAYERS, EXPERIMENTS, N_GRAM, \
-        MAX_FEATURE_LENGTH, FEATURE_MODEL, get_constants_info, AUTOENCODER_DIR, SAVE_FEATUREMODEL
+        MAX_FEATURE_LENGTH, FEATURE_MODEL, get_constants_info, AUTOENCODER_DIR, SAVE_FEATUREMODEL,
 
     from keras.models import load_model
 
@@ -227,6 +227,21 @@ def document_main(train_only_on=None):
                                                               max_feature_length=max_length,
                                                               reduction_model=reduction_model)
 
+
+    if pretrained_model:
+        from helpers.model_utils import predict_and_get_precision_recall_f_score
+        import pandas as pd
+        model = load_model('../models/document_level_classification/final_2048_1024_512/25.05.2017_10:04:09_final_2048_1024_512_01_0.5349.h5')
+        print("model loaded")
+        preds = model.predict(data['x_val'])
+        for p in preds:
+            print(p)
+        prf_val = predict_and_get_precision_recall_f_score(model, data['x_val'], data['y_val'], PREDICTION_TYPE)
+        prf_val_df = pd.DataFrame(data=prf_val, index=pd.Index(["Precision", "Recall", "F-score", "Support"]))
+        print(pd.DataFrame(prf_val_df).__repr__())
+        return
+
+
     if SAVE_FEATUREMODEL:
         from helpers.helper_functions import save_pickle
         save_pickle("../models/document_level_classification/feature_models/bow_10k_most_freq", feature_model)
@@ -254,16 +269,6 @@ def document_main(train_only_on=None):
         extra_info.append("Training on %i training samples" % len(data['x_train']))
 
 
-    #document_trainer(*get_ann_model(input_size, output_size, LAYERS), data=data, extra_info=info, save_model=False)
-
-
-        # This code are for test a saved model !!!!
-
-
-    # c_MODEL_DIR, trained_model_path), data = data, prediction_type = c_PREDICTION_TYPE, normalize = True
-    # model_path = "../models/document_level_classification/base_1024_512_256/16.05.2017_23:14:32_base_1024_512_256_01_0.5424.h5"
-    # load_and_predict(model_path, )
-    # load_and_evaluate(model_path, data=data)
 
     """STANDARD RUNNING"""
     if not Log_Reg:
@@ -278,15 +283,14 @@ def document_main(train_only_on=None):
             print("Running Single Model")
             document_trainer(*get_ann_model(input_size, output_size, LAYERS), data=data, extra_info=extra_info, save_model=False)
 
-    # Logistic Regression
+    # Machine Learning Methods
     if Log_Reg:
-        from ml_models.models import logisitc_regression, svm
+        from ml_models.models import logisitc_regression, svm, random_forests, naive_bayes
         #logisitc_regression(data)
-        print("--- LINEAR ---")
-        svm(data)
 
-
-        #document_trainer(*get_logistic_regression(input_size, output_size), data=data, extra_info=extra_info)
+        #random_forests(data)
+        #svm(data)
+        naive_bayes(data)
 
 
 def char_word_main():
