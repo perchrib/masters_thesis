@@ -246,7 +246,7 @@ def plot_models(log_path_list, graph_metric, save_path=None, title=None):
                 plt.plot(statistics[metric][i], label=model_names[i] + " " + metric)
                 plt.ylabel(metric)
 
-
+    #plt.ylabel("Validation & Training Loss")
     plt.xlabel("Epochs")
     plt.legend()
 
@@ -528,8 +528,26 @@ if __name__ == '__main__':
             '../logs/character_level_classification/Regularizer/23.05.2017_10:18:48_Conv_BiLSTM_l1.txt',      # Regularizer
             '../logs/character_level_classification/No dropout/22.05.2017_16:39:37_Conv_BiLSTM.txt'   # No dropout
          ]
+    doc_paths = [
+        '../logs/document_level_classification/final_2048_1024_512/25.05.2017_10:22:27_final_2048_1024_512.txt',
+        #'../logs/document_level_classification/old/base_1024_512/24.05.2017_14:02:53_base_1024_512.txt',
+        #'../logs/document_level_classification/old/base_1024_512/24.05.2017_15:54:44_base_1024_512.txt',
+        '../logs/document_level_classification/old/base_1024_512/24.05.2017_01:18:41_base_1024_512.txt'
+    ]
+    doc_final_paths = [
+        '../logs/document_level_classification/final_2048_1024_512/25.05.2017_10:22:27_final_2048_1024_512.txt',
+        '../logs/document_level_classification/final_2048_1024_512_batch_norm/05.06.2017_17:37:23_final_2048_1024_512.txt',
+        '../logs/document_level_classification/final_2048_1024_512_dropout_0.1/25.05.2017_16:07:25_final_2048_1024_512_dropout_0.1.txt',
+        '../logs/document_level_classification/final_2048_1024_512_l1_reg_1e-05/06.06.2017_15:09:49_final_2048_1024_512_l1_reg_1e-05.txt',
+        '../logs/document_level_classification/final_2048_1024_512_l2_reg_0.1/06.06.2017_16:55:37_final_2048_1024_512_l2_reg_0.1.txt'
 
-    plot_models(char_paths, VAL_LOSS, save_path='../../images/experiments/char_model_comp.png', title="Character model comparison")
+    ]
+
+    #plot_models(doc_paths, VAL_LOSS, save_path='../autoencoder-dimension.png', title='Autoencoder Dimensionality Reduction Compared to Base')
+    #plot_models(doc_paths, [VAL_LOSS, TRAIN_LOSS], save_path='../autoencoder-dimension-val.png', title='Autoencoder Dimensionality Reduction Compared to Base')
+    plot_models(doc_final_paths, VAL_LOSS, save_path='../base_reg_loss.png', title='Final Model Regularization')
+
+    #plot_models(char_paths, VAL_LOSS, save_path='../../images/experiments/char_model_comp.png', title="Character model comparison")
 
     # path = ['../logs/word_embedding_classification/BiLSTM/22.05.2017_16:37:14_BiLSTM.txt', '../logs/character_level_classification/Ablation/20.05.2017_21:30:39_Conv_BiLSTM_em_lower.txt']
     # plot_models(path, [VAL_LOSS, TRAIN_LOSS], title="Conv_BiLSTM training loss and validation loss")  #save_path="../../images/experiments/char_train_val_loss_.png"

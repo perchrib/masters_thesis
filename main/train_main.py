@@ -168,10 +168,10 @@ def char_main(specified_filters=None, train_only_on=None, save_model=False):
     #         extra_info=extra_info)
 
 
-def document_main(train_only_on=None):
+def document_main(train_only_on=None, pretrained_model = False):
     # Load dataset
     from document_level_classification.constants import Log_Reg, TEST_DATA_DIR, LAYERS, EXPERIMENTS, N_GRAM, \
-        MAX_FEATURE_LENGTH, FEATURE_MODEL, get_constants_info, AUTOENCODER_DIR, SAVE_FEATUREMODEL
+        MAX_FEATURE_LENGTH, FEATURE_MODEL, get_constants_info, AUTOENCODER_DIR, SAVE_FEATUREMODEL,
 
     from keras.models import load_model
 
@@ -228,7 +228,6 @@ def document_main(train_only_on=None):
                                                               reduction_model=reduction_model)
 
 
-    pretrained_model = False
     if pretrained_model:
         from helpers.model_utils import predict_and_get_precision_recall_f_score
         import pandas as pd
@@ -270,16 +269,6 @@ def document_main(train_only_on=None):
         extra_info.append("Training on %i training samples" % len(data['x_train']))
 
 
-    #document_trainer(*get_ann_model(input_size, output_size, LAYERS), data=data, extra_info=info, save_model=False)
-
-
-        # This code are for test a saved model !!!!
-
-
-    # c_MODEL_DIR, trained_model_path), data = data, prediction_type = c_PREDICTION_TYPE, normalize = True
-    # model_path = "../models/document_level_classification/base_1024_512_256/16.05.2017_23:14:32_base_1024_512_256_01_0.5424.h5"
-    # load_and_predict(model_path, )
-    # load_and_evaluate(model_path, data=data)
 
     """STANDARD RUNNING"""
     if not Log_Reg:
@@ -294,13 +283,14 @@ def document_main(train_only_on=None):
             print("Running Single Model")
             document_trainer(*get_ann_model(input_size, output_size, LAYERS), data=data, extra_info=extra_info, save_model=False)
 
-    # Logistic Regression
+    # Machine Learning Methods
     if Log_Reg:
-        from ml_models.models import logisitc_regression, svm, random_forests
+        from ml_models.models import logisitc_regression, svm, random_forests, naive_bayes
         #logisitc_regression(data)
 
         #random_forests(data)
-        svm(data)
+        #svm(data)
+        naive_bayes(data)
 
 
 def char_word_main():

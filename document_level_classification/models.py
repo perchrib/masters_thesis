@@ -31,6 +31,8 @@ def generate_model(input_shape, output_layer, hidden_layers):
                 input_layers = Dense(layer, activation=ACTIVATION,
                                      kernel_regularizer=l2_reg,
                                      activity_regularizer=l1_reg)(input_layers)
+            if i + 1 == len(hidden_layers):
+                continue
 
         print("dens layer added, layer: ", layer)
         input_layers = Dense(layer, activation=ACTIVATION)(input_layers)

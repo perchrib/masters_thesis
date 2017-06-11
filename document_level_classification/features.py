@@ -62,17 +62,10 @@ class BOW():
 
         if not vocabulary:
             self.vocabulary = self.n_frequent_words_in_texts().keys()
-            #print(n_frequent.most_common()[-100:])
-            #print(n_frequent.most_common(100))
 
         if SENTIMENT_FEATURE:
             self.vocabulary.append('PLACEHOLDER_123456789')
 
-        # if EMOTICON_FEATURE:
-        #     emo = [':(', ':)', ':-(', ':-)', ':-D', ':-P', ':D', ':P', ';(', ';)', ';-(', ';-)', ';-D', ';-P', ';D', ';P', '<3', '=(', '=)', '=D', '=P']
-        #     for e in emo:
-        #         state = e in self.vocabulary
-        #         print("EMOTICON: ", e, "is in vocabulary => ", state)
         self.ngram_range = ngram_range
         self.cv = CountVectorizer(vocabulary=self.vocabulary, ngram_range=self.ngram_range)
         self.bag = self.cv.fit_transform(self.documents)

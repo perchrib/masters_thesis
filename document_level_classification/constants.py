@@ -41,7 +41,7 @@ LAYERS = [[2048, 1024, 512]]
 # Regularization
 DROPOUT = 0.0
 DROPOUT_FIRST_LAYER = False
-BATCH_NORM = True
+BATCH_NORM = False
 L1 = 0
 L2 = 0
 LAYER_PENALTY = 2

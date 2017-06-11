@@ -209,8 +209,8 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style, print_indi
     # PRF - Stacked model
     print_prf_scores(y_pred=aggregated_preds, y_true=y_true)
 
-    plot_conf = True
-    analyze_outliers = False
+    plot_conf = False
+    analyze_outliers = True
 
     if plot_conf:
         from helpers.model_utils import plot_prediction_confidence
@@ -227,7 +227,7 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style, print_indi
 
 
         from helpers.model_utils import find_differences_in_prediction
-        index = find_differences_in_prediction(pred_dict_categorical, y_true, true_positive=False)
+        index = find_differences_in_prediction(pred_dict_categorical, y_true, true_positive=True)
 
         indexes = sorted(index.keys())
         doc_count = 0
@@ -244,9 +244,9 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style, print_indi
                 elif DOC_MODEL in m:
                     doc_count += 1
 
-        print("DOC: ", doc_count)
-        print("Word: ", word_count)
         print("Char: ", char_count)
+        print("Word: ", word_count)
+        print("DOC: ", doc_count)
 
 
 if __name__ == '__main__':

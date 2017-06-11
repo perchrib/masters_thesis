@@ -144,6 +144,8 @@ def plot_stop_words(male, female):
     v.save_plot("stopwords-histogram", 'stopwords')
 
 def plot_twitter_syntax_tokens(male, female):
+    print("Male: ", male)
+    print("Female: ", female)
     male_ = male.keys()
     female_ = female.keys()
     x_values = sorted(list(set(male_ + female_)))
@@ -249,7 +251,7 @@ if __name__ == '__main__':
     #plot_pos_tags(pos_tag_counter(word_tokenize(male_texts), simple_pos_tags=False), normalize(pos_tag_counter(word_tokenize(female_texts), simple_pos_tags=False), SCALE), counter_type="Pos-Tags")
 
     # Twitter Syntax Tokens
-    #plot_twitter_syntax_tokens(male_data.twitter_syntax_token_count, normalize(female_data.twitter_syntax_token_count, SCALE))
+    plot_twitter_syntax_tokens(male_data.twitter_syntax_token_count, normalize(female_data.twitter_syntax_token_count, SCALE))
 
 
 

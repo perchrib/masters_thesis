@@ -44,7 +44,6 @@ if __name__ == "__main__":
     reversed_word_index = dict(zip(word_index.values(), word_index.keys()))
     print("Load GLoVe Word Embeddings")
     word_embeddings = load_pickle(glove_path)
-
     values = sorted(word_index.values())
     final_embeddings = []
     reversed_dictionary = {}
