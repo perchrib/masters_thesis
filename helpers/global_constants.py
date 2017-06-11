@@ -28,8 +28,9 @@ WORD_MODEL = "Word model"
 DOC_MODEL = "Doc model"
 
 # Stacking - Prediction averaging style
-MAX_VOTE = "MAX_VOTE"
+MAJORITY = "MAJORITY"
 AVERAGE_CONF = "AVERAGE_CONF"
+MAX_CONF = "MAX_CONF"
 
 # Directories
 TRAIN_DATA_DIR = '../data/train/'

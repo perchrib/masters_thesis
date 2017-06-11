@@ -16,7 +16,6 @@ GENDER = ['male', 'female']
 SCALE = 1.1711
 
 def tag_plotter(male_tags, female_tags, tag_type):
-    # TODO maybe take visualizer_1 and visualizer_2 in same figure using subplot
     visualizer_1 = Visualizer(title='50 Most Frequent ' + tag_type + ' of Male', xlabel=tag_type, ylabel="Frequency")
     male_most_freq_tags_50 = most_common(male_tags, 50)
     visualizer_1.plot_one_dataset_token_counts(male_most_freq_tags_50, MALE_COLOR, "male")

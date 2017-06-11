@@ -1,0 +1,10 @@
+Generating predictions with model from path: ../models/document_level_classification/final_2048_1024_512/25.05.2017_10:04:09_final_2048_1024_512_01_0.5349.h5...Done. Elapsed time: 0h:00m:44s
+Generating predictions with model from path: ../models/word_embedding_classification/BiLSTM/23.05.2017_18:12:26_BiLSTM_punct_em.h5...Done. Elapsed time: 0h:00m:28s
+
+
+Averaging predictions using: AVERAGE_CONF
+             Female      Male  Overall Micro
+Precision     0.611     0.592          0.602
+Recall        0.636     0.567          0.602
+F-score       0.623     0.579          0.602
+Support    6586.000  6145.000            NaN
