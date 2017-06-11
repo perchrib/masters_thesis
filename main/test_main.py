@@ -86,7 +86,6 @@ def pre_process_test_char(trained_char_index_path, specified_filters=None):
 
 
 def pre_process_test_doc(vocabulary_path, specified_filters=None):
-    # TODO: Implement appropriate document level pre-processing
     print("\nPre-processing data for doc model")
     filters = d_FILTERS if specified_filters is None else specified_filters
 
@@ -157,7 +156,7 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style, print_indi
     # Dictionary with predictions for each system. Predictions in categorical confidence form
     pred_dict_categorical = {}
     pred_dict = {}  # Dictionary with predictions for each system. Predictions with single class values
-    loaded_models = {}  # TODO: May be removed if model is only used once in code sequence
+    loaded_models = {}
 
     y_categorical = formatted_data.values()[0][Y_TEST]  # Categorical true labels - only used to get shape.
     y_true = get_argmax_classes(y_categorical)  # The correct test set labels - single class values
@@ -235,21 +234,6 @@ def predict_stacked_model(model_paths, vocabularies, averaging_style, print_indi
 
 
 if __name__ == '__main__':
-    # model_path = '../models/word_embedding_classification/BiLSTM/23.05.2017_18:12:26_BiLSTM_punct_em.h5'
-    # w_data = pre_process_test_word(trained_word_index_path='../models/word_embedding_classification/word_index/23.05.2017_18:12:28_BiLSTM_punct_em.pkl')
-    #
-
-    # model_path = "../models/character_level_classification/Conv_BiLSTM/23.05.2017_05:36:06_Conv_BiLSTM_no_lower.h5"
-    # c_data = pre_process_test_char(
-    #     "../models/character_level_classification/char_index/23.05.2017_05:36:06_Conv_BiLSTM_no_lower.pkl",
-    #     {
-    #         REM_STOPWORDS: True,
-    #         LEMMATIZE: False,
-    #         REM_PUNCTUATION: False,
-    #         REM_EMOTICONS: False,
-    #         LOWERCASE: False
-    #     })
-
     # load_and_evaluate(model_path, c_data)
 
     predict_stacked_model(

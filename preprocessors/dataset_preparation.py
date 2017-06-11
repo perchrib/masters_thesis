@@ -45,7 +45,7 @@ def prepare_dataset(prediction_type=GENDER, folder_path=TRAIN_DATA_DIR, gender=N
                 author_data = data_samples.pop(0).split(':::')  # ID, gender and age of author
 
                 # Remaining lines correspond to the tweets by the author
-                # TODO: If anything other than gender needs to be classified, this needs to be moved
+                # TODO: If anything other than gender needs to be classified, this part must be refactored
                 gender_author = author_data[1].upper()
                 if not gender:
                     gender_author = gender
@@ -255,14 +255,15 @@ def display_gender_distribution(metadata):
     num_males = reduce(lambda total, x: total + 1 if x['gender'] == 'MALE' else total, metadata, 0)
     num_females = reduce(lambda total, x: total + 1 if x['gender'] == 'FEMALE' else total, metadata, 0)
 
-    print("Total number of texts %i" % num_total)
+    print("\nTotal number of texts %i" % num_total)
     print("Number of male texts: %i. Fraction of total: %f" % (num_males, float(num_males) / num_total))
     print("Number of female texts: %i Fraction of total: %f" % (num_females, float(num_females) / num_total))
 
 
-# if __name__ == '__main__':
-#     txts, labels, metadata, labels_index = prepare_dataset(GENDER)
-#     display_gender_distribution(metadata)
+if __name__ == '__main__':
+    prepare_dataset(folder_path=TEST_DATA_DIR)
+    # txts, labels, metadata, labels_index = prepare_dataset(GENDER)
+    # display_gender_distribution(metadata)
 #     parser = Parser()
 #     # txts = parser.replace_all_twitter_syntax_tokens(txts)  # Replace Internet terms and lowercase
 #

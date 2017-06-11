@@ -31,7 +31,7 @@ def train(model, model_info, data, save_model=False, extra_info=None):
                   metrics=MODEL_METRICS)
 
     # Callbacks
-    early_stopping = EarlyStopping(monitor='val_loss', patience=1)  # TODO: Patience is 1
+    early_stopping = EarlyStopping(monitor='val_loss', patience=1)
     callbacks = [early_stopping]
 
     # if save_model:
@@ -95,6 +95,6 @@ def get_embedding_layer(word_index):
                      weights=[embedding_matrix],
                      input_length=MAX_SEQUENCE_LENGTH,
                      trainable=False,
-                     mask_zero=True)  # Ignore unknown words  # TODO: Mask-zero
+                     mask_zero=True)  # Ignore unknown words
     # Not trainable to prevent weights from being updated during training
 

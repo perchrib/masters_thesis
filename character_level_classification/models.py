@@ -269,7 +269,7 @@ def get_char_model_Conv_2xBiLSTM(num_output_nodes, char_num):
     embedding = get_one_hot_layer(tweet_input, char_num)
 
     kernel_size = 5
-    filters = 1024  # TODO: NUmber of filters
+    filters = 1024
     pool_length = 2
     conv_dropout = 0.5
     lstm_drop = 0.2
