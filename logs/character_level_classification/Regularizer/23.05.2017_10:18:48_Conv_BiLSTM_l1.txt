@@ -1,6 +1,6 @@
 Training_log - 23/05/2017 10:18:48
 
-Model name: Conv_BiLSTM w/L1 Regularizer
+Model name: Conv_BiLSTM w/L1
 Elapsed training time: 10h:44m:03s
 
 Training set size: 587373

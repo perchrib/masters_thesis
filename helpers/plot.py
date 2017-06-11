@@ -44,8 +44,40 @@ def plot_xor():
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
+
+def simple_plot(x, y, x_label, y_label, title=None, save_path=None):
+    """
+    Create a simple plot given x and y
+    :param x:
+    :param y:
+    :param x_label:
+    :param y_label:
+    :param title:
+    :param save_path:
+    :return:
+    """
+    plt.plot(x, y)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+
+    if title:
+        plt.title(title)
+
+    if save_path:
+        plt.savefig(save_path, format='png', dpi=600)
+
+    plt.show()
+
+
 if __name__ == '__main__':
     # plt.style.use("seaborn-darkgrid")
     # plot_svm_mockup()
-    plot_xor()
+    # plot_xor()
     # plot_sigmoid_mockup()
+
+    # Word-level vocabulary
+    simple_plot(x=[5000, 10000, 25000, 50000, 880000], y=[0.560, 0.550, 0.536, 0.536, 0.535],
+                x_label="Vocabulary size",
+                y_label="Validation loss",
+                title="Vocabulary sizes for word-level model",
+                save_path="../../images_temp/word_vocab.png")

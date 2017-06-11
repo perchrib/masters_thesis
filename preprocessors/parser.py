@@ -147,7 +147,7 @@ class Parser:
                 try:
                     l_term = self.lemmatizer.lemmatize(word=pos_tags[i][0], pos=get_wordnet_pos(pos_tags[i][1])).encode('utf-8')
                     lemmatized_terms.append(l_term)
-                except Exception:  # TODO: Investigate if lemmatization works properly
+                except Exception:
                     # UnicodeDecodeError
                     continue
 
